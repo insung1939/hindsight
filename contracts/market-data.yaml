@@ -1,0 +1,520 @@
+openapi: 3.1.0
+info:
+  title: 루틴 market-data
+  description: 자산 마스터 · 일별 시세 · 환율. 자산군별 수집 어댑터(공공데이터포털·Stooq·업비트·수출입은행)를 가진다.
+  contact:
+    name: market-data owner
+    url: https://github.com/insung1939/routine
+  version: 0.1.0
+  x-owner: team-market-data
+  x-service: market-data
+paths:
+  /healthz:
+    get:
+      tags:
+      - ops
+      summary: 서비스 상태
+      operationId: healthz
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      parameters:
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+  /v1/assets:
+    get:
+      tags:
+      - assets
+      summary: 자산 목록
+      operationId: list_assets
+      parameters:
+      - name: market
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Market
+      - name: asset_type
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Asset Type
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListAssets'
+        '422':
+          description: Validation Error
+          content: &id001
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          description: 서버 내부 오류
+          content: *id001
+  /v1/assets/{asset_id}:
+    get:
+      tags:
+      - assets
+      summary: 자산 하나
+      operationId: get_asset
+      parameters:
+      - name: asset_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Asset Id
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetOut'
+        '422':
+          description: Validation Error
+          content: *id001
+        '500':
+          description: 서버 내부 오류
+          content: *id001
+        '404':
+          description: 대상 없음
+          content: *id001
+  /v1/assets/{asset_id}/prices:
+    get:
+      tags:
+      - prices
+      summary: 일별 종가 이력
+      operationId: list_prices
+      parameters:
+      - name: asset_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Asset Id
+      - name: from
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: From
+      - name: to
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: To
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 5000
+          default: 500
+          title: Limit
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListPrices'
+        '422':
+          description: Validation Error
+          content: *id001
+        '500':
+          description: 서버 내부 오류
+          content: *id001
+        '404':
+          description: 대상 없음
+          content: *id001
+  /v1/assets/{asset_id}/prices/latest:
+    get:
+      tags:
+      - prices
+      summary: 가장 최근 종가
+      operationId: latest_price
+      parameters:
+      - name: asset_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Asset Id
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceOut'
+        '422':
+          description: Validation Error
+          content: *id001
+        '500':
+          description: 서버 내부 오류
+          content: *id001
+        '404':
+          description: 대상 없음
+          content: *id001
+  /v1/fx-rates:
+    get:
+      tags:
+      - fx
+      summary: 환율 이력
+      operationId: list_fx_rates
+      parameters:
+      - name: base
+        in: query
+        required: false
+        schema:
+          type: string
+          default: USD
+          title: Base
+      - name: quote
+        in: query
+        required: false
+        schema:
+          type: string
+          default: KRW
+          title: Quote
+      - name: from
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: From
+      - name: to
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: To
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListFx'
+        '422':
+          description: Validation Error
+          content: *id001
+        '500':
+          description: 서버 내부 오류
+          content: *id001
+  /v1/fx-rates/latest:
+    get:
+      tags:
+      - fx
+      summary: 최근 환율
+      operationId: latest_fx_rate
+      parameters:
+      - name: base
+        in: query
+        required: false
+        schema:
+          type: string
+          default: USD
+          title: Base
+      - name: quote
+        in: query
+        required: false
+        schema:
+          type: string
+          default: KRW
+          title: Quote
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FxOut'
+        '422':
+          description: Validation Error
+          content: *id001
+        '500':
+          description: 서버 내부 오류
+          content: *id001
+  /internal/sync:
+    post:
+      tags:
+      - ops
+      summary: 시세·환율 수집 (스케줄러가 호출)
+      operationId: sync_market_data
+      parameters:
+      - name: days
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 5000
+          default: 200
+          title: Days
+      - name: X-Internal-Token
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Internal-Token
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncResult'
+        '422':
+          description: Validation Error
+          content: *id001
+        '500':
+          description: 서버 내부 오류
+          content: *id001
+components:
+  schemas:
+    AssetOut:
+      properties:
+        asset_id:
+          type: string
+          title: Asset Id
+        market:
+          type: string
+          title: Market
+        symbol:
+          type: string
+          title: Symbol
+        name:
+          type: string
+          title: Name
+        currency:
+          type: string
+          title: Currency
+        asset_type:
+          type: string
+          title: Asset Type
+        expense_ratio:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Expense Ratio
+      type: object
+      required:
+      - asset_id
+      - market
+      - symbol
+      - name
+      - currency
+      - asset_type
+      title: AssetOut
+    FxOut:
+      properties:
+        base:
+          type: string
+          title: Base
+        quote:
+          type: string
+          title: Quote
+        rate_date:
+          type: string
+          format: date
+          title: Rate Date
+        rate:
+          type: number
+          title: Rate
+      type: object
+      required:
+      - base
+      - quote
+      - rate_date
+      - rate
+      title: FxOut
+    ListAssets:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/AssetOut'
+          type: array
+          title: Items
+        next_cursor:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Next Cursor
+      type: object
+      required:
+      - items
+      title: ListAssets
+    ListFx:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/FxOut'
+          type: array
+          title: Items
+        next_cursor:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Next Cursor
+      type: object
+      required:
+      - items
+      title: ListFx
+    ListPrices:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/PriceOut'
+          type: array
+          title: Items
+        next_cursor:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Next Cursor
+      type: object
+      required:
+      - items
+      title: ListPrices
+    PriceOut:
+      properties:
+        asset_id:
+          type: string
+          title: Asset Id
+        trade_date:
+          type: string
+          format: date
+          title: Trade Date
+        close:
+          type: number
+          title: Close
+        currency:
+          type: string
+          title: Currency
+      type: object
+      required:
+      - asset_id
+      - trade_date
+      - close
+      - currency
+      title: PriceOut
+    SyncResult:
+      properties:
+        prices_upserted:
+          type: integer
+          title: Prices Upserted
+        fx_upserted:
+          type: integer
+          title: Fx Upserted
+        skipped:
+          items:
+            type: string
+          type: array
+          title: Skipped
+      type: object
+      required:
+      - prices_upserted
+      - fx_upserted
+      - skipped
+      title: SyncResult
+    Problem:
+      type: object
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+      required:
+      - type
+      - title
+      - status
+tags:
+- name: assets
+- name: fx
+- name: ops
+- name: prices
+servers:
+- url: http://localhost:8001
+  description: 로컬
+- url: https://routine-market-data.onrender.com
+  description: Render (팀 운영)

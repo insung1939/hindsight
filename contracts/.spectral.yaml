@@ -1,0 +1,67 @@
+# 루틴 API 스타일 가이드 — PR 마다 CI 가 검사한다. 규칙의 근거는 PLAN.md 5.2.
+extends: ["spectral:oas"]
+rules:
+  # ── 내장 규칙 강도 조정 ──
+  operation-operationId: error
+  operation-description: off
+  operation-tags: error
+  info-contact: error
+  info-description: error
+  oas3-api-servers: error
+
+  # ── 경로: /v1 또는 /internal 또는 /healthz, kebab-case, 파라미터는 snake_case ──
+  routine-path-prefix:
+    description: 경로는 /v1/, /internal/, /healthz 로 시작한다.
+    severity: error
+    given: $.paths[*]~
+    then:
+      function: pattern
+      functionOptions:
+        match: "^(/healthz|/v[0-9]+/.+|/internal/.+)$"
+  routine-path-kebab-case:
+    description: 경로 조각은 kebab-case, 경로 파라미터는 {snake_case}.
+    severity: error
+    given: $.paths[*]~
+    then:
+      function: pattern
+      functionOptions:
+        match: "^(/[a-z0-9]+(-[a-z0-9]+)*|/\\{[a-z][a-z0-9_]*\\})+$"
+
+  # ── 스키마 필드는 snake_case ──
+  routine-property-snake-case:
+    description: JSON 필드 이름은 snake_case.
+    severity: error
+    given: $..properties[*]~
+    then:
+      function: pattern
+      functionOptions:
+        match: "^[a-z][a-z0-9_]*$"
+
+  # ── 오류 응답은 RFC 9457 problem+json ──
+  routine-error-problem-json:
+    description: 4xx·5xx 응답은 application/problem+json 을 쓴다.
+    severity: error
+    given: $.paths[*][*].responses[?(@property.match(/^[45]/))]
+    then:
+      field: content.application/problem+json
+      function: truthy
+
+  # ── 소유자 메타데이터 (Backstage 카탈로그와 연결) ──
+  routine-info-owner:
+    description: info.x-owner 에 담당 팀/사람을 적는다.
+    severity: error
+    given: $.info
+    then:
+      field: x-owner
+      function: truthy
+
+  # ── 목록 응답은 items + next_cursor ──
+  routine-list-shape:
+    description: 목록 스키마(List*)는 items 와 next_cursor 를 가진다.
+    severity: warn
+    given: $.components.schemas[?(@property.match(/^List/))].properties
+    then:
+      - field: items
+        function: truthy
+      - field: next_cursor
+        function: truthy
