@@ -1,0 +1,14 @@
+# 서비스 간 주소는 k8s Service DNS. Secret 은 secret.example.yaml 을 복사해 실제 값으로 만든다 (커밋 금지).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: routine-config
+  namespace: routine
+data:
+  ALLOWED_ORIGINS: "http://localhost:5173,https://routine.vercel.app"
+  MARKET_DATA_URL: "http://market-data.routine.svc.cluster.local:8000"
+  INCOME_URL: "http://income.routine.svc.cluster.local:8000"
+  PORTFOLIO_URL: "http://portfolio.routine.svc.cluster.local:8000"
+  PLAN_URL: "http://plan.routine.svc.cluster.local:8000"
+  BACKTEST_URL: "http://backtest.routine.svc.cluster.local:8000"
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector.routine.svc.cluster.local:4318"

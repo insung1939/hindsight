@@ -1,0 +1,25 @@
+# 수집 스케줄 — GitHub Actions sync.yml 의 k8s 판. 클러스터 안에서 내부 토큰으로 /internal/sync 를 부른다.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: sync
+  namespace: routine
+spec:
+  schedule: "10 22 * * *"   # 07:10 KST
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: sync
+              image: curlimages/curl:8.10.1
+              env:
+                - name: INTERNAL_TOKEN
+                  valueFrom: { secretKeyRef: { name: routine-secrets, key: INTERNAL_TOKEN } }
+              command: ["sh", "-c"]
+              args:
+                - |
+                  curl -sS -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "http://market-data:8000/internal/sync?days=30" &&
+                  curl -sS -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "http://income:8000/internal/sync"

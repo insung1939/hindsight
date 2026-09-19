@@ -13,7 +13,8 @@ x-common: &common
     PORTFOLIO_URL: http://portfolio:8000
     PLAN_URL: http://plan:8000
     BACKTEST_URL: http://backtest:8000
-    # OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318   # 5주차
+    # 관측 프로필을 켜면(--profile observability) 서비스가 여기로 트레이스를 보낸다. 컬렉터가 없으면 조용히 실패한다.
+    OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
 
 services:
   market-data:
@@ -55,7 +56,53 @@ services:
     ports: ["8005:8000"]
     depends_on: [market-data, income, portfolio]
 
+  # ── 세미나 트랙: 게이트웨이 (docker compose --profile gateway up) ──
+  apisix:
+    image: apache/apisix:3.11.0-debian
+    profiles: [gateway]
+    # standalone 모드는 config.yaml 의 deployment.role_data_plane.config_provider: yaml 로 켠다
+    # (APISIX_STAND_ALONE 환경변수를 쓰면 엔트리포인트가 config.yaml 을 덮어써 :ro 마운트와 충돌한다)
+    volumes:
+      - ../gateway/apisix.yaml:/usr/local/apisix/conf/apisix.yaml:ro
+      - ../gateway/config.yaml:/usr/local/apisix/conf/config.yaml:ro
+    ports: ["9080:9080", "9091:9091"]
+    depends_on: [market-data, income, portfolio, plan, backtest]
+
+  # ── 세미나 트랙: 관측 (docker compose --profile observability up) ──
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.111.0
+    profiles: [observability]
+    command: ["--config=/etc/otel/config.yaml"]
+    volumes: [./otel-collector.yaml:/etc/otel/config.yaml:ro]
+    ports: ["4318:4318", "8889:8889"]
+    depends_on: [tempo]
+
+  tempo:
+    image: grafana/tempo:2.6.1
+    profiles: [observability]
+    command: ["-config.file=/etc/tempo.yaml"]
+    volumes: [./tempo.yaml:/etc/tempo.yaml:ro, tempo:/var/tempo]
+    ports: ["3200:3200"]
+
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    profiles: [observability]
+    volumes: [./prometheus.yml:/etc/prometheus/prometheus.yml:ro]
+    ports: ["9090:9090"]
+
+  grafana:
+    image: grafana/grafana:11.3.0
+    profiles: [observability]
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+    volumes: [./grafana-datasources.yaml:/etc/grafana/provisioning/datasources/ds.yaml:ro]
+    ports: ["3000:3000"]
+    depends_on: [tempo, prometheus]
+
 volumes:
+  tempo: {}
   market-data: {}
   income: {}
   portfolio: {}
