@@ -16,7 +16,7 @@ KAIST 디지털금융MBA 〈클라우드컴퓨팅실습〉 팀 프로젝트. 여
 
 ```
             apps/web (Vercel)
-                 │  plan · portfolio · backtest · income 만 호출
+                 │  plan · portfolio · backtest · income 호출 ('데이터' 페이지만 market-data 읽기)
      ┌───────────┼──────────────┬──────────────┐
      ▼           ▼              ▼              ▼
    plan      portfolio       backtest        income
@@ -35,9 +35,9 @@ routine/
 ├── contracts/          OpenAPI 3.1 명세 5개 — 단일 진실 공급원. .spectral.yaml 이 스타일 규칙
 ├── libs/routine-common 앱 골격 · 오류 포맷 · 요청 ID · DB · 서비스 간 클라이언트
 ├── services/<svc>/     FastAPI + SQLAlchemy, Dockerfile, tests/(계약 드리프트 검사)
-├── apps/web/           React (Vite) — 팀 페이지 겸 화면 (5주차)
-├── platform/           compose(로컬 통합) · k8s(세미나) · backstage(카탈로그)
-├── docs/               api.md · db.md · data-sources.md (발표 필수 문서)
+├── apps/web/           React (Vite) — 화면 5개 (이번 달·자산·타임머신·신화 검증·데이터)
+├── platform/           compose(서비스+게이트웨이+관측) · gateway(APISIX) · k8s(kustomize) · backstage(카탈로그)
+├── docs/               api.md · db.md · data-sources.md (발표 필수) · seminar-demo.md (세미나 런북)
 ├── scripts/            dev_up/down · smoke.py · export_contracts.py · gen_api_docs.py
 └── .github/workflows/  contracts(Spectral·oasdiff) · services(pytest·이미지) · sync(수집 스케줄)
 ```
@@ -54,7 +54,11 @@ python scripts/smoke.py        # 시세 수집 → 포트폴리오 → 지시서
 
 키 없이도 돈다(업비트 · Yahoo). 국내 시세는 `DATA_GO_KR_KEY`, 공식 환율은 `KOREAEXIM_KEY`, 배당 공시는 `DART_KEY` 를 `.env` 에 넣으면 붙는다. 키는 저장소·프롬프트에 넣지 않는다.
 
-Docker 로 한 번에: `docker compose -f platform/compose/docker-compose.yml up --build`
+프론트: `cd apps/web && npm install && npm run dev` → http://localhost:5173 (이번 달 · 자산 현황 · 타임머신 · 신화 검증 · 데이터).
+
+Docker 로 한 번에: `make compose` (서비스 5개) · `make compose-all` (+ APISIX 게이트웨이 9080, Grafana 3000, Prometheus 9090, Tempo 3200). 명령 목록은 `make help`.
+
+세미나 데모 순서와 명령은 [docs/seminar-demo.md](docs/seminar-demo.md).
 
 ## 개발 규칙 (팀원 전원) — API-First
 

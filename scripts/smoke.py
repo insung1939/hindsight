@@ -6,13 +6,15 @@
 흐름: 시세 수집 → 포트폴리오·계좌·보유·규칙 → 평가(portfolio→market-data) → 지시서(plan→portfolio→market-data)
       → 실행 기록·준수 점수 → 타임머신(backtest→market-data) → 매수일 검증
 """
+import os
 import sys
 
 import httpx
 
 BASE = {"market-data": "http://127.0.0.1:8001", "income": "http://127.0.0.1:8002", "portfolio": "http://127.0.0.1:8003",
         "plan": "http://127.0.0.1:8004", "backtest": "http://127.0.0.1:8005"}
-c = httpx.Client(timeout=120)
+# compose/배포 환경은 INTERNAL_TOKEN 이 설정돼 있으므로 /internal/* 호출에 같은 값을 보낸다 (로컬 dev 는 무시됨)
+c = httpx.Client(timeout=120, headers={"X-Internal-Token": os.getenv("INTERNAL_TOKEN", "dev-token")})
 
 
 def call(svc, method, path, **kw):

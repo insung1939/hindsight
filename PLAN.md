@@ -332,6 +332,9 @@ routine/
 ## 10. 진행 상태
 
 - [x] 2026-09-19 모노레포 · 서비스 5개 프로토타입 · contracts · Spectral/oasdiff/pytest CI · compose · render.yaml · Backstage 카탈로그 · 문서 (조인성)
+- [x] 2026-09-19 프론트 `apps/web` 화면 5개(이번 달·자산·타임머신·신화 검증·데이터) 로컬 동작 확인
+- [x] 2026-09-19 세미나 트랙 선행: APISIX 게이트웨이(키 인증·/internal 차단·rate-limit·메트릭) · OTel→Tempo/Prometheus/Grafana (compose 프로필) · k8s kustomize 매니페스트 · `docs/seminar-demo.md` 런북
+- [ ] GitHub `insung1939/routine` 생성·푸시 → Actions 확인 (사용자가 직접)
 - [ ] 팀원에게 공유, 서비스 담당 정하기
 - [ ] 각자 인증키 3종 발급 (공공데이터포털 · 수출입은행 · DART)
 - [ ] Supabase 프로젝트 · 스키마 5개 · Render Blueprint 배포 · Vercel 팀 페이지 (4주차)
