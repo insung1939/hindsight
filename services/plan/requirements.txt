@@ -1,0 +1,6 @@
+fastapi[standard]>=0.115
+sqlalchemy>=2.0
+psycopg2-binary
+httpx>=0.27
+pyyaml
+# 로컬: pip install -e ../../libs/routine-common   |   Docker: 빌드 컨텍스트가 저장소 루트라 COPY 로 설치

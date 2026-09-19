@@ -1,0 +1,25 @@
+# 수집 스케줄 — Render 무료 플랜엔 크론이 없으므로 GitHub Actions 가 매일 각 서비스의 /internal/sync 를 부른다.
+# Secrets: MARKET_DATA_URL, INCOME_URL (https://….onrender.com), INTERNAL_TOKEN
+name: sync
+
+on:
+  schedule:
+    - cron: "10 22 * * *"   # 매일 07:10 KST
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: market-data
+        if: ${{ secrets.MARKET_DATA_URL != '' }}
+        run: |
+          curl -sS --max-time 300 --retry 3 --retry-delay 30 -X POST \
+            -H "X-Internal-Token: ${{ secrets.INTERNAL_TOKEN }}" \
+            "${{ secrets.MARKET_DATA_URL }}/internal/sync?days=30"
+      - name: income
+        if: ${{ secrets.INCOME_URL != '' }}
+        run: |
+          curl -sS --max-time 300 --retry 3 --retry-delay 30 -X POST \
+            -H "X-Internal-Token: ${{ secrets.INTERNAL_TOKEN }}" \
+            "${{ secrets.INCOME_URL }}/internal/sync"

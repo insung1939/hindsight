@@ -1,0 +1,63 @@
+# 로컬 통합 실행 — 서비스 5개를 컨테이너로 띄운다 (SQLite, 볼륨에 보존).
+#   docker compose -f platform/compose/docker-compose.yml up --build
+# 세미나 트랙에서 APISIX · OTel Collector · Grafana 를 여기에 덧붙인다 (7주차).
+name: routine
+
+x-common: &common
+  restart: unless-stopped
+  environment: &env
+    ALLOWED_ORIGINS: http://localhost:5173
+    INTERNAL_TOKEN: dev-token
+    MARKET_DATA_URL: http://market-data:8000
+    INCOME_URL: http://income:8000
+    PORTFOLIO_URL: http://portfolio:8000
+    PLAN_URL: http://plan:8000
+    BACKTEST_URL: http://backtest:8000
+    # OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318   # 5주차
+
+services:
+  market-data:
+    <<: *common
+    build: { context: ../.., dockerfile: services/market-data/Dockerfile }
+    environment: { <<: *env, DATABASE_URL: sqlite:////data/market-data.db }
+    volumes: [market-data:/data]
+    ports: ["8001:8000"]
+
+  income:
+    <<: *common
+    build: { context: ../.., dockerfile: services/income/Dockerfile }
+    environment: { <<: *env, DATABASE_URL: sqlite:////data/income.db }
+    volumes: [income:/data]
+    ports: ["8002:8000"]
+    depends_on: [market-data]
+
+  portfolio:
+    <<: *common
+    build: { context: ../.., dockerfile: services/portfolio/Dockerfile }
+    environment: { <<: *env, DATABASE_URL: sqlite:////data/portfolio.db }
+    volumes: [portfolio:/data]
+    ports: ["8003:8000"]
+    depends_on: [market-data]
+
+  plan:
+    <<: *common
+    build: { context: ../.., dockerfile: services/plan/Dockerfile }
+    environment: { <<: *env, DATABASE_URL: sqlite:////data/plan.db }
+    volumes: [plan:/data]
+    ports: ["8004:8000"]
+    depends_on: [portfolio, market-data]
+
+  backtest:
+    <<: *common
+    build: { context: ../.., dockerfile: services/backtest/Dockerfile }
+    environment: { <<: *env, DATABASE_URL: sqlite:////data/backtest.db }
+    volumes: [backtest:/data]
+    ports: ["8005:8000"]
+    depends_on: [market-data, income, portfolio]
+
+volumes:
+  market-data: {}
+  income: {}
+  portfolio: {}
+  plan: {}
+  backtest: {}

@@ -1,0 +1,8 @@
+Metadata-Version: 2.4
+Name: routine-common
+Version: 0.1.0
+Summary: 루틴 서비스들이 공유하는 최소 공통 코드 (앱 생성, 오류 포맷, 요청 ID, DB, 서비스 간 HTTP 클라이언트)
+Requires-Python: >=3.11
+Requires-Dist: fastapi>=0.115
+Requires-Dist: sqlalchemy>=2.0
+Requires-Dist: httpx>=0.27

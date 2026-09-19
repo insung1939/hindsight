@@ -1,0 +1,282 @@
+openapi: 3.1.0
+info:
+  title: 루틴 plan
+  description: 월간 매수 지시서 생성. 목표 비중과 현재 비중 차이를 예산으로 메운다.
+  contact:
+    name: plan owner
+    url: https://github.com/insung1939/routine
+  version: 0.1.0
+  x-owner: team-plan
+  x-service: plan
+paths:
+  /healthz:
+    get:
+      tags:
+      - ops
+      summary: 서비스 상태
+      operationId: healthz
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      parameters:
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+  /v1/instructions:
+    post:
+      tags:
+      - instructions
+      summary: 이번 달 매수 지시서 생성 (portfolio · market-data 호출)
+      operationId: create_instruction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InstructionIn'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstructionOut'
+        '422':
+          description: Validation Error
+          content: &id001
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          description: 서버 내부 오류
+          content: *id001
+      parameters:
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+    get:
+      tags:
+      - instructions
+      summary: 지시서 목록
+      operationId: list_instructions
+      parameters:
+      - name: portfolio_id
+        in: query
+        required: true
+        schema:
+          type: integer
+          title: Portfolio Id
+      - name: month
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Month
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOf'
+        '422':
+          description: Validation Error
+          content: *id001
+        '500':
+          description: 서버 내부 오류
+          content: *id001
+  /v1/instructions/{instruction_id}:
+    get:
+      tags:
+      - instructions
+      summary: 지시서 하나
+      operationId: get_instruction
+      parameters:
+      - name: instruction_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Instruction Id
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstructionOut'
+        '422':
+          description: Validation Error
+          content: *id001
+        '500':
+          description: 서버 내부 오류
+          content: *id001
+        '404':
+          description: 대상 없음
+          content: *id001
+components:
+  schemas:
+    InstructionIn:
+      properties:
+        portfolio_id:
+          type: integer
+          title: Portfolio Id
+        month:
+          anyOf:
+          - type: string
+            pattern: ^\d{4}-\d{2}$
+          - type: 'null'
+          title: Month
+          description: '기본값: 이번 달'
+        budget_krw:
+          anyOf:
+          - type: number
+            minimum: 0.0
+          - type: 'null'
+          title: Budget Krw
+          description: '기본값: 포트폴리오의 monthly_budget'
+      type: object
+      required:
+      - portfolio_id
+      title: InstructionIn
+    InstructionOut:
+      properties:
+        id:
+          type: integer
+          title: Id
+        portfolio_id:
+          type: integer
+          title: Portfolio Id
+        month:
+          type: string
+          title: Month
+        budget_krw:
+          type: number
+          title: Budget Krw
+        total_value_krw:
+          type: number
+          title: Total Value Krw
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        items:
+          items:
+            $ref: '#/components/schemas/ItemOut'
+          type: array
+          title: Items
+      type: object
+      required:
+      - id
+      - portfolio_id
+      - month
+      - budget_krw
+      - total_value_krw
+      - created_at
+      - items
+      title: InstructionOut
+    ItemOut:
+      properties:
+        asset_id:
+          type: string
+          title: Asset Id
+        account_id:
+          type: integer
+          title: Account Id
+        target_weight:
+          type: number
+          title: Target Weight
+        current_weight:
+          type: number
+          title: Current Weight
+        amount_krw:
+          type: number
+          title: Amount Krw
+        price:
+          type: number
+          title: Price
+        currency:
+          type: string
+          title: Currency
+        fx_rate:
+          type: number
+          title: Fx Rate
+        quantity:
+          type: number
+          title: Quantity
+      type: object
+      required:
+      - asset_id
+      - account_id
+      - target_weight
+      - current_weight
+      - amount_krw
+      - price
+      - currency
+      - fx_rate
+      - quantity
+      title: ItemOut
+    ListOf:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/InstructionOut'
+          type: array
+          title: Items
+        next_cursor:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Next Cursor
+      type: object
+      required:
+      - items
+      title: ListOf
+    Problem:
+      type: object
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+      required:
+      - type
+      - title
+      - status
+tags:
+- name: instructions
+- name: ops
+servers:
+- url: http://localhost:8004
+  description: 로컬
+- url: https://routine-plan.onrender.com
+  description: Render (팀 운영)

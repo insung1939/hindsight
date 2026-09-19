@@ -1,0 +1,50 @@
+# API 계약 검사 — contracts/*.yaml 이 바뀌는 PR 마다
+#  1) Spectral: 전사 스타일 규칙(contracts/.spectral.yaml) 위반이면 실패
+#  2) oasdiff : main 대비 Breaking Change(필드 삭제·타입 변경·필수화·경로 제거)면 실패
+name: contracts
+
+on:
+  pull_request:
+    paths: ["contracts/**", ".github/workflows/contracts.yml"]
+  push:
+    branches: [main]
+    paths: ["contracts/**"]
+
+jobs:
+  spectral:
+    name: Spectral lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npx -y @stoplight/spectral-cli@6 lint "contracts/*.yaml" --ruleset contracts/.spectral.yaml --fail-severity error
+
+  breaking:
+    name: oasdiff breaking (${{ matrix.service }})
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [market-data, income, portfolio, plan, backtest]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: main 브랜치의 명세 꺼내기
+        id: base
+        run: |
+          mkdir -p /tmp/base
+          if git show "origin/${{ github.base_ref }}:contracts/${{ matrix.service }}.yaml" > "/tmp/base/${{ matrix.service }}.yaml" 2>/dev/null; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"; echo "main 에 명세가 없음(신규 서비스) — 검사 생략"
+          fi
+      - name: oasdiff
+        if: steps.base.outputs.exists == 'true'
+        run: |
+          docker run --rm \
+            -v /tmp/base:/base:ro -v "${{ github.workspace }}/contracts:/head:ro" \
+            tufin/oasdiff breaking "/base/${{ matrix.service }}.yaml" "/head/${{ matrix.service }}.yaml" --fail-on ERR
