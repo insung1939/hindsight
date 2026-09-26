@@ -10,16 +10,21 @@ on:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    env:
+      MARKET_DATA_URL: ${{ secrets.MARKET_DATA_URL }}
+      INCOME_URL: ${{ secrets.INCOME_URL }}
+      INTERNAL_TOKEN: ${{ secrets.INTERNAL_TOKEN }}
     steps:
       - name: market-data
-        if: ${{ secrets.MARKET_DATA_URL != '' }}
+        if: env.MARKET_DATA_URL != ''
         run: |
           curl -sS --max-time 300 --retry 3 --retry-delay 30 -X POST \
-            -H "X-Internal-Token: ${{ secrets.INTERNAL_TOKEN }}" \
-            "${{ secrets.MARKET_DATA_URL }}/internal/sync?days=30"
+            -H "X-Internal-Token: $INTERNAL_TOKEN" "$MARKET_DATA_URL/internal/sync?days=30"
       - name: income
-        if: ${{ secrets.INCOME_URL != '' }}
+        if: env.INCOME_URL != ''
         run: |
           curl -sS --max-time 300 --retry 3 --retry-delay 30 -X POST \
-            -H "X-Internal-Token: ${{ secrets.INTERNAL_TOKEN }}" \
-            "${{ secrets.INCOME_URL }}/internal/sync"
+            -H "X-Internal-Token: $INTERNAL_TOKEN" "$INCOME_URL/internal/sync"
+      - name: skipped
+        if: env.MARKET_DATA_URL == ''
+        run: echo "MARKET_DATA_URL secret 이 없어 건너뜀 (Render 배포 후 등록)"
