@@ -3,199 +3,244 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>5조 힌드사이트</title>
+<title>5조 아이디어 피칭</title>
 <meta name="description" content="유튜버가 말한 종목, 그 뒤에 어떻게 됐나 — 클라우드컴퓨팅실습 5조 아이디어 피칭" />
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔭</text></svg>" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
 <style>
   :root {
     --bg: #fbfbfc; --surface: #ffffff; --surface-2: #f1f3f7; --text: #14213d; --muted: #5f6b80; --border: #e4e8ef;
-    --accent: #2f5bea; --accent-soft: rgba(47, 91, 234, .10); --up: #0b5d3b; --up-soft: rgba(11, 93, 59, .10); --down: #dc2626;
+    --accent: #2f5bea; --accent-soft: rgba(47, 91, 234, .10); --up: #0b5d3b; --down: #dc2626;
     --shadow: 0 1px 2px rgba(20,33,61,.05), 0 10px 30px rgba(20,33,61,.07); --shadow-lg: 0 20px 60px rgba(20,33,61,.16);
     --radius: 18px; --font: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   }
   @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
     --bg: #0c1220; --surface: #121a2b; --surface-2: #19233a; --text: #e8ecf4; --muted: #9aa6bd; --border: #253046;
-    --accent: #7c98ff; --accent-soft: rgba(124,152,255,.14); --up: #6fcf97; --up-soft: rgba(111,207,151,.14); --down: #f0806f;
+    --accent: #7c98ff; --accent-soft: rgba(124,152,255,.14); --up: #6fcf97; --down: #f0806f;
     --shadow: 0 1px 2px rgba(0,0,0,.35), 0 10px 30px rgba(0,0,0,.4); --shadow-lg: 0 20px 60px rgba(0,0,0,.5); } }
   :root[data-theme="dark"] {
     --bg: #0c1220; --surface: #121a2b; --surface-2: #19233a; --text: #e8ecf4; --muted: #9aa6bd; --border: #253046;
-    --accent: #7c98ff; --accent-soft: rgba(124,152,255,.14); --up: #6fcf97; --up-soft: rgba(111,207,151,.14); --down: #f0806f;
+    --accent: #7c98ff; --accent-soft: rgba(124,152,255,.14); --up: #6fcf97; --down: #f0806f;
     --shadow: 0 1px 2px rgba(0,0,0,.35), 0 10px 30px rgba(0,0,0,.4); --shadow-lg: 0 20px 60px rgba(0,0,0,.5); }
 
   * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font); line-height: 1.55; -webkit-font-smoothing: antialiased; }
-  a { color: inherit; }
-  .wrap { max-width: 880px; margin: 0 auto; padding: 0 20px; }
+  html, body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font); -webkit-font-smoothing: antialiased; }
+  html { scroll-snap-type: y proximity; scroll-behavior: smooth; }
 
-  /* 상단 바 */
-  .bar { position: sticky; top: 0; z-index: 10; backdrop-filter: blur(10px); background: color-mix(in srgb, var(--bg) 82%, transparent); border-bottom: 1px solid var(--border); }
-  .bar .wrap { display: flex; align-items: center; justify-content: space-between; height: 54px; }
-  .bar .brand { font-weight: 700; letter-spacing: -.01em; }
-  .bar .brand small { color: var(--muted); font-weight: 500; margin-left: 8px; }
-  .bar button { font: inherit; font-size: 13px; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 6px 12px; cursor: pointer; }
-  .progress { position: absolute; left: 0; bottom: -1px; height: 2px; width: 0; background: var(--accent); transition: width .1s linear; }
+  /* 슬라이드 = 화면 하나 */
+  .slide { min-height: 100svh; scroll-snap-align: start; display: flex; align-items: center; padding: 72px 20px 80px; }
+  .slide > .in { width: 100%; max-width: 960px; margin: 0 auto; }
+  .kicker { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--accent); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 18px; }
+  .kicker i { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  h1 { font-size: clamp(40px, 8vw, 84px); line-height: 1.06; letter-spacing: -.04em; font-weight: 800; margin: 0 0 24px; }
+  h2 { font-size: clamp(32px, 5.6vw, 56px); line-height: 1.12; letter-spacing: -.035em; font-weight: 800; margin: 0 0 22px; }
+  .hl { color: var(--accent); }
+  .lead { font-size: clamp(18px, 2.6vw, 26px); line-height: 1.5; color: var(--muted); max-width: 760px; margin: 0; }
+  .lead b { color: var(--text); font-weight: 700; }
+  .team { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 32px; }
+  .team span { font-size: 15px; padding: 8px 16px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); }
 
-  /* 히어로 */
-  .hero { padding: 96px 0 72px; }
-  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px; }
-  .eyebrow i { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); display: inline-block; }
-  h1 { font-size: clamp(36px, 7.5vw, 66px); line-height: 1.08; letter-spacing: -.035em; margin: 22px 0 18px; font-weight: 800; }
-  h1 .hl { color: var(--accent); }
-  .sub { font-size: clamp(17px, 2.4vw, 21px); color: var(--muted); max-width: 640px; margin: 0 0 28px; }
-  .team { display: flex; flex-wrap: wrap; gap: 8px; }
-  .team span { font-size: 14px; padding: 7px 14px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); }
-  .scroll-hint { margin-top: 56px; color: var(--muted); font-size: 13px; display: flex; align-items: center; gap: 8px; }
-  .scroll-hint b { display: inline-block; width: 18px; height: 28px; border: 2px solid var(--border); border-radius: 12px; position: relative; }
-  .scroll-hint b::after { content: ""; position: absolute; left: 50%; top: 5px; width: 3px; height: 6px; margin-left: -1.5px; border-radius: 2px; background: var(--accent); animation: wheel 1.6s ease-in-out infinite; }
-  @keyframes wheel { 0%,100% { transform: translateY(0); opacity: 1 } 60% { transform: translateY(9px); opacity: .2 } }
-
-  /* 섹션 */
-  section { padding: 56px 0; border-top: 1px solid var(--border); }
-  .kicker { font-size: 13px; font-weight: 700; color: var(--accent); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 10px; }
-  h2 { font-size: clamp(26px, 4.4vw, 38px); letter-spacing: -.03em; line-height: 1.2; margin: 0 0 16px; font-weight: 800; }
-  .lead { font-size: clamp(17px, 2.2vw, 20px); color: var(--muted); max-width: 680px; margin: 0; }
-  .lead b { color: var(--text); }
+  /* 예시 카드 (문제 슬라이드) */
+  .example { margin-top: 32px; display: grid; gap: 12px; grid-template-columns: 1fr auto 1fr; align-items: center; max-width: 760px; }
+  .example .box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; box-shadow: var(--shadow); }
+  .example .box small { display: block; color: var(--muted); font-size: 13px; margin-bottom: 4px; }
+  .example .box b { font-size: clamp(16px, 2vw, 20px); letter-spacing: -.01em; }
+  .example .q { color: var(--accent); font-size: 28px; text-align: center; }
+  @media (max-width: 600px) { .example { grid-template-columns: 1fr; } .example .q { transform: rotate(90deg); } }
 
   /* 흐름 */
-  .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 28px; }
-  .flow .step { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px; box-shadow: var(--shadow); font-weight: 600; }
-  .flow .step small { display: block; font-weight: 500; color: var(--muted); font-size: 12.5px; margin-top: 2px; }
-  .flow .arrow { color: var(--muted); font-size: 18px; }
+  .flow { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); margin-top: 36px; counter-reset: step; }
+  .flow .step { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow); position: relative; }
+  .flow .step::before { counter-increment: step; content: counter(step); position: absolute; top: 16px; right: 18px; width: 28px; height: 28px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; display: grid; place-items: center; }
+  .flow .step b { display: block; font-size: 20px; letter-spacing: -.02em; margin-bottom: 6px; }
+  .flow .step span { color: var(--muted); font-size: 15px; }
 
-  /* 카드 */
-  .cards { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin-top: 28px; }
+  /* 화면 카드 */
+  .cards { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); margin-top: 32px; }
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow); transition: transform .25s ease, box-shadow .25s ease; }
   .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
-  .card .num { font-size: 13px; font-weight: 700; color: var(--accent); }
-  .card h3 { font-size: 19px; margin: 6px 0 8px; letter-spacing: -.02em; }
-  .card p { margin: 0; color: var(--muted); font-size: 15px; }
-  .mini { margin-top: 16px; background: var(--surface-2); border-radius: 12px; padding: 12px; font-size: 13px; }
-  .mini .r { display: flex; justify-content: space-between; padding: 4px 0; }
-  .up { color: var(--up); font-weight: 600; } .down { color: var(--down); font-weight: 600; }
-  .bars { display: flex; gap: 4px; align-items: flex-end; height: 56px; }
+  .card .n { font-size: 13px; font-weight: 700; color: var(--accent); }
+  .card h3 { font-size: 22px; margin: 6px 0 8px; letter-spacing: -.02em; }
+  .card p { margin: 0; color: var(--muted); font-size: 15.5px; line-height: 1.5; }
+  .mini { margin-top: 16px; background: var(--surface-2); border-radius: 12px; padding: 12px 14px; font-size: 13.5px; }
+  .mini .r { display: flex; justify-content: space-between; padding: 5px 0; }
+  .up { color: var(--up); font-weight: 700; } .down { color: var(--down); font-weight: 700; }
+  .bars { display: flex; gap: 4px; align-items: flex-end; height: 60px; }
   .bars i { flex: 1; border-radius: 3px 3px 0 0; background: var(--up); opacity: .85; }
   .bars i.n { background: var(--down); }
-  svg.line { width: 100%; height: 64px; display: block; }
+  svg.line { width: 100%; height: 66px; display: block; }
 
-  /* 데이터 칩 */
-  .chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
-  .chip { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 12px 16px; box-shadow: var(--shadow); }
-  .chip b { display: block; font-size: 15px; }
-  .chip span { color: var(--muted); font-size: 13px; }
-  .chip .tag { display: inline-block; font-size: 11px; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 2px 8px; margin-left: 6px; vertical-align: middle; }
+  /* 데이터 · 원칙 */
+  .two { display: grid; gap: 18px; grid-template-columns: 1fr 1fr; margin-top: 32px; }
+  @media (max-width: 720px) { .two { grid-template-columns: 1fr; } }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow); }
+  .panel h3 { margin: 0 0 12px; font-size: 15px; color: var(--muted); font-weight: 600; letter-spacing: .02em; }
+  .panel ul { margin: 0; padding: 0; list-style: none; }
+  .panel li { padding: 10px 0; border-top: 1px solid var(--border); font-size: 17px; }
+  .panel li:first-child { border-top: none; padding-top: 0; }
+  .panel li small { display: block; color: var(--muted); font-size: 13.5px; margin-top: 2px; }
+  .tag { display: inline-block; font-size: 11.5px; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 2px 8px; margin-left: 6px; vertical-align: middle; }
 
   /* 확장 */
-  .plus { margin-top: 24px; background: linear-gradient(135deg, var(--accent-soft), transparent 70%), var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); }
-  .plus h3 { margin: 0 0 6px; font-size: 20px; letter-spacing: -.02em; }
-  .plus p { margin: 0; color: var(--muted); }
+  .plus { margin-top: 32px; background: linear-gradient(135deg, var(--accent-soft), transparent 60%), var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); max-width: 760px; }
+  .plus h3 { margin: 0 0 8px; font-size: 24px; letter-spacing: -.02em; }
+  .plus p { margin: 0; color: var(--muted); font-size: 17px; line-height: 1.55; }
 
-  footer { padding: 40px 0 64px; color: var(--muted); font-size: 13.5px; border-top: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 8px 20px; }
+  /* 상단 · 내비 */
+  .bar { position: fixed; top: 0; left: 0; right: 0; z-index: 10; backdrop-filter: blur(10px); background: color-mix(in srgb, var(--bg) 80%, transparent); border-bottom: 1px solid var(--border); }
+  .bar .in { max-width: 960px; margin: 0 auto; padding: 0 20px; height: 52px; display: flex; align-items: center; justify-content: space-between; font-size: 14px; }
+  .bar .in b { font-weight: 700; } .bar .in span { color: var(--muted); }
+  .bar button { font: inherit; font-size: 13px; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 6px 12px; cursor: pointer; }
+  .dots { position: fixed; right: 16px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 10; }
+  .dots a { width: 8px; height: 8px; border-radius: 50%; background: var(--border); display: block; transition: transform .2s, background .2s; }
+  .dots a.on { background: var(--accent); transform: scale(1.5); }
+  .hint { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); font-size: 12.5px; color: var(--muted); background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px; z-index: 10; box-shadow: var(--shadow); }
+  @media (max-width: 720px) { .dots, .hint { display: none; } }
 
-  /* 등장 애니메이션 */
-  .rv { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
+  /* 등장 */
+  .rv { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; transition-delay: calc(var(--i, 0) * 90ms); }
   .rv.in { opacity: 1; transform: none; }
-  .hero .rv { transition-delay: calc(var(--i, 0) * 90ms); }
-  @media (prefers-reduced-motion: reduce) { .rv { opacity: 1; transform: none; transition: none; } .scroll-hint b::after { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { .rv { opacity: 1; transform: none; transition: none; } html { scroll-behavior: auto; } }
 </style>
 </head>
 <body>
 
-<div class="bar">
-  <div class="wrap">
-    <div class="brand">힌드사이트 <small>5조 · 아이디어 피칭</small></div>
-    <button id="theme" type="button">다크</button>
-  </div>
-  <div class="progress" id="progress"></div>
-</div>
+<div class="bar"><div class="in"><div><b>5조</b> <span>· 아이디어 피칭 · 클라우드컴퓨팅실습</span></div><button id="theme" type="button">다크</button></div></div>
+<nav class="dots" id="dots" aria-label="슬라이드"></nav>
+<div class="hint">← → 또는 스크롤</div>
 
-<main class="wrap">
-
-  <header class="hero">
-    <div class="eyebrow rv" style="--i:0"><i></i>KAIST 디지털금융MBA · 클라우드컴퓨팅실습</div>
+<!-- 1. 제목 -->
+<section class="slide" id="s1">
+  <div class="in">
+    <div class="kicker rv" style="--i:0"><i></i>KAIST 디지털금융MBA</div>
     <h1 class="rv" style="--i:1">유튜버가 말한 종목,<br><span class="hl">그 뒤에</span> 어떻게 됐나</h1>
-    <p class="sub rv" style="--i:2">주식·코인 유튜브 채널이 제목에서 언급한 종목을 모아, 언급 뒤 <b>5·20·60 거래일</b> 주가가 실제로 어떻게 움직였는지 보여주는 서비스.</p>
+    <p class="lead rv" style="--i:2">주식·코인 유튜브 영상이 언급한 종목의 <b>이후 주가 흐름</b>을 데이터로 보여주는 서비스</p>
     <div class="team rv" style="--i:3"><span>김지환</span><span>오선호</span><span>조인성</span><span>채재희</span><span>김현준</span></div>
-    <div class="scroll-hint rv" style="--i:4"><b></b> 아래로</div>
-  </header>
+  </div>
+</section>
 
-  <section id="why">
-    <div class="kicker rv">왜</div>
-    <h2 class="rv">듣고 사는 사람은 많은데,<br>맞았는지 확인하는 사람은 없다.</h2>
-    <p class="lead rv">언급이 몰리는 종목은 이미 오른 뒤인 경우가 많다. 우리는 <b>"누가 잘 맞혔나"</b>가 아니라 <b>"유튜브 언급을 따라가면 어떻게 되나"</b>를 숫자로 보여준다.</p>
-  </section>
-
-  <section id="how">
-    <div class="kicker rv">어떻게</div>
-    <h2 class="rv">제목 한 줄이 통계가 되기까지</h2>
-    <div class="flow rv">
-      <div class="step">유튜브 영상 제목<small>YouTube API</small></div><span class="arrow">→</span>
-      <div class="step">종목 매칭<small>이름·별칭 사전</small></div><span class="arrow">→</span>
-      <div class="step">언급일 기준 주가<small>국내·미국·코인</small></div><span class="arrow">→</span>
-      <div class="step">5·20·60일 수익률<small>벤치마크 대비</small></div>
+<!-- 2. 문제 -->
+<section class="slide" id="s2">
+  <div class="in">
+    <div class="kicker rv"><i></i>문제</div>
+    <h2 class="rv">영상 보고 사는 사람은 많은데,<br>그 뒤를 확인하는 사람은 없다</h2>
+    <p class="lead rv">언급이 몰리는 종목은 이미 오른 뒤인 경우가 많다. 그런데 <b>"그 말이 맞았는지"</b>를 숫자로 보여주는 곳이 없다.</p>
+    <div class="example rv">
+      <div class="box"><small>어제 올라온 영상</small><b>"삼성전자, 지금 사도 될까?"</b></div>
+      <div class="q">?</div>
+      <div class="box"><small>20 거래일 뒤</small><b>주가는 실제로 어떻게 됐을까</b></div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <section id="screens">
-    <div class="kicker rv">화면</div>
+<!-- 3. 무엇을 -->
+<section class="slide" id="s3">
+  <div class="in">
+    <div class="kicker rv"><i></i>우리가 만드는 것</div>
+    <h2 class="rv">제목 한 줄이<br>통계가 되기까지</h2>
+    <p class="lead rv">유튜브 채널 20개의 영상 제목에서 종목을 찾고, 언급일 이후 <b>5·20·60 거래일</b> 수익률을 계산한다.</p>
+    <div class="flow rv">
+      <div class="step"><b>영상 제목 수집</b><span>주식·코인 채널 20개, 최근 1년</span></div>
+      <div class="step"><b>종목 찾기</b><span>"삼전" → 삼성전자, "엔비디아" → NVDA</span></div>
+      <div class="step"><b>주가 붙이기</b><span>언급일 기준 국내·미국·코인 시세</span></div>
+      <div class="step"><b>통계 내기</b><span>수익률 분포, 시장 대비 초과수익</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. 화면 -->
+<section class="slide" id="s4">
+  <div class="in">
+    <div class="kicker rv"><i></i>화면</div>
     <h2 class="rv">세 화면이면 충분하다</h2>
     <div class="cards">
-      <div class="card rv">
-        <div class="num">01</div><h3>이번 주 언급 급증</h3>
-        <p>언급이 늘어난 종목 순위. 옆에 그 종목의 과거 반응이 붙는다.</p>
+      <div class="card rv" style="--i:0">
+        <div class="n">01</div><h3>이번 주 언급 급증</h3>
+        <p>이번 주 언급이 늘어난 종목. 옆에 그 종목의 <b>과거 언급 뒤 반응</b>이 붙는다.</p>
         <div class="mini"><div class="r"><span>삼성전자 · 12건</span><span class="down">과거 −6.5%</span></div><div class="r"><span>SK하이닉스 · 6건</span><span class="down">−13.6%</span></div><div class="r"><span>NVIDIA · 1건</span><span class="up">+2.6%</span></div></div>
       </div>
-      <div class="card rv">
-        <div class="num">02</div><h3>언급 뒤에</h3>
-        <p>수익률 분포, 상승 확률, 코스피·S&amp;P500·비트코인 대비 초과수익. 채널은 익명 집계.</p>
-        <div class="mini"><div class="bars"><i class="n" style="height:90%"></i><i class="n" style="height:50%"></i><i class="n" style="height:40%"></i><i class="n" style="height:95%"></i><i style="height:70%"></i><i style="height:100%"></i><i style="height:45%"></i><i style="height:25%"></i></div><div class="r" style="margin-top:6px"><span>−20% … +20%</span><span>표본 수 표시</span></div></div>
+      <div class="card rv" style="--i:1">
+        <div class="n">02</div><h3>언급 뒤에</h3>
+        <p>언급 뒤 수익률 <b>분포</b>와 상승 확률. 시장(코스피·S&amp;P500·비트코인) 대비 얼마나 더 갔나.</p>
+        <div class="mini"><div class="bars"><i class="n" style="height:90%"></i><i class="n" style="height:50%"></i><i class="n" style="height:40%"></i><i class="n" style="height:95%"></i><i style="height:70%"></i><i style="height:100%"></i><i style="height:45%"></i><i style="height:25%"></i></div><div class="r" style="margin-top:6px"><span>−20% … +20%</span><span>표본 수 함께</span></div></div>
       </div>
-      <div class="card rv">
-        <div class="num">03</div><h3>종목 타임라인</h3>
-        <p>주가 그래프 위에 언급 시점을 점으로. 점 색이 20일 뒤 상승·하락.</p>
-        <div class="mini"><svg class="line" viewBox="0 0 300 64" preserveAspectRatio="none" aria-hidden="true"><path d="M2,52 L30,48 L60,42 L90,45 L120,33 L150,26 L180,12 L200,18 L220,30 L250,26 L280,32 L298,29" fill="none" stroke="currentColor" stroke-opacity=".55" stroke-width="1.6"/><circle cx="120" cy="33" r="4.5" fill="var(--up)"/><circle cx="180" cy="12" r="4.5" fill="var(--down)"/><circle cx="200" cy="18" r="4.5" fill="var(--down)"/><circle cx="250" cy="26" r="4.5" fill="var(--muted)"/></svg></div>
+      <div class="card rv" style="--i:2">
+        <div class="n">03</div><h3>종목 타임라인</h3>
+        <p>종목 하나의 주가 위에 <b>언급 시점을 점</b>으로. 점 색이 20일 뒤 상승·하락.</p>
+        <div class="mini"><svg class="line" viewBox="0 0 300 66" preserveAspectRatio="none" aria-hidden="true"><path d="M2,54 L30,50 L60,44 L90,47 L120,35 L150,28 L180,13 L200,19 L220,31 L250,27 L280,33 L298,30" fill="none" stroke="currentColor" stroke-opacity=".55" stroke-width="1.6"/><circle cx="120" cy="35" r="4.5" fill="var(--up)"/><circle cx="180" cy="13" r="4.5" fill="var(--down)"/><circle cx="200" cy="19" r="4.5" fill="var(--down)"/><circle cx="250" cy="27" r="4.5" fill="var(--muted)"/></svg></div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <section id="data">
-    <div class="kicker rv">데이터</div>
-    <h2 class="rv">전부 공개 API. 자막·댓글은 안 쓴다.</h2>
-    <p class="lead rv">채널 20개 × 최근 1년. 채널 실명은 어디에도 내지 않고, 종목을 추천하지 않는다.</p>
-    <div class="chips rv">
-      <div class="chip"><b>YouTube Data API<span class="tag">수업 제공</span></b><span>영상 제목·게시일·조회수</span></div>
-      <div class="chip"><b>DART corpCode<span class="tag">수업 제공</span></b><span>상장사 이름·종목코드</span></div>
-      <div class="chip"><b>공공데이터포털 · Yahoo · 업비트</b><span>국내·미국·코인 시세, 지수</span></div>
+<!-- 5. 데이터 · 원칙 -->
+<section class="slide" id="s5">
+  <div class="in">
+    <div class="kicker rv"><i></i>데이터와 원칙</div>
+    <h2 class="rv">전부 공개 API로,<br>사람을 평가하지 않는다</h2>
+    <div class="two">
+      <div class="panel rv" style="--i:0">
+        <h3>쓰는 데이터</h3>
+        <ul>
+          <li>YouTube Data API<span class="tag">수업 제공</span><small>영상 제목·게시일·조회수</small></li>
+          <li>DART<span class="tag">수업 제공</span><small>상장사 이름·종목코드</small></li>
+          <li>공공데이터포털 · Yahoo · 업비트<small>국내·미국·코인 시세, 코스피·S&amp;P500 지수</small></li>
+        </ul>
+      </div>
+      <div class="panel rv" style="--i:1">
+        <h3>지키는 것</h3>
+        <ul>
+          <li>채널은 익명(A·B·C)으로만 집계<small>누가 잘 맞혔나가 아니라, 유튜브 언급을 따라가면 어떻게 되나</small></li>
+          <li>종목을 추천하지 않는다<small>통계와 표본 수만 보여준다</small></li>
+          <li>자막·댓글은 쓰지 않는다<small>공개 메타데이터만</small></li>
+        </ul>
+      </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <section id="more">
-    <div class="kicker rv">확장</div>
-    <h2 class="rv">사건만 바꾸면 같은 틀로 돈다</h2>
+<!-- 6. 확장 -->
+<section class="slide" id="s6">
+  <div class="in">
+    <div class="kicker rv"><i></i>확장</div>
+    <h2 class="rv">사건만 바꾸면<br>같은 틀로 돈다</h2>
+    <p class="lead rv">"어떤 사건 뒤에 주가가 어땠나"라는 뼈대는 그대로. 사건의 출처만 늘리면 된다.</p>
     <div class="plus rv">
       <h3>트럼프 발언 → 주가</h3>
-      <p>"사건 → 이후 주가"라는 뼈대는 그대로 두고 사건 출처만 하나 더 붙인다. 발언은 뉴스 헤드라인으로 잡아, 관세·반도체 같은 키워드별로 관련 업종·지수의 이후 반응을 비교한다.</p>
+      <p>관세·반도체·금리 같은 발언을 뉴스 헤드라인으로 잡아, 관련 업종과 지수가 그 뒤 어떻게 움직였는지 같은 방식으로 본다.</p>
     </div>
-  </section>
+  </div>
+</section>
 
-</main>
-
-<footer class="wrap">
-  <span>5조 · 김지환 · 오선호 · 조인성 · 채재희 · 김현준</span>
-  <a href="https://github.com/insung1939/hindsight" target="_blank" rel="noreferrer">github.com/insung1939/hindsight</a>
-</footer>
+<!-- 7. 마무리 -->
+<section class="slide" id="s7">
+  <div class="in">
+    <div class="kicker rv"><i></i>정리</div>
+    <h2 class="rv">유튜브 언급을 따라가면<br><span class="hl">실제로 어떻게 되는지</span>,<br>처음으로 숫자로 보여준다</h2>
+    <p class="lead rv">채널 20개 · 최근 1년 · 5·20·60일 수익률 · 화면 3개</p>
+    <div class="team rv"><span>김지환</span><span>오선호</span><span>조인성</span><span>채재희</span><span>김현준</span></div>
+  </div>
+</section>
 
 <script>
-  // 등장 애니메이션
-  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { threshold: 0.15 });
-  document.querySelectorAll(".rv").forEach((el) => io.observe(el));
-  // 읽기 진행 바
-  const bar = document.getElementById("progress");
-  addEventListener("scroll", () => { const h = document.documentElement; bar.style.width = (h.scrollTop / (h.scrollHeight - h.clientHeight) * 100) + "%"; }, { passive: true });
+  const slides = [...document.querySelectorAll(".slide")];
+  const dots = document.getElementById("dots");
+  slides.forEach((s, i) => { const a = document.createElement("a"); a.href = "#" + s.id; a.title = `${i + 1} / ${slides.length}`; dots.appendChild(a); });
+  const io = new IntersectionObserver((es) => es.forEach((e) => {
+    if (e.isIntersecting) { e.target.querySelectorAll(".rv").forEach((el) => el.classList.add("in")); const i = slides.indexOf(e.target);
+      [...dots.children].forEach((d, j) => d.classList.toggle("on", i === j)); }
+  }), { threshold: 0.5 });
+  slides.forEach((s) => io.observe(s));
+  // 키보드 ← → / 스페이스
+  let cur = 0;
+  const go = (d) => { cur = Math.max(0, Math.min(slides.length - 1, cur + d)); slides[cur].scrollIntoView({ behavior: "smooth" }); };
+  addEventListener("keydown", (e) => {
+    if (["ArrowRight", "ArrowDown", "PageDown", " "].includes(e.key)) { e.preventDefault(); go(1); }
+    if (["ArrowLeft", "ArrowUp", "PageUp"].includes(e.key)) { e.preventDefault(); go(-1); }
+  });
+  addEventListener("scroll", () => { const y = scrollY + innerHeight / 2; cur = slides.findIndex((s) => y >= s.offsetTop && y < s.offsetTop + s.offsetHeight); if (cur < 0) cur = 0; }, { passive: true });
   // 테마
-  const root = document.documentElement, btn = document.getElementById("theme");
-  const sys = matchMedia("(prefers-color-scheme: dark)");
+  const root = document.documentElement, btn = document.getElementById("theme"), sys = matchMedia("(prefers-color-scheme: dark)");
   const apply = () => { const dark = root.dataset.theme ? root.dataset.theme === "dark" : sys.matches; btn.textContent = dark ? "라이트" : "다크"; };
   try { const saved = localStorage.getItem("theme"); if (saved) root.dataset.theme = saved; } catch (_) {}
   btn.onclick = () => { const dark = root.dataset.theme ? root.dataset.theme === "dark" : sys.matches; root.dataset.theme = dark ? "light" : "dark"; try { localStorage.setItem("theme", root.dataset.theme); } catch (_) {} apply(); };
