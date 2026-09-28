@@ -1,5 +1,5 @@
-# 수집 스케줄 — Render 무료 플랜엔 크론이 없으므로 GitHub Actions 가 매일 각 서비스의 /internal/sync 를 부른다.
-# Secrets: MARKET_DATA_URL, INCOME_URL (https://….onrender.com), INTERNAL_TOKEN
+# 수집 스케줄 — 매일 순서대로: market-data(사전·시세) → youtube(새 영상) → mentions(매칭) → market-data(새로 tracked 된 종목 시세) → stats(수익률)
+# Secrets: MARKET_DATA_URL, YOUTUBE_URL, MENTIONS_URL, STATS_URL (https://….onrender.com), INTERNAL_TOKEN
 name: sync
 
 on:
@@ -12,19 +12,26 @@ jobs:
     runs-on: ubuntu-latest
     env:
       MARKET_DATA_URL: ${{ secrets.MARKET_DATA_URL }}
-      INCOME_URL: ${{ secrets.INCOME_URL }}
+      YOUTUBE_URL: ${{ secrets.YOUTUBE_URL }}
+      MENTIONS_URL: ${{ secrets.MENTIONS_URL }}
+      STATS_URL: ${{ secrets.STATS_URL }}
       INTERNAL_TOKEN: ${{ secrets.INTERNAL_TOKEN }}
     steps:
-      - name: market-data
-        if: env.MARKET_DATA_URL != ''
-        run: |
-          curl -sS --max-time 300 --retry 3 --retry-delay 30 -X POST \
-            -H "X-Internal-Token: $INTERNAL_TOKEN" "$MARKET_DATA_URL/internal/sync?days=30"
-      - name: income
-        if: env.INCOME_URL != ''
-        run: |
-          curl -sS --max-time 300 --retry 3 --retry-delay 30 -X POST \
-            -H "X-Internal-Token: $INTERNAL_TOKEN" "$INCOME_URL/internal/sync"
       - name: skipped
         if: env.MARKET_DATA_URL == ''
         run: echo "MARKET_DATA_URL secret 이 없어 건너뜀 (Render 배포 후 등록)"
+      - name: market-data (사전 + 시세)
+        if: env.MARKET_DATA_URL != ''
+        run: curl -sS --max-time 600 --retry 3 --retry-delay 30 -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "$MARKET_DATA_URL/internal/sync?days=30"
+      - name: youtube (새 영상)
+        if: env.YOUTUBE_URL != ''
+        run: curl -sS --max-time 600 --retry 3 --retry-delay 30 -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "$YOUTUBE_URL/internal/sync?days=3"
+      - name: mentions (매칭)
+        if: env.MENTIONS_URL != ''
+        run: curl -sS --max-time 600 --retry 3 --retry-delay 30 -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "$MENTIONS_URL/internal/sync"
+      - name: market-data (새로 언급된 종목 시세)
+        if: env.MARKET_DATA_URL != ''
+        run: curl -sS --max-time 600 --retry 3 --retry-delay 30 -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "$MARKET_DATA_URL/internal/sync?days=120&dictionary=false"
+      - name: stats (수익률·요약)
+        if: env.STATS_URL != ''
+        run: curl -sS --max-time 600 --retry 3 --retry-delay 30 -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "$STATS_URL/internal/sync"

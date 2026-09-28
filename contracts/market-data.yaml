@@ -1,11 +1,12 @@
 openapi: 3.1.0
 info:
-  title: 루틴 market-data
-  description: 자산 마스터 · 일별 시세 · 환율. 자산군별 수집 어댑터(공공데이터포털·Stooq·업비트·수출입은행)를 가진다.
+  title: 힌드사이트 market-data
+  description: '종목 사전(국내·미국·코인·지수 + 별칭) · 일별 시세. 출처: DART corpCode, 공공데이터포털, Yahoo
+    Finance, 업비트.'
   contact:
     name: market-data owner
-    url: https://github.com/insung1939/routine
-  version: 0.1.0
+    url: https://github.com/insung1939/hindsight
+  version: 0.2.0
   x-owner: team-market-data
   x-service: market-data
 paths:
@@ -28,6 +29,43 @@ paths:
         schema:
           type: string
         description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+  /v1/dictionary:
+    get:
+      tags:
+      - dictionary
+      summary: 종목 사전 전체 (이름·별칭 → asset_id). mentions 서비스가 매칭에 쓴다
+      operationId: get_dictionary
+      parameters:
+      - name: market
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Market
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListDictionary'
+        '422':
+          description: Validation Error
+          content: &id001
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          description: 서버 내부 오류
+          content: *id001
   /v1/assets:
     get:
       tags:
@@ -43,14 +81,32 @@ paths:
           - type: string
           - type: 'null'
           title: Market
-      - name: asset_type
+      - name: tracked
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Tracked
+      - name: q
         in: query
         required: false
         schema:
           anyOf:
           - type: string
           - type: 'null'
-          title: Asset Type
+          description: 이름·별칭 검색
+          title: Q
+        description: 이름·별칭 검색
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 5000
+          default: 200
+          title: Limit
       - name: X-Request-ID
         in: header
         required: false
@@ -66,10 +122,7 @@ paths:
                 $ref: '#/components/schemas/ListAssets'
         '422':
           description: Validation Error
-          content: &id001
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
+          content: *id001
         '500':
           description: 서버 내부 오류
           content: *id001
@@ -79,6 +132,41 @@ paths:
       - assets
       summary: 자산 하나
       operationId: get_asset
+      parameters:
+      - name: asset_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Asset Id
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetOut'
+        '422':
+          description: Validation Error
+          content: *id001
+        '500':
+          description: 서버 내부 오류
+          content: *id001
+        '404':
+          description: 대상 없음
+          content: *id001
+  /v1/assets/{asset_id}/track:
+    post:
+      tags:
+      - assets
+      summary: 시세 수집 대상으로 켠다 (mentions 가 새 종목을 발견했을 때 호출)
+      operationId: track_asset
       parameters:
       - name: asset_id
         in: path
@@ -169,62 +257,19 @@ paths:
         '404':
           description: 대상 없음
           content: *id001
-  /v1/assets/{asset_id}/prices/latest:
+  /v1/prices:
     get:
       tags:
       - prices
-      summary: 가장 최근 종가
-      operationId: latest_price
+      summary: 여러 종목 시세를 한 번에 (stats 서비스용). asset_ids 는 쉼표 구분
+      operationId: batch_prices
       parameters:
-      - name: asset_id
-        in: path
+      - name: asset_ids
+        in: query
         required: true
         schema:
           type: string
-          title: Asset Id
-      - name: X-Request-ID
-        in: header
-        required: false
-        schema:
-          type: string
-        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PriceOut'
-        '422':
-          description: Validation Error
-          content: *id001
-        '500':
-          description: 서버 내부 오류
-          content: *id001
-        '404':
-          description: 대상 없음
-          content: *id001
-  /v1/fx-rates:
-    get:
-      tags:
-      - fx
-      summary: 환율 이력
-      operationId: list_fx_rates
-      parameters:
-      - name: base
-        in: query
-        required: false
-        schema:
-          type: string
-          default: USD
-          title: Base
-      - name: quote
-        in: query
-        required: false
-        schema:
-          type: string
-          default: KRW
-          title: Quote
+          title: Asset Ids
       - name: from
         in: query
         required: false
@@ -255,47 +300,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ListFx'
-        '422':
-          description: Validation Error
-          content: *id001
-        '500':
-          description: 서버 내부 오류
-          content: *id001
-  /v1/fx-rates/latest:
-    get:
-      tags:
-      - fx
-      summary: 최근 환율
-      operationId: latest_fx_rate
-      parameters:
-      - name: base
-        in: query
-        required: false
-        schema:
-          type: string
-          default: USD
-          title: Base
-      - name: quote
-        in: query
-        required: false
-        schema:
-          type: string
-          default: KRW
-          title: Quote
-      - name: X-Request-ID
-        in: header
-        required: false
-        schema:
-          type: string
-        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FxOut'
+                $ref: '#/components/schemas/BatchPrices'
         '422':
           description: Validation Error
           content: *id001
@@ -306,7 +311,7 @@ paths:
     post:
       tags:
       - ops
-      summary: 시세·환율 수집 (스케줄러가 호출)
+      summary: 사전 갱신(DART·업비트) + tracked 종목 시세 수집
       operationId: sync_market_data
       parameters:
       - name: days
@@ -315,8 +320,15 @@ paths:
         schema:
           type: integer
           maximum: 5000
-          default: 200
+          default: 400
           title: Days
+      - name: dictionary
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: true
+          title: Dictionary
       - name: X-Internal-Token
         in: header
         required: false
@@ -360,48 +372,80 @@ components:
         name:
           type: string
           title: Name
+        aliases:
+          items:
+            type: string
+          type: array
+          title: Aliases
         currency:
           type: string
           title: Currency
         asset_type:
           type: string
           title: Asset Type
-        expense_ratio:
+        benchmark_id:
           anyOf:
-          - type: number
+          - type: string
           - type: 'null'
-          title: Expense Ratio
+          title: Benchmark Id
+        tracked:
+          type: boolean
+          title: Tracked
       type: object
       required:
       - asset_id
       - market
       - symbol
       - name
+      - aliases
       - currency
       - asset_type
+      - tracked
       title: AssetOut
-    FxOut:
+    BatchPrices:
       properties:
-        base:
-          type: string
-          title: Base
-        quote:
-          type: string
-          title: Quote
-        rate_date:
-          type: string
-          format: date
-          title: Rate Date
-        rate:
-          type: number
-          title: Rate
+        series:
+          items:
+            $ref: '#/components/schemas/PriceSeries'
+          type: array
+          title: Series
+        missing:
+          items:
+            type: string
+          type: array
+          title: Missing
       type: object
       required:
-      - base
-      - quote
-      - rate_date
-      - rate
-      title: FxOut
+      - series
+      - missing
+      title: BatchPrices
+    DictionaryEntry:
+      properties:
+        asset_id:
+          type: string
+          title: Asset Id
+        name:
+          type: string
+          title: Name
+        aliases:
+          items:
+            type: string
+          type: array
+          title: Aliases
+        market:
+          type: string
+          title: Market
+        ambiguous:
+          type: boolean
+          title: Ambiguous
+      type: object
+      required:
+      - asset_id
+      - name
+      - aliases
+      - market
+      - ambiguous
+      title: DictionaryEntry
     ListAssets:
       properties:
         items:
@@ -418,11 +462,11 @@ components:
       required:
       - items
       title: ListAssets
-    ListFx:
+    ListDictionary:
       properties:
         items:
           items:
-            $ref: '#/components/schemas/FxOut'
+            $ref: '#/components/schemas/DictionaryEntry'
           type: array
           title: Items
         next_cursor:
@@ -430,10 +474,16 @@ components:
           - type: string
           - type: 'null'
           title: Next Cursor
+        ambiguous_names:
+          items:
+            type: string
+          type: array
+          title: Ambiguous Names
       type: object
       required:
       - items
-      title: ListFx
+      - ambiguous_names
+      title: ListDictionary
     ListPrices:
       properties:
         items:
@@ -472,14 +522,34 @@ components:
       - close
       - currency
       title: PriceOut
+    PriceSeries:
+      properties:
+        asset_id:
+          type: string
+          title: Asset Id
+        currency:
+          type: string
+          title: Currency
+        points:
+          items:
+            items: {}
+            type: array
+          type: array
+          title: Points
+      type: object
+      required:
+      - asset_id
+      - currency
+      - points
+      title: PriceSeries
     SyncResult:
       properties:
+        assets_added:
+          type: integer
+          title: Assets Added
         prices_upserted:
           type: integer
           title: Prices Upserted
-        fx_upserted:
-          type: integer
-          title: Fx Upserted
         skipped:
           items:
             type: string
@@ -487,8 +557,8 @@ components:
           title: Skipped
       type: object
       required:
+      - assets_added
       - prices_upserted
-      - fx_upserted
       - skipped
       title: SyncResult
     Problem:
@@ -510,11 +580,11 @@ components:
       - status
 tags:
 - name: assets
-- name: fx
+- name: dictionary
 - name: ops
 - name: prices
 servers:
 - url: http://localhost:8001
   description: 로컬
-- url: https://routine-market-data.onrender.com
+- url: https://hindsight-market-data.onrender.com
   description: Render (팀 운영)

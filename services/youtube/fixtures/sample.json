@@ -1,0 +1,30 @@
+{
+  "_note": "키 없이 로컬 개발·테스트용 가짜 데이터. 채널·영상 id 와 제목은 지어낸 것이며 실제 채널이 아니다. 게시일은 2026-06~09 로 시세가 있는 구간에 맞춤.",
+  "channels": [
+    {"channel_id": "UC_SAMPLE_A", "handle": "@sample_stock_a", "title": "샘플 주식 채널 A", "category": "stock", "anon_code": "A", "uploads_playlist_id": "UU_SAMPLE_A", "subscriber_count": 100000, "tracked": false},
+    {"channel_id": "UC_SAMPLE_B", "handle": "@sample_stock_b", "title": "샘플 주식 채널 B", "category": "stock", "anon_code": "B", "uploads_playlist_id": "UU_SAMPLE_B", "subscriber_count": 50000, "tracked": false},
+    {"channel_id": "UC_SAMPLE_C", "handle": "@sample_crypto_c", "title": "샘플 코인 채널 C", "category": "crypto", "anon_code": "C", "uploads_playlist_id": "UU_SAMPLE_C", "subscriber_count": 30000, "tracked": false}
+  ],
+  "videos": [
+    {"video_id": "smp0001", "channel_id": "UC_SAMPLE_A", "title": "삼성전자 지금 사도 될까? 반도체 사이클 총정리", "description": "삼전 하닉 비교", "published_at": "2026-06-03T09:00:00", "view_count": 120000},
+    {"video_id": "smp0002", "channel_id": "UC_SAMPLE_A", "title": "엔비디아 실적 발표 앞두고 체크할 것", "description": "", "published_at": "2026-06-10T09:00:00", "view_count": 95000},
+    {"video_id": "smp0003", "channel_id": "UC_SAMPLE_A", "title": "테슬라 로보택시, 지금이 기회인가", "description": "테슬라 분석", "published_at": "2026-06-17T09:00:00", "view_count": 80000},
+    {"video_id": "smp0004", "channel_id": "UC_SAMPLE_A", "title": "이번 주 시장 브리핑", "description": "코스피 전망과 금리", "published_at": "2026-06-24T09:00:00", "view_count": 40000},
+    {"video_id": "smp0005", "channel_id": "UC_SAMPLE_B", "title": "SK하이닉스 목표가 상향, 하닉 더 갈까", "description": "", "published_at": "2026-07-01T09:00:00", "view_count": 70000},
+    {"video_id": "smp0006", "channel_id": "UC_SAMPLE_B", "title": "현대차 기아 관세 이슈 정리", "description": "", "published_at": "2026-07-08T09:00:00", "view_count": 45000},
+    {"video_id": "smp0007", "channel_id": "UC_SAMPLE_B", "title": "팔란티어 이 가격에 사도 되나", "description": "PLTR", "published_at": "2026-07-15T09:00:00", "view_count": 65000},
+    {"video_id": "smp0008", "channel_id": "UC_SAMPLE_B", "title": "네이버 카카오 AI 전략 비교", "description": "", "published_at": "2026-07-22T09:00:00", "view_count": 38000},
+    {"video_id": "smp0009", "channel_id": "UC_SAMPLE_A", "title": "코리안리 배당주로 어떤가", "description": "", "published_at": "2026-07-29T09:00:00", "view_count": 22000},
+    {"video_id": "smp0010", "channel_id": "UC_SAMPLE_B", "title": "한화에어로 방산주 랠리 끝인가", "description": "한화에어로스페이스", "published_at": "2026-08-05T09:00:00", "view_count": 51000},
+    {"video_id": "smp0011", "channel_id": "UC_SAMPLE_C", "title": "비트코인 10만 달러 재돌파, 지금 사야 하나", "description": "BTC", "published_at": "2026-06-05T09:00:00", "view_count": 150000},
+    {"video_id": "smp0012", "channel_id": "UC_SAMPLE_C", "title": "이더리움 ETF 승인 이후 시나리오", "description": "", "published_at": "2026-06-19T09:00:00", "view_count": 90000},
+    {"video_id": "smp0013", "channel_id": "UC_SAMPLE_C", "title": "솔라나 vs 리플 하반기 전망", "description": "", "published_at": "2026-07-03T09:00:00", "view_count": 60000},
+    {"video_id": "smp0014", "channel_id": "UC_SAMPLE_C", "title": "도지코인 또 펌핑? 밈코인 주의보", "description": "", "published_at": "2026-07-17T09:00:00", "view_count": 110000},
+    {"video_id": "smp0015", "channel_id": "UC_SAMPLE_C", "title": "오늘의 코인 시황", "description": "시장 전반", "published_at": "2026-08-01T09:00:00", "view_count": 20000},
+    {"video_id": "smp0016", "channel_id": "UC_SAMPLE_A", "title": "삼성전자 3분기 잠정실적 리뷰", "description": "", "published_at": "2026-08-12T09:00:00", "view_count": 88000},
+    {"video_id": "smp0017", "channel_id": "UC_SAMPLE_B", "title": "엔비디아 하닉 삼전, AI 반도체 3대장", "description": "", "published_at": "2026-08-19T09:00:00", "view_count": 130000},
+    {"video_id": "smp0018", "channel_id": "UC_SAMPLE_A", "title": "애플 아이폰 신제품과 주가", "description": "", "published_at": "2026-08-26T09:00:00", "view_count": 42000},
+    {"video_id": "smp0019", "channel_id": "UC_SAMPLE_C", "title": "비트코인 조정, 이더 알트 어디까지", "description": "", "published_at": "2026-08-22T09:00:00", "view_count": 75000},
+    {"video_id": "smp0020", "channel_id": "UC_SAMPLE_B", "title": "9월 FOMC 앞두고 포트폴리오 점검", "description": "", "published_at": "2026-09-02T09:00:00", "view_count": 33000}
+  ]
+}

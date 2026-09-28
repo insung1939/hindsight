@@ -3,7 +3,7 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: sync
-  namespace: routine
+  namespace: hindsight
 spec:
   schedule: "10 22 * * *"   # 07:10 KST
   concurrencyPolicy: Forbid
@@ -17,9 +17,13 @@ spec:
               image: curlimages/curl:8.10.1
               env:
                 - name: INTERNAL_TOKEN
-                  valueFrom: { secretKeyRef: { name: routine-secrets, key: INTERNAL_TOKEN } }
+                  valueFrom: { secretKeyRef: { name: hindsight-secrets, key: INTERNAL_TOKEN } }
               command: ["sh", "-c"]
               args:
                 - |
-                  curl -sS -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "http://market-data:8000/internal/sync?days=30" &&
-                  curl -sS -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "http://income:8000/internal/sync"
+                  H="X-Internal-Token: $INTERNAL_TOKEN"
+                  curl -sS -X POST -H "$H" "http://market-data:8000/internal/sync?days=30" &&
+                  curl -sS -X POST -H "$H" "http://youtube:8000/internal/sync?days=3" &&
+                  curl -sS -X POST -H "$H" "http://mentions:8000/internal/sync" &&
+                  curl -sS -X POST -H "$H" "http://market-data:8000/internal/sync?days=120&dictionary=false" &&
+                  curl -sS -X POST -H "$H" "http://stats:8000/internal/sync"

@@ -1,0 +1,465 @@
+openapi: 3.1.0
+info:
+  title: 힌드사이트 mentions
+  description: 영상 제목·설명에서 종목을 찾아 언급 사실을 저장한다. 사전은 market-data, 영상은 youtube 에서 받는다.
+  contact:
+    name: mentions owner
+    url: https://github.com/insung1939/hindsight
+  version: 0.1.0
+  x-owner: team-mentions
+  x-service: mentions
+paths:
+  /healthz:
+    get:
+      tags:
+      - ops
+      summary: 서비스 상태
+      operationId: healthz
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      parameters:
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+  /v1/mentions:
+    get:
+      tags:
+      - mentions
+      summary: 언급 목록
+      operationId: list_mentions
+      parameters:
+      - name: asset_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Asset Id
+      - name: channel_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Channel Id
+      - name: since
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Since
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 5000
+          default: 500
+          title: Limit
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListMentions'
+        '422':
+          description: Validation Error
+          content: &id001
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          description: 서버 내부 오류
+          content: *id001
+  /v1/mentions/trending:
+    get:
+      tags:
+      - mentions
+      summary: 최근 N일 언급 급증 종목 (직전 N일 대비)
+      operationId: trending_mentions
+      parameters:
+      - name: days
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 90
+          minimum: 1
+          default: 7
+          title: Days
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          default: 20
+          title: Limit
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListTrending'
+        '422':
+          description: Validation Error
+          content: *id001
+        '500':
+          description: 서버 내부 오류
+          content: *id001
+  /v1/unmatched:
+    get:
+      tags:
+      - mentions
+      summary: 종목을 못 잡은 영상 제목 (별칭 사전 보강용)
+      operationId: list_unmatched
+      parameters:
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 500
+          default: 50
+          title: Limit
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListUnmatched'
+        '422':
+          description: Validation Error
+          content: *id001
+        '500':
+          description: 서버 내부 오류
+          content: *id001
+  /v1/coverage:
+    get:
+      tags:
+      - mentions
+      summary: 매칭 성공률 (데이터 페이지용)
+      operationId: get_coverage
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoverageOut'
+        '500':
+          description: 서버 내부 오류
+          content: *id001
+      parameters:
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+  /internal/sync:
+    post:
+      tags:
+      - ops
+      summary: youtube 의 새 영상을 market-data 사전으로 매칭 (full=true 면 처음부터 다시)
+      operationId: sync_mentions
+      parameters:
+      - name: full
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+          title: Full
+      - name: X-Internal-Token
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Internal-Token
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncResult'
+        '422':
+          description: Validation Error
+          content: *id001
+        '500':
+          description: 서버 내부 오류
+          content: *id001
+components:
+  schemas:
+    CoverageOut:
+      properties:
+        videos_seen:
+          type: integer
+          title: Videos Seen
+        videos_matched:
+          type: integer
+          title: Videos Matched
+        match_rate:
+          type: number
+          title: Match Rate
+        mentions:
+          type: integer
+          title: Mentions
+        assets:
+          type: integer
+          title: Assets
+        last_video_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Last Video At
+      type: object
+      required:
+      - videos_seen
+      - videos_matched
+      - match_rate
+      - mentions
+      - assets
+      - last_video_at
+      title: CoverageOut
+    ListMentions:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/MentionOut'
+          type: array
+          title: Items
+        next_cursor:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Next Cursor
+      type: object
+      required:
+      - items
+      title: ListMentions
+    ListTrending:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/TrendingItem'
+          type: array
+          title: Items
+        next_cursor:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Next Cursor
+        days:
+          type: integer
+          title: Days
+      type: object
+      required:
+      - items
+      - days
+      title: ListTrending
+    ListUnmatched:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/UnmatchedOut'
+          type: array
+          title: Items
+        next_cursor:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Next Cursor
+      type: object
+      required:
+      - items
+      title: ListUnmatched
+    MentionOut:
+      properties:
+        id:
+          type: integer
+          title: Id
+        video_id:
+          type: string
+          title: Video Id
+        channel_id:
+          type: string
+          title: Channel Id
+        asset_id:
+          type: string
+          title: Asset Id
+        matched_text:
+          type: string
+          title: Matched Text
+        field:
+          type: string
+          title: Field
+        confidence:
+          type: number
+          title: Confidence
+        published_at:
+          type: string
+          format: date-time
+          title: Published At
+        view_count:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: View Count
+      type: object
+      required:
+      - id
+      - video_id
+      - channel_id
+      - asset_id
+      - matched_text
+      - field
+      - confidence
+      - published_at
+      title: MentionOut
+    SyncResult:
+      properties:
+        videos_scanned:
+          type: integer
+          title: Videos Scanned
+        mentions_added:
+          type: integer
+          title: Mentions Added
+        unmatched_added:
+          type: integer
+          title: Unmatched Added
+        assets_tracked:
+          type: integer
+          title: Assets Tracked
+        skipped:
+          items:
+            type: string
+          type: array
+          title: Skipped
+      type: object
+      required:
+      - videos_scanned
+      - mentions_added
+      - unmatched_added
+      - assets_tracked
+      - skipped
+      title: SyncResult
+    TrendingItem:
+      properties:
+        asset_id:
+          type: string
+          title: Asset Id
+        mentions:
+          type: integer
+          title: Mentions
+        prev_mentions:
+          type: integer
+          title: Prev Mentions
+        channels:
+          type: integer
+          title: Channels
+        views:
+          type: integer
+          title: Views
+        last_mentioned_at:
+          type: string
+          format: date-time
+          title: Last Mentioned At
+      type: object
+      required:
+      - asset_id
+      - mentions
+      - prev_mentions
+      - channels
+      - views
+      - last_mentioned_at
+      title: TrendingItem
+    UnmatchedOut:
+      properties:
+        video_id:
+          type: string
+          title: Video Id
+        channel_id:
+          type: string
+          title: Channel Id
+        title:
+          type: string
+          title: Title
+        published_at:
+          type: string
+          format: date-time
+          title: Published At
+      type: object
+      required:
+      - video_id
+      - channel_id
+      - title
+      - published_at
+      title: UnmatchedOut
+    Problem:
+      type: object
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+      required:
+      - type
+      - title
+      - status
+tags:
+- name: mentions
+- name: ops
+servers:
+- url: http://localhost:8003
+  description: 로컬
+- url: https://hindsight-mentions.onrender.com
+  description: Render (팀 운영)

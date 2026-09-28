@@ -1,11 +1,10 @@
-// 서비스별 주소. 프론트는 plan · portfolio · backtest · income 을 부르고, market-data 는 '데이터' 페이지에서 읽기만 한다.
+// 서비스별 주소. 화면은 stats · mentions 를 주로 부르고, market-data 는 종목 이름·시세(타임라인) 읽기, youtube 는 수집 현황만.
 const env = import.meta.env;
 export const URLS = {
-  plan: env.VITE_PLAN_URL || "http://localhost:8004",
-  portfolio: env.VITE_PORTFOLIO_URL || "http://localhost:8003",
-  backtest: env.VITE_BACKTEST_URL || "http://localhost:8005",
-  income: env.VITE_INCOME_URL || "http://localhost:8002",
+  stats: env.VITE_STATS_URL || "http://localhost:8004",
+  mentions: env.VITE_MENTIONS_URL || "http://localhost:8003",
   marketData: env.VITE_MARKET_DATA_URL || "http://localhost:8001",
+  youtube: env.VITE_YOUTUBE_URL || "http://localhost:8002",
 };
 
 export class ApiError extends Error {
@@ -32,5 +31,15 @@ export async function api(service, path, { method = "GET", body, params } = {}) 
   return data;
 }
 
-export const krw = (n) => Math.round(n ?? 0).toLocaleString("ko-KR") + "원";
-export const pct = (x, d = 1) => ((x ?? 0) * 100).toFixed(d) + "%";
+export const pct = (x, d = 1) => (x == null ? "—" : ((x > 0 ? "+" : "") + (x * 100).toFixed(d) + "%"));
+export const num = (n) => (n ?? 0).toLocaleString("ko-KR");
+export const dateOnly = (s) => (s || "").slice(0, 10);
+
+// 종목 이름 캐시 — market-data 사전을 한 번 받아 asset_id → 이름
+let _names = null;
+export async function assetNames() {
+  if (_names) return _names;
+  const d = await api("marketData", "/v1/assets", { params: { limit: 5000 } });
+  _names = Object.fromEntries(d.items.map((a) => [a.asset_id, a]));
+  return _names;
+}

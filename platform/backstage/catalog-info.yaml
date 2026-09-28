@@ -1,148 +1,109 @@
-# Backstage 카탈로그 — 서비스 5개와 각 API, 소유자, 의존 관계. 세미나 3번 항목(디스커버리·카탈로그).
-# Backstage 에서 이 파일 URL 을 등록하면 "누가 소유하고 누가 누구를 부르는지"가 한 화면에 뜬다.
+# Backstage 카탈로그 — 서비스 4개와 각 API, 소유자, 의존 관계. 세미나 3번 항목(디스커버리·카탈로그).
 apiVersion: backstage.io/v1alpha1
 kind: System
 metadata:
-  name: routine
-  description: 다자산 적립식 투자자의 운영 시스템
+  name: hindsight
+  description: 유튜버가 말한 종목, 그 뒤에 어떻게 됐나
 spec:
-  owner: team-routine
+  owner: team-hindsight
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: market-data
-  description: 자산 마스터 · 일별 시세 · 환율 (최하층, 아무도 부르지 않음)
-  annotations:
-    github.com/project-slug: insung1939/routine
+  description: 종목 사전(국내·미국·코인·지수 + 별칭) · 일별 시세 (최하층, 아무도 부르지 않음)
+  annotations: { github.com/project-slug: insung1939/hindsight }
   tags: [python, fastapi]
 spec:
   type: service
   lifecycle: experimental
-  owner: team-market-data
-  system: routine
+  owner: team-b
+  system: hindsight
   providesApis: [market-data-api]
 ---
 apiVersion: backstage.io/v1alpha1
 kind: API
-metadata:
-  name: market-data-api
+metadata: { name: market-data-api }
 spec:
   type: openapi
   lifecycle: experimental
-  owner: team-market-data
-  system: routine
+  owner: team-b
+  system: hindsight
   definition:
-    $text: https://github.com/insung1939/routine/blob/main/contracts/market-data.yaml
+    $text: https://github.com/insung1939/hindsight/blob/main/contracts/market-data.yaml
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: income
-  description: 배당·분배금 이력, 월별 현금흐름
-  annotations:
-    github.com/project-slug: insung1939/routine
+  name: youtube
+  description: 추적 채널과 영상 메타데이터 수집 (최하층)
+  annotations: { github.com/project-slug: insung1939/hindsight }
 spec:
   type: service
   lifecycle: experimental
-  owner: team-income
-  system: routine
-  providesApis: [income-api]
-  consumesApis: [market-data-api]
-  dependsOn: [component:market-data]
+  owner: team-a
+  system: hindsight
+  providesApis: [youtube-api]
 ---
 apiVersion: backstage.io/v1alpha1
 kind: API
-metadata:
-  name: income-api
+metadata: { name: youtube-api }
 spec:
   type: openapi
   lifecycle: experimental
-  owner: team-income
-  system: routine
+  owner: team-a
+  system: hindsight
   definition:
-    $text: https://github.com/insung1939/routine/blob/main/contracts/income.yaml
+    $text: https://github.com/insung1939/hindsight/blob/main/contracts/youtube.yaml
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: portfolio
-  description: 포트폴리오 · 계좌 · 보유 · 규칙 · 실행 기록 · 준수 점수
-  annotations:
-    github.com/project-slug: insung1939/routine
+  name: mentions
+  description: 영상 제목·설명에서 종목 매칭
+  annotations: { github.com/project-slug: insung1939/hindsight }
 spec:
   type: service
   lifecycle: experimental
-  owner: team-portfolio
-  system: routine
-  providesApis: [portfolio-api]
-  consumesApis: [market-data-api]
-  dependsOn: [component:market-data]
+  owner: team-c
+  system: hindsight
+  providesApis: [mentions-api]
+  consumesApis: [youtube-api, market-data-api]
+  dependsOn: [component:youtube, component:market-data]
 ---
 apiVersion: backstage.io/v1alpha1
 kind: API
-metadata:
-  name: portfolio-api
+metadata: { name: mentions-api }
 spec:
   type: openapi
   lifecycle: experimental
-  owner: team-portfolio
-  system: routine
+  owner: team-c
+  system: hindsight
   definition:
-    $text: https://github.com/insung1939/routine/blob/main/contracts/portfolio.yaml
+    $text: https://github.com/insung1939/hindsight/blob/main/contracts/mentions.yaml
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: plan
-  description: 월간 매수 지시서
-  annotations:
-    github.com/project-slug: insung1939/routine
+  name: stats
+  description: 언급 뒤 5·20·60 거래일 수익률과 초과수익, 요약 캐시
+  annotations: { github.com/project-slug: insung1939/hindsight }
 spec:
   type: service
   lifecycle: experimental
-  owner: user:insung1939
-  system: routine
-  providesApis: [plan-api]
-  consumesApis: [portfolio-api, market-data-api]
-  dependsOn: [component:portfolio, component:market-data]
+  owner: team-d
+  system: hindsight
+  providesApis: [stats-api]
+  consumesApis: [mentions-api, market-data-api]
+  dependsOn: [component:mentions, component:market-data]
 ---
 apiVersion: backstage.io/v1alpha1
 kind: API
-metadata:
-  name: plan-api
+metadata: { name: stats-api }
 spec:
   type: openapi
   lifecycle: experimental
-  owner: user:insung1939
-  system: routine
+  owner: team-d
+  system: hindsight
   definition:
-    $text: https://github.com/insung1939/routine/blob/main/contracts/plan.yaml
----
-apiVersion: backstage.io/v1alpha1
-kind: Component
-metadata:
-  name: backtest
-  description: 적립식 타임머신 · 신화 검증
-  annotations:
-    github.com/project-slug: insung1939/routine
-spec:
-  type: service
-  lifecycle: experimental
-  owner: team-backtest
-  system: routine
-  providesApis: [backtest-api]
-  consumesApis: [market-data-api, income-api, portfolio-api]
-  dependsOn: [component:market-data, component:income, component:portfolio]
----
-apiVersion: backstage.io/v1alpha1
-kind: API
-metadata:
-  name: backtest-api
-spec:
-  type: openapi
-  lifecycle: experimental
-  owner: team-backtest
-  system: routine
-  definition:
-    $text: https://github.com/insung1939/routine/blob/main/contracts/backtest.yaml
+    $text: https://github.com/insung1939/hindsight/blob/main/contracts/stats.yaml

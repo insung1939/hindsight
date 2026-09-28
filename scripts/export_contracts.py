@@ -15,20 +15,20 @@ from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
-SERVICES = ["market-data", "income", "portfolio", "plan", "backtest"]
+SERVICES = ["market-data", "youtube", "mentions", "stats"]
 
 
 def export(service: str) -> Path:
     svc_dir = ROOT / "services" / service
     os.environ["DATABASE_URL"] = "sqlite:///:memory:"
     sys.path.insert(0, str(svc_dir))
-    for m in ("main", "models", "collectors", "seed", "engine"):
+    for m in ("main", "models", "collectors", "seed", "engine", "matcher"):
         sys.modules.pop(m, None)
     app = importlib.import_module("main").app
     spec = app.openapi()
     spec["servers"] = [
         {"url": f"http://localhost:{8000 + SERVICES.index(service) + 1}", "description": "로컬"},
-        {"url": f"https://routine-{service}.onrender.com", "description": "Render (팀 운영)"},
+        {"url": f"https://hindsight-{service}.onrender.com", "description": "Render (팀 운영)"},
     ]
     out = ROOT / "contracts" / f"{service}.yaml"
     out.write_text(yaml.safe_dump(spec, allow_unicode=True, sort_keys=False), encoding="utf-8")

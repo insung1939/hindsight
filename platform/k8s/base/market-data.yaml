@@ -2,33 +2,33 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: market-data
-  namespace: routine
-  labels: { app: market-data, part-of: routine }
+  namespace: hindsight
+  labels: { app: market-data, part-of: hindsight }
 spec:
   replicas: 1
   selector:
     matchLabels: { app: market-data }
   template:
     metadata:
-      labels: { app: market-data, part-of: routine }
+      labels: { app: market-data, part-of: hindsight }
     spec:
       containers:
         - name: market-data
-          image: ghcr.io/insung1939/routine-market-dataatest
+          image: ghcr.io/insung1939/hindsight-market-dataatest
           ports: [{ containerPort: 8000 }]
           envFrom:
-            - configMapRef: { name: routine-config }
+            - configMapRef: { name: hindsight-config }
           env:
             - name: DATABASE_URL
-              valueFrom: { secretKeyRef: { name: routine-secrets, key: DATABASE_URL_MARKET_DATA } }
+              valueFrom: { secretKeyRef: { name: hindsight-secrets, key: DATABASE_URL_MARKET_DATA } }
             - name: INTERNAL_TOKEN
-              valueFrom: { secretKeyRef: { name: routine-secrets, key: INTERNAL_TOKEN } }
+              valueFrom: { secretKeyRef: { name: hindsight-secrets, key: INTERNAL_TOKEN } }
             - name: DATA_GO_KR_KEY
-              valueFrom: { secretKeyRef: { name: routine-secrets, key: DATA_GO_KR_KEY, optional: true } }
+              valueFrom: { secretKeyRef: { name: hindsight-secrets, key: DATA_GO_KR_KEY, optional: true } }
             - name: KOREAEXIM_KEY
-              valueFrom: { secretKeyRef: { name: routine-secrets, key: KOREAEXIM_KEY, optional: true } }
+              valueFrom: { secretKeyRef: { name: hindsight-secrets, key: KOREAEXIM_KEY, optional: true } }
             - name: DART_KEY
-              valueFrom: { secretKeyRef: { name: routine-secrets, key: DART_KEY, optional: true } }
+              valueFrom: { secretKeyRef: { name: hindsight-secrets, key: DART_KEY, optional: true } }
           readinessProbe:
             httpGet: { path: /healthz, port: 8000 }
             initialDelaySeconds: 3
@@ -49,7 +49,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: market-data
-  namespace: routine
+  namespace: hindsight
   labels: { app: market-data }
 spec:
   selector: { app: market-data }

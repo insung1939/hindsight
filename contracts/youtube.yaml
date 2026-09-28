@@ -1,0 +1,473 @@
+openapi: 3.1.0
+info:
+  title: 힌드사이트 youtube
+  description: '추적 채널과 영상 메타데이터(제목·설명·게시일·조회수). 출처: YouTube Data API v3.'
+  contact:
+    name: youtube owner
+    url: https://github.com/insung1939/hindsight
+  version: 0.1.0
+  x-owner: team-youtube
+  x-service: youtube
+paths:
+  /healthz:
+    get:
+      tags:
+      - ops
+      summary: 서비스 상태
+      operationId: healthz
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      parameters:
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+  /v1/channels:
+    get:
+      tags:
+      - channels
+      summary: 채널 목록 (익명)
+      operationId: list_channels
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListChannels'
+        '500':
+          description: 서버 내부 오류
+          content: &id001
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+      parameters:
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+    post:
+      tags:
+      - channels
+      summary: 채널 등록 (핸들 → YouTube API 로 id 조회)
+      operationId: add_channel
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelIn'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelOut'
+        '422':
+          description: Validation Error
+          content: *id001
+        '500':
+          description: 서버 내부 오류
+          content: *id001
+      parameters:
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+  /v1/videos:
+    get:
+      tags:
+      - videos
+      summary: 영상 목록 (since 이후, 게시일 오름차순). mentions 가 매일 새 영상을 받아간다
+      operationId: list_videos
+      parameters:
+      - name: since
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Since
+      - name: channel_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Channel Id
+      - name: cursor
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: 마지막으로 받은 video_id 의 published_at ISO
+          title: Cursor
+        description: 마지막으로 받은 video_id 의 published_at ISO
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 2000
+          default: 500
+          title: Limit
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListVideos'
+        '422':
+          description: Validation Error
+          content: *id001
+        '500':
+          description: 서버 내부 오류
+          content: *id001
+  /v1/videos/{video_id}:
+    get:
+      tags:
+      - videos
+      summary: 영상 하나
+      operationId: get_video
+      parameters:
+      - name: video_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Video Id
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VideoOut'
+        '422':
+          description: Validation Error
+          content: *id001
+        '500':
+          description: 서버 내부 오류
+          content: *id001
+        '404':
+          description: 대상 없음
+          content: *id001
+  /v1/coverage:
+    get:
+      tags:
+      - videos
+      summary: 수집 현황 (데이터 페이지용)
+      operationId: get_coverage
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Coverage'
+        '500':
+          description: 서버 내부 오류
+          content: *id001
+      parameters:
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+  /internal/sync:
+    post:
+      tags:
+      - ops
+      summary: 추적 채널의 새 영상 수집 (days 만큼 거슬러; 최초 백필은 days=365)
+      operationId: sync_youtube
+      parameters:
+      - name: days
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 730
+          default: 7
+          title: Days
+      - name: X-Internal-Token
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Internal-Token
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncResult'
+        '422':
+          description: Validation Error
+          content: *id001
+        '500':
+          description: 서버 내부 오류
+          content: *id001
+  /internal/load-fixture:
+    post:
+      tags:
+      - ops
+      summary: 키 없이 개발할 때 쓰는 샘플 데이터 (fixtures/sample.json). 실제 채널·영상이 아니다
+      operationId: load_fixture
+      parameters:
+      - name: X-Internal-Token
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Internal-Token
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncResult'
+        '422':
+          description: Validation Error
+          content: *id001
+        '500':
+          description: 서버 내부 오류
+          content: *id001
+components:
+  schemas:
+    ChannelIn:
+      properties:
+        handle:
+          type: string
+          title: Handle
+          description: '@핸들 (채널 페이지 주소의 @ 뒤)'
+          examples:
+          - '@sampro_tv'
+        category:
+          type: string
+          pattern: ^(stock|crypto)$
+          title: Category
+      type: object
+      required:
+      - handle
+      - category
+      title: ChannelIn
+    ChannelOut:
+      properties:
+        channel_id:
+          type: string
+          title: Channel Id
+        anon_code:
+          type: string
+          title: Anon Code
+        category:
+          type: string
+          title: Category
+        subscriber_count:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Subscriber Count
+        tracked:
+          type: boolean
+          title: Tracked
+        added_at:
+          type: string
+          format: date-time
+          title: Added At
+      type: object
+      required:
+      - channel_id
+      - anon_code
+      - category
+      - tracked
+      - added_at
+      title: ChannelOut
+    Coverage:
+      properties:
+        channels:
+          type: integer
+          title: Channels
+        videos:
+          type: integer
+          title: Videos
+        first_published:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: First Published
+        last_published:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Last Published
+        by_category:
+          additionalProperties:
+            type: integer
+          type: object
+          title: By Category
+      type: object
+      required:
+      - channels
+      - videos
+      - first_published
+      - last_published
+      - by_category
+      title: Coverage
+    ListChannels:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/ChannelOut'
+          type: array
+          title: Items
+        next_cursor:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Next Cursor
+      type: object
+      required:
+      - items
+      title: ListChannels
+    ListVideos:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/VideoOut'
+          type: array
+          title: Items
+        next_cursor:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Next Cursor
+      type: object
+      required:
+      - items
+      title: ListVideos
+    SyncResult:
+      properties:
+        videos_added:
+          type: integer
+          title: Videos Added
+        channels_synced:
+          type: integer
+          title: Channels Synced
+        skipped:
+          items:
+            type: string
+          type: array
+          title: Skipped
+      type: object
+      required:
+      - videos_added
+      - channels_synced
+      - skipped
+      title: SyncResult
+    VideoOut:
+      properties:
+        video_id:
+          type: string
+          title: Video Id
+        channel_id:
+          type: string
+          title: Channel Id
+        title:
+          type: string
+          title: Title
+        description:
+          type: string
+          title: Description
+        published_at:
+          type: string
+          format: date-time
+          title: Published At
+        view_count:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: View Count
+      type: object
+      required:
+      - video_id
+      - channel_id
+      - title
+      - description
+      - published_at
+      title: VideoOut
+    Problem:
+      type: object
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+      required:
+      - type
+      - title
+      - status
+tags:
+- name: channels
+- name: ops
+- name: videos
+servers:
+- url: http://localhost:8002
+  description: 로컬
+- url: https://hindsight-youtube.onrender.com
+  description: Render (팀 운영)

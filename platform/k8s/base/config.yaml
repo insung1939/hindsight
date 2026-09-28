@@ -2,13 +2,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: routine-config
-  namespace: routine
+  name: hindsight-config
+  namespace: hindsight
 data:
-  ALLOWED_ORIGINS: "http://localhost:5173,https://routine.vercel.app"
-  MARKET_DATA_URL: "http://market-data.routine.svc.cluster.local:8000"
-  INCOME_URL: "http://income.routine.svc.cluster.local:8000"
-  PORTFOLIO_URL: "http://portfolio.routine.svc.cluster.local:8000"
-  PLAN_URL: "http://plan.routine.svc.cluster.local:8000"
-  BACKTEST_URL: "http://backtest.routine.svc.cluster.local:8000"
-  OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector.routine.svc.cluster.local:4318"
+  ALLOWED_ORIGINS: "http://localhost:5173,https://hindsight.vercel.app"
+  MARKET_DATA_URL: "http://market-data.hindsight.svc.cluster.local:8000"
+  YOUTUBE_URL: "http://youtube.hindsight.svc.cluster.local:8000"
+  MENTIONS_URL: "http://mentions.hindsight.svc.cluster.local:8000"
+  STATS_URL: "http://stats.hindsight.svc.cluster.local:8000"
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector.hindsight.svc.cluster.local:4318"

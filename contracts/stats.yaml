@@ -1,0 +1,398 @@
+openapi: 3.1.0
+info:
+  title: 힌드사이트 stats
+  description: 언급 뒤 5·20·60 거래일 수익률과 벤치마크 대비 초과수익. 채널은 익명 집계.
+  contact:
+    name: stats owner
+    url: https://github.com/insung1939/hindsight
+  version: 0.1.0
+  x-owner: team-stats
+  x-service: stats
+paths:
+  /healthz:
+    get:
+      tags:
+      - ops
+      summary: 서비스 상태
+      operationId: healthz
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      parameters:
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+  /v1/summary:
+    get:
+      tags:
+      - summary
+      summary: 전체 분포 (scope=overall | market:KRX | market:US | market:CRYPTO)
+      operationId: get_summary
+      parameters:
+      - name: scope
+        in: query
+        required: false
+        schema:
+          type: string
+          default: overall
+          title: Scope
+      - name: horizon
+        in: query
+        required: false
+        schema:
+          type: integer
+          description: 5 · 20 · 60
+          default: 20
+          title: Horizon
+        description: 5 · 20 · 60
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SummaryOut'
+        '422':
+          description: Validation Error
+          content: &id001
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '500':
+          description: 서버 내부 오류
+          content: *id001
+  /v1/summaries:
+    get:
+      tags:
+      - summary
+      summary: '요약 전부 (prefix 로 필터: overall · market · channel · asset)'
+      operationId: list_summaries
+      parameters:
+      - name: prefix
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Prefix
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListSummaries'
+        '422':
+          description: Validation Error
+          content: *id001
+        '500':
+          description: 서버 내부 오류
+          content: *id001
+  /v1/assets/{asset_id}/events:
+    get:
+      tags:
+      - events
+      summary: 종목 하나의 언급별 이후 수익률 (타임라인 화면)
+      operationId: asset_events
+      parameters:
+      - name: asset_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Asset Id
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEvents'
+        '422':
+          description: Validation Error
+          content: *id001
+        '500':
+          description: 서버 내부 오류
+          content: *id001
+        '404':
+          description: 대상 없음
+          content: *id001
+  /v1/channels/{channel_id}/events:
+    get:
+      tags:
+      - events
+      summary: 채널 하나의 언급별 이후 수익률 (익명 코드로만 노출)
+      operationId: channel_events
+      parameters:
+      - name: channel_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Channel Id
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEvents'
+        '422':
+          description: Validation Error
+          content: *id001
+        '500':
+          description: 서버 내부 오류
+          content: *id001
+        '404':
+          description: 대상 없음
+          content: *id001
+  /internal/sync:
+    post:
+      tags:
+      - ops
+      summary: 새 언급의 수익률 계산 + 미완성 값 채우기 + 요약 갱신
+      operationId: sync_stats
+      parameters:
+      - name: since_days
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 2000
+          default: 400
+          title: Since Days
+      - name: X-Internal-Token
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Internal-Token
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncResult'
+        '422':
+          description: Validation Error
+          content: *id001
+        '500':
+          description: 서버 내부 오류
+          content: *id001
+components:
+  schemas:
+    EventOut:
+      properties:
+        mention_id:
+          type: integer
+          title: Mention Id
+        asset_id:
+          type: string
+          title: Asset Id
+        channel_id:
+          type: string
+          title: Channel Id
+        market:
+          type: string
+          title: Market
+        published_at:
+          type: string
+          format: date-time
+          title: Published At
+        t0_date:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: T0 Date
+        t0_close:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: T0 Close
+        r5:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: R5
+        r20:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: R20
+        r60:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: R60
+        x5:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: X5
+        x20:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: X20
+        x60:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: X60
+      type: object
+      required:
+      - mention_id
+      - asset_id
+      - channel_id
+      - market
+      - published_at
+      - t0_date
+      - t0_close
+      - r5
+      - r20
+      - r60
+      - x5
+      - x20
+      - x60
+      title: EventOut
+    ListEvents:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/EventOut'
+          type: array
+          title: Items
+        next_cursor:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Next Cursor
+      type: object
+      required:
+      - items
+      title: ListEvents
+    ListSummaries:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/SummaryOut'
+          type: array
+          title: Items
+        next_cursor:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Next Cursor
+      type: object
+      required:
+      - items
+      title: ListSummaries
+    SummaryOut:
+      properties:
+        key:
+          type: string
+          title: Key
+        value:
+          additionalProperties: true
+          type: object
+          title: Value
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      type: object
+      required:
+      - key
+      - value
+      - updated_at
+      title: SummaryOut
+    SyncResult:
+      properties:
+        events_added:
+          type: integer
+          title: Events Added
+        events_updated:
+          type: integer
+          title: Events Updated
+        summaries:
+          type: integer
+          title: Summaries
+        skipped:
+          items:
+            type: string
+          type: array
+          title: Skipped
+      type: object
+      required:
+      - events_added
+      - events_updated
+      - summaries
+      - skipped
+      title: SyncResult
+    Problem:
+      type: object
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+      required:
+      - type
+      - title
+      - status
+tags:
+- name: events
+- name: ops
+- name: summary
+servers:
+- url: http://localhost:8004
+  description: 로컬
+- url: https://hindsight-stats.onrender.com
+  description: Render (팀 운영)

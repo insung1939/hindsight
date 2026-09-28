@@ -1,5 +1,7 @@
-"""market-data — "이 자산이 지금·과거에 얼마였나, 환율은?" 에 답한다. 아무도 부르지 않는 최하층 서비스."""
-from datetime import date, timedelta
+"""market-data — "이 종목이 언제 얼마였나, 종목 사전은?" 에 답한다. 아무도 부르지 않는 최하층 서비스.
+mentions 는 /v1/dictionary 로 사전을 받고, 새 종목이 언급되면 /v1/assets/{id}/track 으로 시세 수집을 켠다.
+stats 는 /v1/prices 로 여러 종목의 시세를 한 번에 받는다."""
+from datetime import date, datetime, timedelta
 
 from fastapi import Depends, HTTPException, Query
 from pydantic import BaseModel
@@ -7,12 +9,12 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 import collectors
-from models import Asset, FxRate, Price, db
-from routine_common import InternalOnly, create_app
-from seed import SEED_ASSETS
+from hs_common import InternalOnly, create_app
+from models import Asset, Price, db
+from seed import AMBIGUOUS_NAMES, seed_assets
 
-app = create_app("market-data", "루틴 market-data", "0.1.0",
-                 "자산 마스터 · 일별 시세 · 환율. 자산군별 수집 어댑터(공공데이터포털·Stooq·업비트·수출입은행)를 가진다.")
+app = create_app("market-data", "힌드사이트 market-data", "0.2.0",
+                 "종목 사전(국내·미국·코인·지수 + 별칭) · 일별 시세. 출처: DART corpCode, 공공데이터포털, Yahoo Finance, 업비트.")
 
 
 @app.on_event("startup")
@@ -20,7 +22,7 @@ def _startup():
     db.create_all()
     with db.SessionLocal() as s:
         if s.scalar(select(Asset).limit(1)) is None:
-            s.add_all(Asset(**a) for a in SEED_ASSETS)
+            s.add_all(Asset(**a) for a in seed_assets())
             s.commit()
 
 
@@ -30,10 +32,20 @@ class AssetOut(BaseModel):
     market: str
     symbol: str
     name: str
+    aliases: list[str]
     currency: str
     asset_type: str
-    expense_ratio: float | None = None
+    benchmark_id: str | None = None
+    tracked: bool
     model_config = {"from_attributes": True}
+
+
+class DictionaryEntry(BaseModel):
+    asset_id: str
+    name: str
+    aliases: list[str]
+    market: str
+    ambiguous: bool  # 단독 매칭 금지
 
 
 class PriceOut(BaseModel):
@@ -44,17 +56,15 @@ class PriceOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
-class FxOut(BaseModel):
-    base: str
-    quote: str
-    rate_date: date
-    rate: float
-    model_config = {"from_attributes": True}
-
-
 class ListAssets(BaseModel):
     items: list[AssetOut]
     next_cursor: str | None = None
+
+
+class ListDictionary(BaseModel):
+    items: list[DictionaryEntry]
+    next_cursor: str | None = None
+    ambiguous_names: list[str]
 
 
 class ListPrices(BaseModel):
@@ -62,26 +72,49 @@ class ListPrices(BaseModel):
     next_cursor: str | None = None
 
 
-class ListFx(BaseModel):
-    items: list[FxOut]
-    next_cursor: str | None = None
+class PriceSeries(BaseModel):
+    asset_id: str
+    currency: str
+    points: list[list]  # [["2026-01-02", 71000.0], ...] — 여러 종목을 한 번에 줄 때 가볍게
+
+
+class BatchPrices(BaseModel):
+    series: list[PriceSeries]
+    missing: list[str]
 
 
 class SyncResult(BaseModel):
+    assets_added: int
     prices_upserted: int
-    fx_upserted: int
     skipped: list[str]
 
 
-# ── 엔드포인트 ──────────────────────────────────────────
-@app.get("/v1/assets", response_model=ListAssets, tags=["assets"], operation_id="list_assets", summary="자산 목록")
-def list_assets(market: str | None = None, asset_type: str | None = None, s: Session = Depends(db.session)):
-    q = select(Asset)
+# ── 사전 · 자산 ─────────────────────────────────────────
+@app.get("/v1/dictionary", response_model=ListDictionary, tags=["dictionary"], operation_id="get_dictionary",
+         summary="종목 사전 전체 (이름·별칭 → asset_id). mentions 서비스가 매칭에 쓴다")
+def get_dictionary(market: str | None = None, s: Session = Depends(db.session)):
+    q = select(Asset).where(Asset.asset_type != "index")
     if market:
         q = q.where(Asset.market == market)
-    if asset_type:
-        q = q.where(Asset.asset_type == asset_type)
-    return {"items": s.scalars(q.order_by(Asset.asset_id)).all(), "next_cursor": None}
+    rows = s.scalars(q).all()
+    return {"items": [{"asset_id": a.asset_id, "name": a.name, "aliases": a.aliases or [], "market": a.market,
+                       "ambiguous": a.name in AMBIGUOUS_NAMES} for a in rows],
+            "next_cursor": None, "ambiguous_names": sorted(AMBIGUOUS_NAMES)}
+
+
+@app.get("/v1/assets", response_model=ListAssets, tags=["assets"], operation_id="list_assets", summary="자산 목록")
+def list_assets(market: str | None = None, tracked: bool | None = None, q: str | None = Query(default=None, description="이름·별칭 검색"),
+                limit: int = Query(default=200, le=5000), s: Session = Depends(db.session)):
+    stmt = select(Asset)
+    if market:
+        stmt = stmt.where(Asset.market == market)
+    if tracked is not None:
+        stmt = stmt.where(Asset.tracked == tracked)
+    rows = s.scalars(stmt.order_by(Asset.asset_id)).all()
+    if q:
+        ql = q.lower()
+        rows = [a for a in rows if ql in a.name.lower() or any(ql in al.lower() for al in (a.aliases or [])) or ql in a.symbol.lower()]
+    return {"items": rows[:limit], "next_cursor": None}
 
 
 @app.get("/v1/assets/{asset_id}", response_model=AssetOut, tags=["assets"], operation_id="get_asset", summary="자산 하나")
@@ -92,6 +125,20 @@ def get_asset(asset_id: str, s: Session = Depends(db.session)):
     return a
 
 
+@app.post("/v1/assets/{asset_id}/track", response_model=AssetOut, tags=["assets"], operation_id="track_asset",
+          summary="시세 수집 대상으로 켠다 (mentions 가 새 종목을 발견했을 때 호출)")
+def track_asset(asset_id: str, s: Session = Depends(db.session)):
+    a = s.get(Asset, asset_id)
+    if not a:
+        raise HTTPException(404, f"자산 {asset_id} 없음")
+    if not a.tracked:
+        a.tracked = True
+        a.updated_at = datetime.utcnow()
+        s.commit(); s.refresh(a)
+    return a
+
+
+# ── 시세 ────────────────────────────────────────────────
 @app.get("/v1/assets/{asset_id}/prices", response_model=ListPrices, tags=["prices"], operation_id="list_prices",
          summary="일별 종가 이력")
 def list_prices(asset_id: str, from_date: date | None = Query(default=None, alias="from"),
@@ -104,88 +151,100 @@ def list_prices(asset_id: str, from_date: date | None = Query(default=None, alia
         q = q.where(Price.trade_date >= from_date)
     if to_date:
         q = q.where(Price.trade_date <= to_date)
-    rows = s.scalars(q.order_by(Price.trade_date).limit(limit)).all()
-    return {"items": rows, "next_cursor": None}
+    return {"items": s.scalars(q.order_by(Price.trade_date).limit(limit)).all(), "next_cursor": None}
 
 
-@app.get("/v1/assets/{asset_id}/prices/latest", response_model=PriceOut, tags=["prices"], operation_id="latest_price",
-         summary="가장 최근 종가")
-def latest_price(asset_id: str, s: Session = Depends(db.session)):
-    row = s.scalar(select(Price).where(Price.asset_id == asset_id).order_by(Price.trade_date.desc()).limit(1))
-    if not row:
-        raise HTTPException(404, f"자산 {asset_id} 의 시세가 아직 없음. /internal/sync 를 먼저 실행")
-    return row
-
-
-@app.get("/v1/fx-rates", response_model=ListFx, tags=["fx"], operation_id="list_fx_rates", summary="환율 이력")
-def list_fx_rates(base: str = "USD", quote: str = "KRW", from_date: date | None = Query(default=None, alias="from"),
-                  to_date: date | None = Query(default=None, alias="to"), s: Session = Depends(db.session)):
-    q = select(FxRate).where(FxRate.base == base, FxRate.quote == quote)
+@app.get("/v1/prices", response_model=BatchPrices, tags=["prices"], operation_id="batch_prices",
+         summary="여러 종목 시세를 한 번에 (stats 서비스용). asset_ids 는 쉼표 구분")
+def batch_prices(asset_ids: str, from_date: date | None = Query(default=None, alias="from"),
+                 to_date: date | None = Query(default=None, alias="to"), s: Session = Depends(db.session)):
+    ids = [x.strip() for x in asset_ids.split(",") if x.strip()][:200]
+    q = select(Price).where(Price.asset_id.in_(ids))
     if from_date:
-        q = q.where(FxRate.rate_date >= from_date)
+        q = q.where(Price.trade_date >= from_date)
     if to_date:
-        q = q.where(FxRate.rate_date <= to_date)
-    return {"items": s.scalars(q.order_by(FxRate.rate_date)).all(), "next_cursor": None}
+        q = q.where(Price.trade_date <= to_date)
+    by = {i: [] for i in ids}
+    cur = {}
+    for p in s.scalars(q.order_by(Price.trade_date)).all():
+        by[p.asset_id].append([str(p.trade_date), p.close])
+        cur[p.asset_id] = p.currency
+    return {"series": [{"asset_id": i, "currency": cur.get(i, ""), "points": pts} for i, pts in by.items() if pts],
+            "missing": [i for i, pts in by.items() if not pts]}
 
 
-@app.get("/v1/fx-rates/latest", response_model=FxOut, tags=["fx"], operation_id="latest_fx_rate", summary="최근 환율")
-def latest_fx_rate(base: str = "USD", quote: str = "KRW", s: Session = Depends(db.session)):
-    if base == quote:
-        return {"base": base, "quote": quote, "rate_date": date.today(), "rate": 1.0}
-    row = s.scalar(select(FxRate).where(FxRate.base == base, FxRate.quote == quote)
-                   .order_by(FxRate.rate_date.desc()).limit(1))
-    if not row:
-        raise HTTPException(404, f"{base}/{quote} 환율이 아직 없음. KOREAEXIM_KEY 설정 후 /internal/sync")
-    return row
-
-
+# ── 수집 ────────────────────────────────────────────────
 @app.post("/internal/sync", response_model=SyncResult, tags=["ops"], operation_id="sync_market_data",
-          summary="시세·환율 수집 (스케줄러가 호출)", dependencies=[InternalOnly])
-def sync(days: int = Query(default=200, le=5000), s: Session = Depends(db.session)):
-    upserted, skipped = 0, []
+          summary="사전 갱신(DART·업비트) + tracked 종목 시세 수집", dependencies=[InternalOnly])
+def sync(days: int = Query(default=400, le=5000), dictionary: bool = True, s: Session = Depends(db.session)):
+    added, upserted, skipped = 0, 0, []
+    if dictionary:
+        added += _sync_dictionary(s, skipped)
     since = date.today() - timedelta(days=days)
-    for asset in s.scalars(select(Asset)).all():
+    for asset in s.scalars(select(Asset).where(Asset.tracked == True)).all():  # noqa: E712
         try:
-            if asset.source == "upbit":
-                rows = collectors.upbit_daily(asset.symbol, days=days)
-            elif asset.source == "yahoo":
-                rows = [r for r in collectors.yahoo_daily(asset.symbol, years=max(1, days // 365 + 1)) if r[0] >= since]
-            elif asset.source == "datagokr":
-                rows = collectors.datagokr_krx_daily(asset.name, since, date.today())
-                if not rows:
-                    skipped.append(f"{asset.asset_id}: DATA_GO_KR_KEY 없음 또는 결과 없음")
-            else:
-                rows = []
-        except Exception as e:  # 한 출처가 죽어도 나머지는 수집한다
+            rows = _fetch_prices(asset, since, days)
+            if rows is None:
+                skipped.append(f"{asset.asset_id}: 출처 없음")
+                continue
+        except Exception as e:
             skipped.append(f"{asset.asset_id}: {e}")
             continue
         upserted += _upsert_prices(s, asset, rows)
-    fx_upserted = 0
-    # 1) 수출입은행 고시환율 (공식, 키 필요, 하루 단위) — 최근 5영업일
-    for day in collectors.recent_business_days(5):
-        try:
-            rates = collectors.koreaexim_fx(day)
-        except Exception as e:
-            skipped.append(f"fx {day}: {e}")
-            continue
-        if not rates:
-            skipped.append("fx: KOREAEXIM_KEY 없음 (Yahoo 환율로 대체)")
-            break
-        for cur, rate in rates.items():
-            if cur in ("USD", "HKD", "CNH", "JPY", "EUR"):
-                fx_upserted += _upsert_fx(s, cur, day, rate, "koreaexim")
-    # 2) Yahoo 환율 이력 (키 불필요) — 백테스트용 과거 구간을 채운다. 이미 있는 날짜는 건너뛴다.
-    for cur in ("USD", "HKD"):
-        try:
-            rows = collectors.yahoo_daily(f"{cur}KRW=X", years=max(1, days // 365 + 1))
-        except Exception as e:
-            skipped.append(f"fx {cur} yahoo: {e}")
-            continue
-        for d, rate in rows:
-            if d >= since:
-                fx_upserted += _upsert_fx(s, cur, d, rate, "yahoo")
     s.commit()
-    return {"prices_upserted": upserted, "fx_upserted": fx_upserted, "skipped": skipped}
+    return {"assets_added": added, "prices_upserted": upserted, "skipped": skipped[:50]}
+
+
+def _fetch_prices(asset: Asset, since: date, days: int):
+    years = max(1, days // 365 + 1)
+    if asset.source == "upbit":
+        return collectors.upbit_daily(asset.symbol, days=days)
+    if asset.source == "yahoo":
+        return [r for r in collectors.yahoo_daily(asset.symbol, years) if r[0] >= since]
+    if asset.source == "datagokr":
+        rows = collectors.datagokr_krx_daily(asset.name, since, date.today())
+        if rows:
+            return rows
+        if asset.yahoo_symbol:  # 키가 없거나 결과가 없으면 Yahoo 국내 심볼로 대체
+            return [r for r in collectors.yahoo_daily(asset.yahoo_symbol, years) if r[0] >= since]
+        return None
+    return None
+
+
+def _sync_dictionary(s: Session, skipped: list[str]) -> int:
+    added = 0
+    existing = {a.asset_id for a in s.scalars(select(Asset.asset_id)).all()} if False else {r for (r,) in s.execute(select(Asset.asset_id)).all()}
+    # 업비트 KRW 마켓 전부 (키 불필요)
+    try:
+        for m in collectors.upbit_markets():
+            aid = f"CRYPTO:{m['market']}"
+            if aid in existing:
+                continue
+            ticker = m["market"].split("-")[1]
+            # 사전에만 넣는다(tracked=False). 언급되면 mentions 가 track 을 켠다 — 300개 마켓을 매일 긁지 않기 위해
+            s.add(Asset(asset_id=aid, market="CRYPTO", symbol=m["market"], name=m["korean_name"], aliases=[ticker],
+                        currency="KRW", asset_type="crypto", source="upbit", benchmark_id="CRYPTO:KRW-BTC", tracked=False))
+            existing.add(aid); added += 1
+    except Exception as e:
+        skipped.append(f"upbit markets: {e}")
+    # DART 상장사 전체 (키 필요). 사전에만 넣고 tracked=False — 언급되면 mentions 가 track 을 켠다.
+    try:
+        companies = collectors.dart_listed_companies()
+        if not companies:
+            skipped.append("dart: DART_KEY 없음 — 시드 종목만 사용")
+        for c in companies:
+            aid = f"KRX:{c['stock_code']}"
+            if aid in existing:
+                continue
+            name = collectors.normalize_corp_name(c["corp_name"])
+            s.add(Asset(asset_id=aid, market="KRX", symbol=c["stock_code"], name=name, aliases=[], currency="KRW",
+                        asset_type="stock", source="datagokr", yahoo_symbol=f"{c['stock_code']}.KS",
+                        benchmark_id="INDEX:KOSPI", tracked=False))
+            existing.add(aid); added += 1
+    except Exception as e:
+        skipped.append(f"dart: {e}")
+    s.flush()
+    return added
 
 
 def _upsert_prices(s: Session, asset: Asset, rows) -> int:
@@ -195,19 +254,5 @@ def _upsert_prices(s: Session, asset: Asset, rows) -> int:
         if d in existing:
             continue
         s.add(Price(asset_id=asset.asset_id, trade_date=d, close=close, currency=asset.currency))
-        n += 1
+        existing.add(d); n += 1
     return n
-
-
-_fx_seen: set[tuple[str, date]] = set()
-
-
-def _upsert_fx(s: Session, cur: str, day: date, rate: float, source: str) -> int:
-    if (cur, day) in _fx_seen:
-        return 0
-    exists = s.scalar(select(FxRate).where(FxRate.base == cur, FxRate.quote == "KRW", FxRate.rate_date == day))
-    _fx_seen.add((cur, day))
-    if exists:
-        return 0
-    s.add(FxRate(base=cur, quote="KRW", rate_date=day, rate=rate, source=source))
-    return 1
