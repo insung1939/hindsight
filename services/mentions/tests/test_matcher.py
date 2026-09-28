@@ -9,6 +9,9 @@ DICT = [
     {"asset_id": "US:NVDA", "name": "NVIDIA", "aliases": ["엔비디아"], "market": "US", "ambiguous": False},
     {"asset_id": "US:V", "name": "Visa", "aliases": ["비자"], "market": "US", "ambiguous": False},
     {"asset_id": "CRYPTO:KRW-BTC", "name": "비트코인", "aliases": ["BTC"], "market": "CRYPTO", "ambiguous": False},
+    {"asset_id": "CRYPTO:KRW-RE", "name": "리", "aliases": ["RE"], "market": "CRYPTO", "ambiguous": False},
+    {"asset_id": "CRYPTO:KRW-LSK", "name": "리스크", "aliases": ["LSK"], "market": "CRYPTO", "ambiguous": False, "curated": False},
+    {"asset_id": "CRYPTO:KRW-LINK", "name": "체인링크", "aliases": ["LINK"], "market": "CRYPTO", "ambiguous": False, "curated": False},
 ]
 TERMS = build_terms(DICT, {"KT", "비자"})
 
@@ -41,3 +44,18 @@ def test_ascii_word_boundary():
 
 def test_no_text():
     assert match("", TERMS) == []
+
+
+def test_single_char_name_ignored():
+    assert ids("리플 전망과 리스크 정리") == set()  # "리" 한 글자는 무시, "리플"은 사전에 없음
+
+
+def test_uncurated_crypto_needs_context():
+    assert ids("하반기 증시 리스크 점검") == set()                       # 일반 단어
+    assert ids("코인 시장 리스크 코인 급등") == {"CRYPTO:KRW-LSK"}          # 코인 문맥
+    assert {a for a, _, _ in match("리스크 코인 전망", TERMS, crypto_channel=True)} == {"CRYPTO:KRW-LSK"}
+
+
+def test_uppercase_ticker_case_sensitive():
+    assert ids("Subscribe link below") == set()
+    assert ids("코인 LINK 급등") == {"CRYPTO:KRW-LINK"}

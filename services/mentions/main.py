@@ -8,8 +8,12 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from hs_common import InternalOnly, ServiceClient, create_app
+from hs_common.settings import env
 from matcher import build_terms, match
 from models import Mention, SyncState, Unmatched, db
+
+# 설명란까지 볼지. 설명란은 채널 링크·광고 문구("네이버 카페", "link") 때문에 오탐이 많아 기본은 제목만.
+MATCH_FIELDS = ("title", "description") if env("MATCH_DESCRIPTION", "false") == "true" else ("title",)
 
 app = create_app("mentions", "힌드사이트 mentions", "0.1.0",
                  "영상 제목·설명에서 종목을 찾아 언급 사실을 저장한다. 사전은 market-data, 영상은 youtube 에서 받는다.")
@@ -137,6 +141,7 @@ def coverage(s: Session = Depends(db.session)):
 def sync(full: bool = False, s: Session = Depends(db.session)):
     d = market.get("/v1/dictionary")
     terms = build_terms(d["items"], set(d["ambiguous_names"]))
+    crypto_channels = {c["channel_id"] for c in youtube.get("/v1/channels")["items"] if c["category"] == "crypto"}
     state = s.get(SyncState, "last_video_at")
     cursor = None if (full or not state) else state.value
     if full:
@@ -152,8 +157,8 @@ def sync(full: bool = False, s: Session = Depends(db.session)):
         for v in videos:
             scanned += 1
             hits = {}
-            for field in ("title", "description"):
-                for aid, txt, conf in match(v.get(field) or "", terms):
+            for field in MATCH_FIELDS:
+                for aid, txt, conf in match(v.get(field) or "", terms, crypto_channel=v["channel_id"] in crypto_channels):
                     if aid not in hits or conf > hits[aid][1]:
                         hits[aid] = (txt, conf, field)
             pub = datetime.fromisoformat(v["published_at"])

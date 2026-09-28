@@ -26,6 +26,7 @@ class Asset(Base):
     yahoo_symbol: Mapped[str | None] = mapped_column(String(30), nullable=True)  # 국내 종목 Yahoo 대체 심볼(005930.KS)
     benchmark_id: Mapped[str | None] = mapped_column(String(40), nullable=True)  # 초과수익 기준 지수
     tracked: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
+    curated: Mapped[bool] = mapped_column(Boolean, default=False)  # 팀이 손으로 넣은 종목(시드). 자동 수집(업비트·DART)은 False
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 

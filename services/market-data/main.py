@@ -46,6 +46,7 @@ class DictionaryEntry(BaseModel):
     aliases: list[str]
     market: str
     ambiguous: bool  # 단독 매칭 금지
+    curated: bool  # 시드(팀 확인) 종목이면 True. 자동 수집 코인은 문맥 규칙이 붙는다
 
 
 class PriceOut(BaseModel):
@@ -98,7 +99,7 @@ def get_dictionary(market: str | None = None, s: Session = Depends(db.session)):
         q = q.where(Asset.market == market)
     rows = s.scalars(q).all()
     return {"items": [{"asset_id": a.asset_id, "name": a.name, "aliases": a.aliases or [], "market": a.market,
-                       "ambiguous": a.name in AMBIGUOUS_NAMES} for a in rows],
+                       "ambiguous": a.name in AMBIGUOUS_NAMES, "curated": bool(a.curated)} for a in rows],
             "next_cursor": None, "ambiguous_names": sorted(AMBIGUOUS_NAMES)}
 
 

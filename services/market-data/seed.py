@@ -62,14 +62,14 @@ def seed_assets() -> list[dict]:
     for code, name, aliases, ex in _KR:
         out.append({"asset_id": f"KRX:{code}", "market": "KRX", "symbol": code, "name": name, "aliases": aliases,
                     "currency": "KRW", "asset_type": "stock", "source": "datagokr", "yahoo_symbol": f"{code}.{ex}",
-                    "benchmark_id": "INDEX:KOSPI", "tracked": True})
+                    "benchmark_id": "INDEX:KOSPI", "tracked": True, "curated": True})
     for ticker, name, aliases in _US:
         out.append({"asset_id": f"US:{ticker}", "market": "US", "symbol": ticker, "name": name, "aliases": aliases,
                     "currency": "USD", "asset_type": "etf" if ticker in ("SPY", "QQQ", "SOXL", "TQQQ", "SCHD", "JEPI", "JEPQ") else "stock",
-                    "source": "yahoo", "benchmark_id": "INDEX:SPX", "tracked": True})
+                    "source": "yahoo", "benchmark_id": "INDEX:SPX", "tracked": True, "curated": True})
     for mkt, name, aliases in _CRYPTO:
         out.append({"asset_id": f"CRYPTO:{mkt}", "market": "CRYPTO", "symbol": mkt, "name": name, "aliases": aliases,
-                    "currency": "KRW", "asset_type": "crypto", "source": "upbit", "benchmark_id": "CRYPTO:KRW-BTC", "tracked": True})
+                    "currency": "KRW", "asset_type": "crypto", "source": "upbit", "benchmark_id": "CRYPTO:KRW-BTC", "tracked": True, "curated": True})
     return out
 
 
