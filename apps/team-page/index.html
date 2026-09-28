@@ -236,13 +236,15 @@
   }), { threshold: 0.5 });
   slides.forEach((s) => io.observe(s));
   // 키보드 ← → / 스페이스
-  let cur = 0;
+  const where = () => { const y = scrollY + innerHeight / 2; const i = slides.findIndex((s) => y >= s.offsetTop && y < s.offsetTop + s.offsetHeight); return i < 0 ? 0 : i; };
+  let cur = where();
   const go = (d) => { cur = Math.max(0, Math.min(slides.length - 1, cur + d)); slides[cur].scrollIntoView({ behavior: "smooth" }); };
   addEventListener("keydown", (e) => {
     if (["ArrowRight", "ArrowDown", "PageDown", " "].includes(e.key)) { e.preventDefault(); go(1); }
     if (["ArrowLeft", "ArrowUp", "PageUp"].includes(e.key)) { e.preventDefault(); go(-1); }
   });
-  addEventListener("scroll", () => { const y = scrollY + innerHeight / 2; cur = slides.findIndex((s) => y >= s.offsetTop && y < s.offsetTop + s.offsetHeight); if (cur < 0) cur = 0; }, { passive: true });
+  addEventListener("scroll", () => { cur = where(); }, { passive: true });
+  addEventListener("load", () => { cur = where(); });
   // 테마
   const root = document.documentElement, btn = document.getElementById("theme"), sys = matchMedia("(prefers-color-scheme: dark)");
   const apply = () => { const dark = root.dataset.theme ? root.dataset.theme === "dark" : sys.matches; btn.textContent = dark ? "라이트" : "다크"; };
