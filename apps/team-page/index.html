@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>5조 힌드사이트</title>
+<meta name="description" content="유튜버가 말한 종목, 그 뒤에 어떻게 됐나 — KAIST 디지털금융MBA 클라우드컴퓨팅실습 5조 팀 프로젝트 아이디어 피칭" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔭</text></svg>" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<style>
+  :root {
+    --bg: #f6f6f2; --card: #ffffff; --ink: #1c1c1c; --muted: #6b6b66; --line: #e3e3db;
+    --brand: #2f6f6a; --brand-ink: #ffffff; --soft: #e8f0ef; --good: #2f6f6a; --bad: #b4443c; --warn: #b7791f;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #161616; --card: #202020; --ink: #ececec; --muted: #9a9a94; --line: #2e2e2e;
+      --brand: #63b3ad; --brand-ink: #101010; --soft: #1f2a29; --good: #63b3ad; --bad: #e07a72; --warn: #d9a441;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #161616; --card: #202020; --ink: #ececec; --muted: #9a9a94; --line: #2e2e2e;
+    --brand: #63b3ad; --brand-ink: #101010; --soft: #1f2a29; --good: #63b3ad; --bad: #e07a72; --warn: #d9a441;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: Pretendard, -apple-system, "Noto Sans KR", sans-serif; line-height: 1.6; }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 32px 16px 64px; }
+  header.hero { padding: 24px 0 8px; }
+  .eyebrow { color: var(--muted); font-size: 14px; letter-spacing: .02em; }
+  h1 { font-size: clamp(30px, 6vw, 48px); line-height: 1.15; margin: 8px 0 12px; letter-spacing: -0.02em; }
+  h1 small { display: block; font-size: 16px; font-weight: 500; color: var(--muted); margin-top: 8px; letter-spacing: 0; }
+  .team { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 0; }
+  .team span { background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; font-size: 14px; }
+  .team span.lead { border-color: var(--brand); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 20px 0 8px; font-size: 14px; }
+  nav.toc a { color: var(--muted); text-decoration: none; } nav.toc a:hover { color: var(--brand); }
+  section { margin-top: 40px; }
+  h2 { font-size: 22px; margin: 0 0 14px; letter-spacing: -0.01em; }
+  h2 .n { display: inline-block; width: 28px; height: 28px; line-height: 28px; text-align: center; border-radius: 8px; background: var(--brand); color: var(--brand-ink); font-size: 14px; margin-right: 10px; }
+  h3 { font-size: 15px; margin: 0 0 6px; color: var(--muted); font-weight: 600; }
+  p { margin: 0 0 10px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; }
+  .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .big { font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
+  .lead-text { font-size: 19px; }
+  .muted { color: var(--muted); }
+  ul { margin: 0; padding-left: 20px; } li { margin: 4px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+  th, td { text-align: left; padding: 9px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-size: 12.5px; font-weight: 600; }
+  .tag { display: inline-block; font-size: 12px; padding: 2px 8px; border-radius: 999px; background: var(--soft); color: var(--brand); margin-right: 4px; }
+  .tag.warn { background: color-mix(in srgb, var(--warn) 15%, var(--card)); color: var(--warn); }
+  /* 화면 목업 */
+  .mock { border: 1px solid var(--line); border-radius: 10px; padding: 12px; background: var(--bg); font-size: 13px; margin-top: 10px; }
+  .mock .row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px dashed var(--line); }
+  .mock .row:last-child { border-bottom: none; }
+  .good { color: var(--good); } .bad { color: var(--bad); }
+  .bars { display: flex; gap: 4px; align-items: flex-end; height: 70px; margin-top: 8px; }
+  .bars i { flex: 1; display: block; border-radius: 3px 3px 0 0; background: var(--good); }
+  .bars i.neg { background: var(--bad); }
+  svg.line { width: 100%; height: 90px; display: block; margin-top: 6px; }
+  /* 아키텍처 */
+  .arch { display: grid; grid-template-columns: 1fr; gap: 10px; }
+  .tier { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+  .svc { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; background: var(--card); }
+  .svc b { display: block; font-size: 15px; }
+  .svc span { display: block; color: var(--muted); font-size: 13px; margin-top: 3px; }
+  .svc.base { border-color: var(--brand); background: var(--soft); }
+  .arrow { text-align: center; color: var(--muted); font-size: 13px; }
+  .flow { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 14px; }
+  .flow b { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; font-weight: 600; }
+  .flow em { color: var(--muted); font-style: normal; }
+  footer { margin-top: 56px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); padding-top: 16px; }
+  a { color: var(--brand); }
+  @media (max-width: 600px) { .card { padding: 16px; } th, td { padding: 8px 6px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <div class="eyebrow">KAIST 디지털금융MBA · 클라우드컴퓨팅실습 · 5조 · 아이디어 피칭</div>
+  <h1>힌드사이트 <span class="muted" style="font-weight:500">hindsight</span>
+    <small>유튜버가 말한 종목, 그 뒤에 어떻게 됐나</small></h1>
+  <div class="team">
+    <span>김지환</span><span>오선호</span><span>조인성</span><span>채재희</span><span>김현준</span>
+  </div>
+  <nav class="toc">
+    <a href="#why">문제</a><a href="#what">무엇을</a><a href="#screens">화면</a><a href="#data">데이터</a>
+    <a href="#arch">구조</a><a href="#rules">지킬 것</a><a href="#plan">일정·역할</a><a href="#more">확장</a>
+  </nav>
+</header>
+
+<section id="why">
+  <h2><span class="n">1</span>문제</h2>
+  <div class="card">
+    <p class="lead-text">유튜브에서 종목 이야기를 듣고 사는 사람은 많은데, <b>"그 말이 맞았는지"를 사후에 확인하는 사람은 없다.</b></p>
+    <ul>
+      <li>언급이 갑자기 몰리는 종목은 이미 오른 뒤인 경우가 많다. 그걸 숫자로 보여주는 곳이 없다.</li>
+      <li>"누가 잘 맞혔나"가 아니라 <b>"유튜브 언급을 따라가면 어떻게 되나"</b>라는 현상 자체의 성적을 보여주면, 시청자가 스스로 판단할 수 있다.</li>
+      <li>사용자: 유튜브로 투자 정보를 얻는 개인 투자자. 사용자 1호는 우리 팀.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="what">
+  <h2><span class="n">2</span>무엇을 만드나</h2>
+  <div class="card">
+    <p class="lead-text">주식·코인 유튜브 채널이 <b>영상 제목에서 언급한 종목</b>을 모아, <b>언급 뒤 5·20·60 거래일 동안 주가가 실제로 어떻게 움직였는지</b> 통계로 보여주는 서비스.</p>
+    <div class="flow" style="margin-top:8px">
+      <b>유튜브 영상 제목</b><em>→</em><b>종목 매칭</b><em>→</em><b>언급일 기준 주가 추적</b><em>→</em><b>5·20·60일 수익률 통계</b>
+    </div>
+    <p class="muted" style="margin-top:12px">기존 서비스는 언급량을 세는 데서 끝난다. 우리는 <b>언급 뒤 실제 수익률</b>까지 묶는다.</p>
+  </div>
+</section>
+
+<section id="screens">
+  <h2><span class="n">3</span>화면 3개</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>① 이번 주 언급 급증</h3>
+      <p>최근 7일 언급이 늘어난 종목 순위. 옆에 <b>"그 종목의 과거 언급 뒤 20일 평균 반응"</b>이 같이 붙는다.</p>
+      <div class="mock">
+        <div class="row"><span>삼성전자 · 언급 12 (직전 4)</span><span class="bad">과거 반응 −6.5%</span></div>
+        <div class="row"><span>SK하이닉스 · 언급 6 (직전 3)</span><span class="bad">−13.6%</span></div>
+        <div class="row"><span>NVIDIA · 언급 1 (직전 0)</span><span class="good">+2.6%</span></div>
+        <div class="row muted"><span>예시 형태</span><span>표본 수 함께 표시</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>② 언급 뒤에 — 분석 페이지</h3>
+      <p>언급 후 5·20·60일 수익률 <b>분포</b>, 코스피·S&amp;P500·비트코인 대비 <b>초과수익</b>, 상승 확률, 표본 수. 채널은 <b>A·B·C 익명 집계</b>.</p>
+      <div class="mock">
+        <div class="row"><span>표본 444건</span><span>20일 평균 <b class="bad">−4.6%</b> · 상승 42%</span></div>
+        <div class="bars"><i class="neg" style="height:90%"></i><i class="neg" style="height:50%"></i><i class="neg" style="height:40%"></i><i class="neg" style="height:95%"></i><i style="height:70%"></i><i style="height:100%"></i><i style="height:45%"></i><i style="height:25%"></i></div>
+        <div class="row muted"><span>&lt;−20% … &gt;+20%</span><span>수익률 히스토그램</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>③ 종목 타임라인</h3>
+      <p>종목 하나를 고르면 <b>주가 그래프 위에 언급 시점을 점</b>으로 찍는다. 점 색이 20일 뒤 상승·하락.</p>
+      <div class="mock">
+        <svg class="line" viewBox="0 0 300 90" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M2,75 L30,70 L60,62 L90,66 L120,50 L150,40 L180,22 L200,30 L220,45 L250,40 L280,48 L298,44" fill="none" stroke="currentColor" stroke-opacity=".6" stroke-width="1.5"/>
+          <circle cx="120" cy="50" r="4" fill="var(--good)"/><circle cx="180" cy="22" r="4" fill="var(--bad)"/><circle cx="200" cy="30" r="4" fill="var(--bad)"/><circle cx="250" cy="40" r="4" fill="var(--muted)"/>
+        </svg>
+        <div class="row muted"><span>초록 상승 · 빨강 하락</span><span>회색 = 아직 20일 안 지남</span></div>
+      </div>
+    </div>
+  </div>
+  <p class="muted" style="margin-top:10px">+ 데이터 페이지(수업 필수): 출처, 채널 목록(익명), 수집 건수, <b>매칭 성공률과 못 잡은 제목</b>을 그대로 공개.</p>
+</section>
+
+<section id="data">
+  <h2><span class="n">4</span>데이터와 범위</h2>
+  <div class="card">
+    <table>
+      <thead><tr><th>데이터</th><th>출처</th><th>키</th><th>비고</th></tr></thead>
+      <tbody>
+        <tr><td>채널·영상 메타 (제목·설명·게시일·조회수)</td><td>YouTube Data API v3 <span class="tag">수업 제공</span></td><td>필요</td><td>검색(100유닛) 대신 채널 업로드 목록(1유닛)만 → 한도 걱정 없음</td></tr>
+        <tr><td>상장사 이름·종목코드</td><td>DART OpenAPI corpCode <span class="tag">수업 제공</span></td><td>필요</td><td>종목 사전의 뼈대</td></tr>
+        <tr><td>국내 시세</td><td>공공데이터포털 금융위원회_주식시세정보</td><td>필요</td><td>없으면 Yahoo 국내 심볼로 대체</td></tr>
+        <tr><td>미국 시세 · 코스피/S&amp;P500 지수</td><td>Yahoo Finance</td><td>불필요</td><td>초과수익 벤치마크</td></tr>
+        <tr><td>코인 마켓 목록 · 일봉</td><td>업비트 Open API</td><td>불필요</td><td>KRW 마켓 전체가 사전에 자동 등록</td></tr>
+      </tbody>
+    </table>
+    <div class="grid" style="margin-top:14px">
+      <div><h3>범위 (8주차 MVP)</h3><ul><li>채널: 주식 15 + 코인 5, 최근 1년</li><li>종목: 국내 전 상장사 + 미국 주요 종목 + 업비트 코인</li><li>매칭: 제목에서 종목명·별칭 정확 매칭</li><li>통계: 5·20·60일 수익률, 벤치마크 대비 초과수익, 표본 수</li></ul></div>
+      <div><h3>매칭이 핵심이다</h3><ul><li>긴 이름 우선 ("삼성전자우" &gt; "삼성전자")</li><li>흔한 단어(KT·삼성·현대·리스크)는 단독 매칭 금지</li><li>별칭 사전(삼전·하닉·엔비디아…)은 팀이 계속 보강</li><li>못 잡은 제목은 버리지 않고 남겨 성공률로 공개</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section id="arch">
+  <h2><span class="n">5</span>구조 — 서비스 4개, 각자 데이터 하나씩</h2>
+  <div class="card arch">
+    <div class="tier">
+      <div class="svc"><b>stats</b><span>언급 뒤 주가는 어땠나 — 수익률·초과수익·요약</span></div>
+      <div class="svc"><b>mentions</b><span>이 영상이 어떤 종목을 말했나 — 매칭·성공률</span></div>
+    </div>
+    <div class="arrow">↓ REST 로만 묻는다 · 순환 없음 ↓</div>
+    <div class="tier">
+      <div class="svc base"><b>youtube</b><span>어떤 채널이 언제 무슨 영상을 올렸나 (수집 전용)</span></div>
+      <div class="svc base"><b>market-data</b><span>종목 사전 + 일별 시세 + 지수 (수집 전용)</span></div>
+    </div>
+    <p class="muted" style="margin:12px 0 0">매일 새벽 순서: market-data(사전·시세) → youtube(새 영상) → mentions(매칭) → market-data(새로 언급된 종목 시세) → stats(수익률). 화면은 계산하지 않고 저장된 결과만 읽는다.</p>
+    <p class="muted" style="margin:6px 0 0">스택: FastAPI + PostgreSQL(Supabase, 서비스별 스키마) + React. 배포: Vercel(프론트) · Render(백엔드 4개) · GitHub Actions(수집 스케줄). API 명세(OpenAPI)를 먼저 쓰고 CI 가 스타일·하위 호환을 검사한다.</p>
+  </div>
+</section>
+
+<section id="rules">
+  <h2><span class="n">6</span>지킬 것</h2>
+  <div class="grid">
+    <div class="card"><h3>채널은 익명</h3><p>화면·통계·발표 어디에도 채널 실명 랭킹을 내지 않는다. A·B·C 코드로만 집계한다.</p></div>
+    <div class="card"><h3>추천하지 않는다</h3><p>통계와 표본 수만 보여준다. 표본 30건 미만은 "참고용"으로 표시한다.</p></div>
+    <div class="card"><h3>공개 메타데이터만</h3><p>영상 제목·게시일·조회수만 쓴다. 자막·댓글은 수집하지 않는다.</p></div>
+  </div>
+</section>
+
+<section id="plan">
+  <h2><span class="n">7</span>일정과 역할</h2>
+  <div class="grid">
+    <div class="card">
+      <table>
+        <thead><tr><th>주차</th><th>할 일</th></tr></thead>
+        <tbody>
+          <tr><td>5 (9/30)</td><td>아이디어 피칭 · 채널 20개 확정 · 키 발급</td></tr>
+          <tr><td>6 (10/7)</td><td>유튜브·시세 수집기 완성, 1년 백필 · 별칭 사전</td></tr>
+          <tr><td>7 (10/14)</td><td>수익률 통계 · 화면 4개 · 배포 · 문서</td></tr>
+          <tr><td>8 (10/21)</td><td>발표</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <table>
+        <thead><tr><th>역할</th><th>하는 일</th></tr></thead>
+        <tbody>
+          <tr><td>유튜브 수집</td><td>채널 목록, YouTube API 수집기, 백필</td></tr>
+          <tr><td>종목 사전·시세</td><td>DART corpCode, 국내·미국·코인 시세</td></tr>
+          <tr><td>종목 매칭</td><td>별칭 사전, 매칭 규칙, 성공률</td></tr>
+          <tr><td>통계·분석 페이지</td><td>수익률·초과수익, 표본 처리</td></tr>
+          <tr><td>화면·플랫폼</td><td>프론트, API 명세·CI·배포</td></tr>
+        </tbody>
+      </table>
+      <p class="muted" style="margin-top:8px">담당자는 팀 논의 후 확정.</p>
+    </div>
+  </div>
+</section>
+
+<section id="more">
+  <h2><span class="n">8</span>확장 아이디어와 비즈니스</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>트럼프 발언 → 주가 <span class="tag warn">확장</span></h3>
+      <p>같은 뼈대("사건 → 이후 주가")에 사건 출처를 하나 더 붙이는 것이라 구조 변경이 없다. 발언 데이터는 X API 가 유료라 <b>뉴스 헤드라인(네이버 뉴스 API, "트럼프" 검색)</b>을 사건으로 쓰는 것이 현실적. 관세·반도체 등 키워드별로 관련 업종·지수의 이후 반응을 비교.</p>
+    </div>
+    <div class="card">
+      <h3>그 밖의 확장</h3>
+      <ul>
+        <li>언급 급증 신호를 따라 샀을 때의 백테스트</li>
+        <li>조회수 가중 "언급 강도"</li>
+        <li>관심 종목에 새 언급이 뜨면 알림</li>
+        <li>자막·LLM 기반 종목 추출(후속 과목)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>비즈니스 모델</h3>
+      <ul>
+        <li>개인 구독: 관심 종목 언급 알림</li>
+        <li>증권사 리서치·콘텐츠 팀에 "지금 화제인 종목" 데이터</li>
+        <li>광고·마케팅사 대상 언급량 데이터 API</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer>
+  5조 · 김지환 · 오선호 · 조인성 · 채재희 · 김현준 &nbsp;·&nbsp; 저장소: <a href="https://github.com/insung1939/hindsight" target="_blank" rel="noreferrer">github.com/insung1939/hindsight</a>
+  &nbsp;·&nbsp; 통계는 정보 제공 목적이며 특정 종목을 추천하지 않습니다.
+</footer>
+
+</div>
+</body>
+</html>
