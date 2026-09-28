@@ -1,90 +1,48 @@
-import { useEffect, useState } from "react";
-import { api } from "./api";
-import ThisMonth from "./pages/ThisMonth";
-import Assets from "./pages/Assets";
-import TimeMachine from "./pages/TimeMachine";
-import Myths from "./pages/Myths";
+import { useState } from "react";
+import Trending from "./pages/Trending";
+import Afterwards from "./pages/Afterwards";
+import Timeline from "./pages/Timeline";
 import DataPage from "./pages/DataPage";
-import Setup from "./pages/Setup";
 import "./App.css";
 
 const TABS = [
-  ["month", "이번 달"],
-  ["assets", "자산 현황"],
-  ["time", "타임머신"],
-  ["myths", "신화 검증"],
+  ["trending", "이번 주 언급"],
+  ["after", "언급 뒤에"],
+  ["timeline", "종목 타임라인"],
   ["data", "데이터"],
 ];
 
 export default function App() {
-  const [tab, setTab] = useState("month");
-  const [portfolios, setPortfolios] = useState(null);
-  const [pid, setPid] = useState(null);
-  const [error, setError] = useState(null);
+  const [tab, setTab] = useState("trending");
+  const [asset, setAsset] = useState(null); // 타임라인으로 넘길 종목
   const [dark, setDark] = useState(() => window.matchMedia?.("(prefers-color-scheme: dark)").matches);
 
-  const loadPortfolios = async () => {
-    try {
-      const r = await api("portfolio", "/v1/portfolios");
-      setPortfolios(r.items);
-      if (r.items.length && !pid) setPid(r.items[0].id);
-      setError(null);
-    } catch (e) {
-      setError(e);
-      setPortfolios([]);
-    }
-  };
-  useEffect(() => { loadPortfolios(); }, []);
-
-  const portfolio = portfolios?.find((p) => p.id === pid);
+  const openTimeline = (assetId) => { setAsset(assetId); setTab("timeline"); };
 
   return (
     <div className={dark ? "app dark" : "app"}>
       <header className="top">
         <div>
-          <h1>루틴</h1>
-          <p className="tag">다자산 적립식 투자자의 운영 시스템 · 매달 무엇을 얼마 살지, 규칙을 지켰는지</p>
+          <h1>힌드사이트</h1>
+          <p className="tag">유튜버가 말한 종목, 그 뒤에 어떻게 됐나 · 언급 뒤 5·20·60 거래일 수익률</p>
         </div>
-        <div className="top-right">
-          {portfolios?.length > 0 && (
-            <select value={pid ?? ""} onChange={(e) => setPid(Number(e.target.value))}>
-              {portfolios.map((p) => <option key={p.id} value={p.id}>{p.name} ({p.owner})</option>)}
-            </select>
-          )}
-          <button className="ghost" onClick={() => setDark(!dark)}>{dark ? "라이트" : "다크"}</button>
-        </div>
+        <button className="ghost" onClick={() => setDark(!dark)}>{dark ? "라이트" : "다크"}</button>
       </header>
 
-      {error && (
-        <div className="problem">
-          서버에 연결하지 못했습니다: {error.message}
-          <span className="muted"> — Render 무료 플랜은 첫 요청에 30~60초 걸릴 수 있습니다. 잠시 후 새로고침.</span>
-        </div>
-      )}
-
-      {portfolios && portfolios.length === 0 && !error && (
-        <Setup onDone={loadPortfolios} />
-      )}
-
-      {portfolio && (
-        <>
-          <nav className="tabs">
-            {TABS.map(([k, label]) => (
-              <button key={k} className={tab === k ? "on" : ""} onClick={() => setTab(k)}>{label}</button>
-            ))}
-          </nav>
-          <main>
-            {tab === "month" && <ThisMonth portfolio={portfolio} />}
-            {tab === "assets" && <Assets portfolio={portfolio} />}
-            {tab === "time" && <TimeMachine portfolio={portfolio} />}
-            {tab === "myths" && <Myths />}
-            {tab === "data" && <DataPage />}
-          </main>
-        </>
-      )}
+      <nav className="tabs">
+        {TABS.map(([k, label]) => (
+          <button key={k} className={tab === k ? "on" : ""} onClick={() => setTab(k)}>{label}</button>
+        ))}
+      </nav>
+      <main>
+        {tab === "trending" && <Trending onPick={openTimeline} />}
+        {tab === "after" && <Afterwards onPick={openTimeline} />}
+        {tab === "timeline" && <Timeline assetId={asset} onChange={setAsset} />}
+        {tab === "data" && <DataPage />}
+      </main>
 
       <footer className="muted">
-        KAIST 디지털금융MBA 클라우드컴퓨팅실습 팀 프로젝트 · 정보 제공 목적이며 특정 종목을 추천하지 않습니다.
+        KAIST 디지털금융MBA 클라우드컴퓨팅실습 팀 프로젝트 · 채널은 익명 집계 · 통계는 정보 제공 목적이며 특정 종목을 추천하지 않습니다.
       </footer>
     </div>
   );

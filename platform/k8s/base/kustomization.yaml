@@ -4,9 +4,8 @@ resources:
   - namespace.yaml
   - config.yaml
   - market-data.yaml
-  - income.yaml
-  - portfolio.yaml
-  - plan.yaml
-  - backtest.yaml
+  - youtube.yaml
+  - mentions.yaml
+  - stats.yaml
   - cronjob.yaml
   # - secret.yaml   # secret.example.yaml 을 복사해 만든 뒤 주석 해제

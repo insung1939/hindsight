@@ -28,7 +28,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        service: [market-data, income, portfolio, plan, backtest]
+        service: [market-data, youtube, mentions, stats]
     steps:
       - uses: actions/checkout@v4
         with:

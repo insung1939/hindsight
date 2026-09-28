@@ -1,7 +1,7 @@
 # 로컬 통합 실행 — 서비스 5개를 컨테이너로 띄운다 (SQLite, 볼륨에 보존).
 #   docker compose -f platform/compose/docker-compose.yml up --build
 # 세미나 트랙에서 APISIX · OTel Collector · Grafana 를 여기에 덧붙인다 (7주차).
-name: routine
+name: hindsight
 
 x-common: &common
   restart: unless-stopped
@@ -9,10 +9,9 @@ x-common: &common
     ALLOWED_ORIGINS: http://localhost:5173
     INTERNAL_TOKEN: dev-token
     MARKET_DATA_URL: http://market-data:8000
-    INCOME_URL: http://income:8000
-    PORTFOLIO_URL: http://portfolio:8000
-    PLAN_URL: http://plan:8000
-    BACKTEST_URL: http://backtest:8000
+    YOUTUBE_URL: http://youtube:8000
+    MENTIONS_URL: http://mentions:8000
+    STATS_URL: http://stats:8000
     # 관측 프로필을 켜면(--profile observability) 서비스가 여기로 트레이스를 보낸다. 컬렉터가 없으면 조용히 실패한다.
     OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
 
@@ -24,37 +23,28 @@ services:
     volumes: [market-data:/data]
     ports: ["8001:8000"]
 
-  income:
+  youtube:
     <<: *common
-    build: { context: ../.., dockerfile: services/income/Dockerfile }
-    environment: { <<: *env, DATABASE_URL: sqlite:////data/income.db }
-    volumes: [income:/data]
+    build: { context: ../.., dockerfile: services/youtube/Dockerfile }
+    environment: { <<: *env, DATABASE_URL: sqlite:////data/youtube.db, YOUTUBE_API_KEY: ${YOUTUBE_API_KEY:-} }
+    volumes: [youtube:/data]
     ports: ["8002:8000"]
-    depends_on: [market-data]
 
-  portfolio:
+  mentions:
     <<: *common
-    build: { context: ../.., dockerfile: services/portfolio/Dockerfile }
-    environment: { <<: *env, DATABASE_URL: sqlite:////data/portfolio.db }
-    volumes: [portfolio:/data]
+    build: { context: ../.., dockerfile: services/mentions/Dockerfile }
+    environment: { <<: *env, DATABASE_URL: sqlite:////data/mentions.db }
+    volumes: [mentions:/data]
     ports: ["8003:8000"]
-    depends_on: [market-data]
+    depends_on: [youtube, market-data]
 
-  plan:
+  stats:
     <<: *common
-    build: { context: ../.., dockerfile: services/plan/Dockerfile }
-    environment: { <<: *env, DATABASE_URL: sqlite:////data/plan.db }
-    volumes: [plan:/data]
+    build: { context: ../.., dockerfile: services/stats/Dockerfile }
+    environment: { <<: *env, DATABASE_URL: sqlite:////data/stats.db }
+    volumes: [stats:/data]
     ports: ["8004:8000"]
-    depends_on: [portfolio, market-data]
-
-  backtest:
-    <<: *common
-    build: { context: ../.., dockerfile: services/backtest/Dockerfile }
-    environment: { <<: *env, DATABASE_URL: sqlite:////data/backtest.db }
-    volumes: [backtest:/data]
-    ports: ["8005:8000"]
-    depends_on: [market-data, income, portfolio]
+    depends_on: [mentions, market-data]
 
   # ── 세미나 트랙: 게이트웨이 (docker compose --profile gateway up) ──
   apisix:
@@ -66,7 +56,7 @@ services:
       - ../gateway/apisix.yaml:/usr/local/apisix/conf/apisix.yaml:ro
       - ../gateway/config.yaml:/usr/local/apisix/conf/config.yaml:ro
     ports: ["9080:9080", "9091:9091"]
-    depends_on: [market-data, income, portfolio, plan, backtest]
+    depends_on: [market-data, youtube, mentions, stats]
 
   # ── 세미나 트랙: 관측 (docker compose --profile observability up) ──
   otel-collector:
@@ -104,7 +94,6 @@ services:
 volumes:
   tempo: {}
   market-data: {}
-  income: {}
-  portfolio: {}
-  plan: {}
-  backtest: {}
+  youtube: {}
+  mentions: {}
+  stats: {}

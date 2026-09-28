@@ -4,9 +4,8 @@ from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
-ORDER = ["market-data", "income", "portfolio", "plan", "backtest"]
-CALLS = {"market-data": "—", "income": "market-data", "portfolio": "market-data",
-         "plan": "portfolio, market-data", "backtest": "market-data, income, portfolio"}
+ORDER = ["market-data", "youtube", "mentions", "stats"]
+CALLS = {"market-data": "—", "youtube": "—", "mentions": "youtube, market-data", "stats": "mentions, market-data"}
 
 
 def body_schema(op: dict) -> str:

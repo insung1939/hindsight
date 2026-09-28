@@ -1,61 +1,50 @@
 # Apache APISIX standalone 설정 — 세미나 2번 항목 (North-South 게이트웨이).
-# 프론트는 서비스 주소 5개 대신 게이트웨이 하나만 안다: http://localhost:9080/api/<service>/v1/...
+# 프론트는 서비스 주소 4개 대신 게이트웨이 하나만 안다: http://localhost:9080/api/<service>/v1/...
 #
-#   Before: 프론트 → 서비스 5개 직접 호출, 인증·속도제한 없음, 주소가 늘어날수록 프론트 설정이 늘어남
+#   Before: 프론트 → 서비스 4개 직접 호출, 인증·속도제한 없음, /internal/sync 가 외부에 노출
 #   After : 프론트 → APISIX → 서비스.  키 인증(key-auth) · 분당 호출 제한(limit-count) · 경로 재작성 · CORS · 메트릭 을 한곳에서
 #
-# 규칙: 외부에서 /internal/* 은 막는다(수집 트리거는 내부 토큰으로 CronJob 만 부른다).
+# 주의: APISIX uri 와일드카드는 끝에만 가능하다. 서비스별로 나열한다.
 routes:
-  # ── 외부 공개 라우트: /api/<service>/... → <service>/... ──
   - id: market-data
     uri: /api/market-data/*
     upstream_id: market-data
     plugins:
       proxy-rewrite: { regex_uri: ["^/api/market-data/(.*)", "/$1"] }
       key-auth: {}
-      limit-count: { count: 120, time_window: 60, key_type: var, key: remote_addr, rejected_code: 429,
-                     rejected_msg: '{"type":"about:blank","title":"Too Many Requests","status":429}' }
-      cors: { allow_origins: "**", allow_methods: "GET,POST,PATCH,DELETE,OPTIONS", allow_headers: "*", expose_headers: "X-Request-ID" }
-      prometheus: {}
-  - id: income
-    uri: /api/income/*
-    upstream_id: income
-    plugins:
-      proxy-rewrite: { regex_uri: ["^/api/income/(.*)", "/$1"] }
-      key-auth: {}
       limit-count: { count: 120, time_window: 60, key_type: var, key: remote_addr, rejected_code: 429 }
       cors: { allow_origins: "**", allow_methods: "GET,POST,PATCH,DELETE,OPTIONS", allow_headers: "*", expose_headers: "X-Request-ID" }
       prometheus: {}
-  - id: portfolio
-    uri: /api/portfolio/*
-    upstream_id: portfolio
+  - id: youtube
+    uri: /api/youtube/*
+    upstream_id: youtube
     plugins:
-      proxy-rewrite: { regex_uri: ["^/api/portfolio/(.*)", "/$1"] }
-      key-auth: {}
-      limit-count: { count: 120, time_window: 60, key_type: var, key: remote_addr, rejected_code: 429 }
-      cors: { allow_origins: "**", allow_methods: "GET,POST,PATCH,DELETE,OPTIONS", allow_headers: "*", expose_headers: "X-Request-ID" }
-      prometheus: {}
-  - id: plan
-    uri: /api/plan/*
-    upstream_id: plan
-    plugins:
-      proxy-rewrite: { regex_uri: ["^/api/plan/(.*)", "/$1"] }
+      proxy-rewrite: { regex_uri: ["^/api/youtube/(.*)", "/$1"] }
       key-auth: {}
       limit-count: { count: 60, time_window: 60, key_type: var, key: remote_addr, rejected_code: 429 }
-      cors: { allow_origins: "**", allow_methods: "GET,POST,PATCH,DELETE,OPTIONS", allow_headers: "*", expose_headers: "X-Request-ID" }
+      cors: { allow_origins: "**", allow_methods: "GET,POST,OPTIONS", allow_headers: "*", expose_headers: "X-Request-ID" }
       prometheus: {}
-  - id: backtest
-    uri: /api/backtest/*
-    upstream_id: backtest
+  - id: mentions
+    uri: /api/mentions/*
+    upstream_id: mentions
     plugins:
-      proxy-rewrite: { regex_uri: ["^/api/backtest/(.*)", "/$1"] }
+      proxy-rewrite: { regex_uri: ["^/api/mentions/(.*)", "/$1"] }
       key-auth: {}
-      limit-count: { count: 30, time_window: 60, key_type: var, key: remote_addr, rejected_code: 429 }
-      cors: { allow_origins: "**", allow_methods: "GET,POST,PATCH,DELETE,OPTIONS", allow_headers: "*", expose_headers: "X-Request-ID" }
+      limit-count: { count: 120, time_window: 60, key_type: var, key: remote_addr, rejected_code: 429 }
+      cors: { allow_origins: "**", allow_methods: "GET,OPTIONS", allow_headers: "*", expose_headers: "X-Request-ID" }
       prometheus: {}
-  # ── /internal/* 은 외부에서 차단 (APISIX uri 와일드카드는 끝에만 되므로 서비스별로 나열) ──
+  - id: stats
+    uri: /api/stats/*
+    upstream_id: stats
+    plugins:
+      proxy-rewrite: { regex_uri: ["^/api/stats/(.*)", "/$1"] }
+      key-auth: {}
+      limit-count: { count: 120, time_window: 60, key_type: var, key: remote_addr, rejected_code: 429 }
+      cors: { allow_origins: "**", allow_methods: "GET,OPTIONS", allow_headers: "*", expose_headers: "X-Request-ID" }
+      prometheus: {}
+  # ── /internal/* 은 외부에서 차단 ──
   - id: block-internal
-    uris: [/api/market-data/internal/*, /api/income/internal/*, /api/portfolio/internal/*, /api/plan/internal/*, /api/backtest/internal/*]
+    uris: [/api/market-data/internal/*, /api/youtube/internal/*, /api/mentions/internal/*, /api/stats/internal/*]
     priority: 10
     plugins:
       response-rewrite:
@@ -63,57 +52,27 @@ routes:
         headers: { Content-Type: application/problem+json }
         body: '{"type":"about:blank","title":"Forbidden","status":403,"detail":"internal endpoints are not exposed"}'
     upstream_id: market-data
-  # ── 헬스체크는 키 없이 (서비스별 라우트) ──
-  - id: healthz-market-data
-    uri: /api/market-data/healthz
-    priority: 5
-    plugins: { proxy-rewrite: { uri: /healthz } }
-    upstream_id: market-data
-  - id: healthz-income
-    uri: /api/income/healthz
-    priority: 5
-    plugins: { proxy-rewrite: { uri: /healthz } }
-    upstream_id: income
-  - id: healthz-portfolio
-    uri: /api/portfolio/healthz
-    priority: 5
-    plugins: { proxy-rewrite: { uri: /healthz } }
-    upstream_id: portfolio
-  - id: healthz-plan
-    uri: /api/plan/healthz
-    priority: 5
-    plugins: { proxy-rewrite: { uri: /healthz } }
-    upstream_id: plan
-  - id: healthz-backtest
-    uri: /api/backtest/healthz
-    priority: 5
-    plugins: { proxy-rewrite: { uri: /healthz } }
-    upstream_id: backtest
+  # ── 헬스체크는 키 없이 ──
+  - { id: healthz-market-data, uri: /api/market-data/healthz, priority: 5, plugins: { proxy-rewrite: { uri: /healthz } }, upstream_id: market-data }
+  - { id: healthz-youtube, uri: /api/youtube/healthz, priority: 5, plugins: { proxy-rewrite: { uri: /healthz } }, upstream_id: youtube }
+  - { id: healthz-mentions, uri: /api/mentions/healthz, priority: 5, plugins: { proxy-rewrite: { uri: /healthz } }, upstream_id: mentions }
+  - { id: healthz-stats, uri: /api/stats/healthz, priority: 5, plugins: { proxy-rewrite: { uri: /healthz } }, upstream_id: stats }
 
 upstreams:
   - id: market-data
     nodes: { "market-data:8000": 1 }
     type: roundrobin
     checks: { active: { http_path: /healthz, healthy: { interval: 10, successes: 1 }, unhealthy: { interval: 10, http_failures: 3 } } }
-  - id: income
-    nodes: { "income:8000": 1 }
-    type: roundrobin
-  - id: portfolio
-    nodes: { "portfolio:8000": 1 }
-    type: roundrobin
-  - id: plan
-    nodes: { "plan:8000": 1 }
-    type: roundrobin
-  - id: backtest
-    nodes: { "backtest:8000": 1 }
-    type: roundrobin
+  - { id: youtube, nodes: { "youtube:8000": 1 }, type: roundrobin }
+  - { id: mentions, nodes: { "mentions:8000": 1 }, type: roundrobin }
+  - { id: stats, nodes: { "stats:8000": 1 }, type: roundrobin }
 
 consumers:
   - username: web
     plugins:
-      key-auth: { key: routine-web-dev-key }
+      key-auth: { key: hindsight-web-dev-key }
   - username: seminar_demo
     plugins:
-      key-auth: { key: routine-demo-key }
+      key-auth: { key: hindsight-demo-key }
 
 #END

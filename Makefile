@@ -1,5 +1,5 @@
 # 자주 쓰는 명령 모음.  make help
-SERVICES := market-data income portfolio plan backtest
+SERVICES := market-data youtube mentions stats
 COMPOSE  := docker compose -f platform/compose/docker-compose.yml
 
 .PHONY: help setup up down smoke test lint contracts docs web compose compose-all compose-down
@@ -8,17 +8,17 @@ help:            ## 이 목록
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
 
 setup:           ## 가상환경 + 의존성 (최초 1회)
-	python3 -m venv .venv && . .venv/bin/activate && pip install -q -e libs/routine-common pytest pyyaml \
+	python3 -m venv .venv && . .venv/bin/activate && pip install -q -e libs/hs-common pytest pyyaml \
 	  $(foreach s,$(SERVICES),-r services/$(s)/requirements.txt)
 	cd apps/web && npm install
 
-up:              ## 서비스 5개 로컬 실행 (8001~8005)
+up:              ## 서비스 4개 로컬 실행 (8001~8004)
 	./scripts/dev_up.sh
 
 down:            ## 로컬 서비스 종료
 	./scripts/dev_down.sh
 
-smoke:           ## 수집 → 지시서 → 타임머신 한 바퀴
+smoke:           ## 사전·시세 → 샘플 영상 → 매칭 → 수익률 한 바퀴
 	. .venv/bin/activate && python scripts/smoke.py
 
 test:            ## 서비스별 pytest (계약 드리프트 포함)
@@ -36,7 +36,7 @@ docs:            ## docs/api.md 재생성
 web:             ## 프론트 개발 서버 (5173)
 	cd apps/web && npm run dev
 
-compose:         ## Docker 로 서비스 5개
+compose:         ## Docker 로 서비스 4개
 	$(COMPOSE) up -d --build
 
 compose-all:     ## + APISIX 게이트웨이 + OTel·Tempo·Prometheus·Grafana (세미나)

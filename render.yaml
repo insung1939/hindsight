@@ -1,11 +1,12 @@
-# Render Blueprint — 대시보드 New → Blueprint 에서 이 저장소를 고르면 서비스 5개가 한 번에 만들어진다.
-# 무료 플랜: 15분 미사용 시 슬립(콜드 스타트 30~60초). sync: false 항목은 대시보드에서 직접 넣는다.
-#   DATABASE_URL     = Supabase Session pooler 주소 (서비스별 스키마 권한 계정 권장, PLAN.md 4.4)
+# Render Blueprint — New → Blueprint 에서 이 저장소를 고르면 서비스 4개가 한 번에 만들어진다. (docs/deploy.md)
+# sync: false 항목은 대시보드에서 직접 넣는다.
+#   DATABASE_URL     = Supabase Session pooler 주소 (4개 전부 같은 값, 스키마는 서비스가 만든다)
 #   ALLOWED_ORIGINS  = Vercel 주소 (끝에 / 없이)
-#   INTERNAL_TOKEN   = 다섯 서비스에 같은 값. GitHub Secrets 의 INTERNAL_TOKEN 과 동일하게.
+#   INTERNAL_TOKEN   = 4개 전부 같은 값. GitHub Secrets 의 INTERNAL_TOKEN 과 동일하게.
+#   YOUTUBE_API_KEY  = youtube 서비스만
 services:
   - type: web
-    name: routine-market-data
+    name: hindsight-market-data
     runtime: docker
     plan: free
     dockerfilePath: ./services/market-data/Dockerfile
@@ -16,64 +17,49 @@ services:
       - { key: ALLOWED_ORIGINS, sync: false }
       - { key: INTERNAL_TOKEN, sync: false }
       - { key: DATA_GO_KR_KEY, sync: false }
-      - { key: KOREAEXIM_KEY, sync: false }
+      - { key: DART_KEY, sync: false }
 
   - type: web
-    name: routine-income
+    name: hindsight-youtube
     runtime: docker
     plan: free
-    dockerfilePath: ./services/income/Dockerfile
+    dockerfilePath: ./services/youtube/Dockerfile
     dockerContext: .
     healthCheckPath: /healthz
     envVars:
       - { key: DATABASE_URL, sync: false }
       - { key: ALLOWED_ORIGINS, sync: false }
       - { key: INTERNAL_TOKEN, sync: false }
-      - { key: DART_KEY, sync: false }
-      - key: MARKET_DATA_URL
-        fromService: { type: web, name: routine-market-data, property: host }
+      - { key: YOUTUBE_API_KEY, sync: false }
 
   - type: web
-    name: routine-portfolio
+    name: hindsight-mentions
     runtime: docker
     plan: free
-    dockerfilePath: ./services/portfolio/Dockerfile
+    dockerfilePath: ./services/mentions/Dockerfile
     dockerContext: .
     healthCheckPath: /healthz
     envVars:
       - { key: DATABASE_URL, sync: false }
       - { key: ALLOWED_ORIGINS, sync: false }
+      - { key: INTERNAL_TOKEN, sync: false }
       - key: MARKET_DATA_URL
-        fromService: { type: web, name: routine-market-data, property: host }
+        fromService: { type: web, name: hindsight-market-data, property: host }
+      - key: YOUTUBE_URL
+        fromService: { type: web, name: hindsight-youtube, property: host }
 
   - type: web
-    name: routine-plan
+    name: hindsight-stats
     runtime: docker
     plan: free
-    dockerfilePath: ./services/plan/Dockerfile
+    dockerfilePath: ./services/stats/Dockerfile
     dockerContext: .
     healthCheckPath: /healthz
     envVars:
       - { key: DATABASE_URL, sync: false }
       - { key: ALLOWED_ORIGINS, sync: false }
+      - { key: INTERNAL_TOKEN, sync: false }
       - key: MARKET_DATA_URL
-        fromService: { type: web, name: routine-market-data, property: host }
-      - key: PORTFOLIO_URL
-        fromService: { type: web, name: routine-portfolio, property: host }
-
-  - type: web
-    name: routine-backtest
-    runtime: docker
-    plan: free
-    dockerfilePath: ./services/backtest/Dockerfile
-    dockerContext: .
-    healthCheckPath: /healthz
-    envVars:
-      - { key: DATABASE_URL, sync: false }
-      - { key: ALLOWED_ORIGINS, sync: false }
-      - key: MARKET_DATA_URL
-        fromService: { type: web, name: routine-market-data, property: host }
-      - key: INCOME_URL
-        fromService: { type: web, name: routine-income, property: host }
-      - key: PORTFOLIO_URL
-        fromService: { type: web, name: routine-portfolio, property: host }
+        fromService: { type: web, name: hindsight-market-data, property: host }
+      - key: MENTIONS_URL
+        fromService: { type: web, name: hindsight-mentions, property: host }

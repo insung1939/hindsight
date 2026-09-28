@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stats
+  namespace: hindsight
+  labels: { app: stats, part-of: hindsight }
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: stats }
+  template:
+    metadata:
+      labels: { app: stats, part-of: hindsight }
+    spec:
+      containers:
+        - name: stats
+          image: ghcr.io/insung1939/hindsight-statsatest
+          ports: [{ containerPort: 8000 }]
+          envFrom:
+            - configMapRef: { name: hindsight-config }
+          env:
+            - name: DATABASE_URL
+              valueFrom: { secretKeyRef: { name: hindsight-secrets, key: DATABASE_URL_STATS } }
+            - name: INTERNAL_TOKEN
+              valueFrom: { secretKeyRef: { name: hindsight-secrets, key: INTERNAL_TOKEN } }
+            - name: DATA_GO_KR_KEY
+              valueFrom: { secretKeyRef: { name: hindsight-secrets, key: DATA_GO_KR_KEY, optional: true } }
+            - name: KOREAEXIM_KEY
+              valueFrom: { secretKeyRef: { name: hindsight-secrets, key: KOREAEXIM_KEY, optional: true } }
+            - name: DART_KEY
+              valueFrom: { secretKeyRef: { name: hindsight-secrets, key: DART_KEY, optional: true } }
+          readinessProbe:
+            httpGet: { path: /healthz, port: 8000 }
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: { path: /healthz, port: 8000 }
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          resources:
+            requests: { cpu: 50m, memory: 128Mi }
+            limits: { cpu: 500m, memory: 512Mi }
+          volumeMounts: [{ name: data, mountPath: /data }]
+      volumes:
+        - name: data
+          emptyDir: {}   # SQLite 데모용. Supabase 를 쓰면 필요 없다.
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stats
+  namespace: hindsight
+  labels: { app: stats }
+spec:
+  selector: { app: stats }
+  ports: [{ port: 8000, targetPort: 8000 }]
