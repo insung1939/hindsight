@@ -438,6 +438,9 @@ components:
         ambiguous:
           type: boolean
           title: Ambiguous
+        curated:
+          type: boolean
+          title: Curated
       type: object
       required:
       - asset_id
@@ -445,6 +448,7 @@ components:
       - aliases
       - market
       - ambiguous
+      - curated
       title: DictionaryEntry
     ListAssets:
       properties:
