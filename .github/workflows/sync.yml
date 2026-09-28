@@ -22,16 +22,21 @@ jobs:
         run: echo "MARKET_DATA_URL secret 이 없어 건너뜀 (Render 배포 후 등록)"
       - name: market-data (사전 + 시세)
         if: env.MARKET_DATA_URL != ''
-        run: curl -sS --max-time 600 --retry 3 --retry-delay 30 -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "$MARKET_DATA_URL/internal/sync?days=30"
+        run: |
+          curl -sS --max-time 600 --retry 3 --retry-delay 30 -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "$MARKET_DATA_URL/internal/sync?days=30"
       - name: youtube (새 영상)
         if: env.YOUTUBE_URL != ''
-        run: curl -sS --max-time 600 --retry 3 --retry-delay 30 -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "$YOUTUBE_URL/internal/sync?days=3"
+        run: |
+          curl -sS --max-time 600 --retry 3 --retry-delay 30 -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "$YOUTUBE_URL/internal/sync?days=3"
       - name: mentions (매칭)
         if: env.MENTIONS_URL != ''
-        run: curl -sS --max-time 600 --retry 3 --retry-delay 30 -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "$MENTIONS_URL/internal/sync"
+        run: |
+          curl -sS --max-time 600 --retry 3 --retry-delay 30 -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "$MENTIONS_URL/internal/sync"
       - name: market-data (새로 언급된 종목 시세)
         if: env.MARKET_DATA_URL != ''
-        run: curl -sS --max-time 600 --retry 3 --retry-delay 30 -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "$MARKET_DATA_URL/internal/sync?days=120&dictionary=false"
+        run: |
+          curl -sS --max-time 600 --retry 3 --retry-delay 30 -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "$MARKET_DATA_URL/internal/sync?days=120&dictionary=false"
       - name: stats (수익률·요약)
         if: env.STATS_URL != ''
-        run: curl -sS --max-time 600 --retry 3 --retry-delay 30 -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "$STATS_URL/internal/sync"
+        run: |
+          curl -sS --max-time 600 --retry 3 --retry-delay 30 -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "$STATS_URL/internal/sync"
