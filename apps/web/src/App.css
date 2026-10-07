@@ -52,3 +52,4 @@ tr.hl td { background: color-mix(in srgb, var(--brand) 14%, transparent); }
 
 .step { position: relative; padding-top: 22px; }
 .step-n { position: absolute; top: 10px; right: 14px; font-size: 20px; color: var(--brand); font-weight: 700; }
+.wake { background: color-mix(in srgb, var(--warn) 14%, var(--card)); border: 1px solid var(--warn); border-radius: 10px; padding: 10px 14px; margin: 0 0 12px; font-size: 14px; }
