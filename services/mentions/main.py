@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from hs_common import InternalOnly, ServiceClient, create_app
+from hs_common import InternalOnly, ServiceClient, create_app, memo_ttl
 from hs_common.settings import env
 from matcher import build_terms, classify_stance, match
 from models import Mention, SyncState, Unmatched, db
@@ -141,15 +141,21 @@ def list_unmatched(limit: int = Query(default=50, le=500), s: Session = Depends(
 
 @app.get("/v1/coverage", response_model=CoverageOut, tags=["mentions"], operation_id="get_coverage", summary="매칭 성공률 (데이터 페이지용)")
 def coverage(s: Session = Depends(db.session)):
-    matched = s.scalar(select(func.count(func.distinct(Mention.video_id)))) or 0
-    unmatched = s.scalar(select(func.count()).select_from(Unmatched)) or 0
-    seen = matched + unmatched
-    last = s.get(SyncState, "last_video_at")
-    return {"videos_seen": seen, "videos_matched": matched, "match_rate": (matched / seen) if seen else 0.0,
-            "mentions": s.scalar(select(func.count()).select_from(Mention)) or 0,
-            "by_stance": dict(s.execute(select(Mention.stance, func.count()).group_by(Mention.stance)).all()),
-            "assets": s.scalar(select(func.count(func.distinct(Mention.asset_id)))) or 0,
-            "last_video_at": last.value if last else None}
+    return _coverage_cached()
+
+
+@memo_ttl(300)
+def _coverage_cached():
+    with db.SessionLocal() as s:
+        matched = s.scalar(select(func.count(func.distinct(Mention.video_id)))) or 0
+        unmatched = s.scalar(select(func.count()).select_from(Unmatched)) or 0
+        seen = matched + unmatched
+        last = s.get(SyncState, "last_video_at")
+        return {"videos_seen": seen, "videos_matched": matched, "match_rate": (matched / seen) if seen else 0.0,
+                "mentions": s.scalar(select(func.count()).select_from(Mention)) or 0,
+                "by_stance": dict(s.execute(select(Mention.stance, func.count()).group_by(Mention.stance)).all()),
+                "assets": s.scalar(select(func.count(func.distinct(Mention.asset_id)))) or 0,
+                "last_video_at": last.value if last else None}
 
 
 @app.post("/internal/sync", response_model=SyncResult, tags=["ops"], operation_id="sync_mentions",
@@ -207,5 +213,6 @@ def sync(full: bool = False, s: Session = Depends(db.session)):
         st.value = last_at
         s.merge(st)
     s.commit()
+    memo_ttl.clear()
     return {"videos_scanned": scanned, "mentions_added": added, "unmatched_added": un_added,
             "assets_tracked": tracked, "skipped": skipped}

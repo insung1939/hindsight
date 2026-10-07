@@ -10,7 +10,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from engine import HORIZONS, event_day, forward_returns, summarize
-from hs_common import InternalOnly, ServiceClient, create_app
+from hs_common import InternalOnly, ServiceClient, create_app, memo_ttl
 from models import EventReturn, Summary, db
 
 app = create_app("stats", "하인드사이트 stats", "0.1.0", "언급 뒤 5·20·60 거래일 수익률과 벤치마크 대비 초과수익. 채널별 랭킹 포함.")
@@ -160,11 +160,17 @@ def list_summaries(prefix: str | None = None, horizon: int | None = Query(defaul
 @app.get("/v1/coverage", response_model=StatsCoverage, tags=["ops"], operation_id="get_stats_coverage",
          summary="계산 현황 (데이터 페이지용): 언급별 수익률이 몇 건 채워졌나")
 def stats_coverage(s: Session = Depends(db.session)):
-    cnt = lambda cond=None: s.scalar(select(func.count()).select_from(EventReturn).where(cond) if cond is not None else select(func.count()).select_from(EventReturn)) or 0  # noqa: E731
-    return {"events": cnt(), "events_theme": cnt(EventReturn.kind == "theme"), "with_t0": cnt(EventReturn.t0_date.is_not(None)),
-            "r5_filled": cnt(EventReturn.r5.is_not(None)), "r20_filled": cnt(EventReturn.r20.is_not(None)), "r60_filled": cnt(EventReturn.r60.is_not(None)),
-            "vol_ratio_filled": cnt(EventReturn.vol_ratio.is_not(None)), "disclosure_checked": cnt(EventReturn.near_disclosure.is_not(None)), "last_computed_at": s.scalar(select(func.max(EventReturn.computed_at))),
-            "summaries": s.scalar(select(func.count()).select_from(Summary)) or 0}
+    return _stats_coverage_cached()
+
+
+@memo_ttl(300)
+def _stats_coverage_cached():
+    with db.SessionLocal() as s:
+        cnt = lambda cond=None: s.scalar(select(func.count()).select_from(EventReturn).where(cond) if cond is not None else select(func.count()).select_from(EventReturn)) or 0  # noqa: E731
+        return {"events": cnt(), "events_theme": cnt(EventReturn.kind == "theme"), "with_t0": cnt(EventReturn.t0_date.is_not(None)),
+                "r5_filled": cnt(EventReturn.r5.is_not(None)), "r20_filled": cnt(EventReturn.r20.is_not(None)), "r60_filled": cnt(EventReturn.r60.is_not(None)),
+                "vol_ratio_filled": cnt(EventReturn.vol_ratio.is_not(None)), "disclosure_checked": cnt(EventReturn.near_disclosure.is_not(None)), "last_computed_at": s.scalar(select(func.max(EventReturn.computed_at))),
+                "summaries": s.scalar(select(func.count()).select_from(Summary)) or 0}
 
 
 @app.get("/v1/channels/ranking", response_model=ChannelRanking, tags=["summary"], operation_id="channel_ranking",
@@ -292,6 +298,7 @@ def _sync(s: Session, since_days: int, full: bool) -> dict:
     s.flush()
     n = _rebuild_summaries(s)
     s.commit()
+    memo_ttl.clear()
     return {"events_added": added, "events_updated": updated, "summaries": n, "skipped": ([f"이미 완료된 언급 {complete}건 건너뜀"] if complete else []) + skipped[:50]}
 
 
