@@ -15,7 +15,7 @@ from models import Mention, SyncState, Unmatched, db
 # 설명란까지 볼지. 설명란은 채널 링크·광고 문구("네이버 카페", "link") 때문에 오탐이 많아 기본은 제목만.
 MATCH_FIELDS = ("title", "description") if env("MATCH_DESCRIPTION", "false") == "true" else ("title",)
 
-app = create_app("mentions", "힌드사이트 mentions", "0.1.0",
+app = create_app("mentions", "하인드사이트 mentions", "0.1.0",
                  "영상 제목·설명에서 종목을 찾아 언급 사실을 저장한다. 사전은 market-data, 영상은 youtube 에서 받는다.")
 youtube = ServiceClient("youtube", timeout=60)
 market = ServiceClient("market-data", timeout=60)

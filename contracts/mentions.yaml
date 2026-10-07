@@ -1,6 +1,6 @@
 openapi: 3.1.0
 info:
-  title: 힌드사이트 mentions
+  title: 하인드사이트 mentions
   description: 영상 제목·설명에서 종목을 찾아 언급 사실을 저장한다. 사전은 market-data, 영상은 youtube 에서 받는다.
   contact:
     name: mentions owner

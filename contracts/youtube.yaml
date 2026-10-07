@@ -1,6 +1,6 @@
 openapi: 3.1.0
 info:
-  title: 힌드사이트 youtube
+  title: 하인드사이트 youtube
   description: '추적 채널과 영상 메타데이터(제목·설명·게시일·조회수). 출처: YouTube Data API v3.'
   contact:
     name: youtube owner

@@ -7,6 +7,26 @@ from .settings import allowed_origins, env
 
 
 
+class CacheHeaderMiddleware:
+    """조회(GET /v1/*) 응답에 Cache-Control 10분. 데이터는 하루 한 번 배치로만 바뀐다. 브라우저·CDN 이 같은 요청을 다시 받지 않게."""
+
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http" or scope.get("method") != "GET" or not scope.get("path", "").startswith("/v1/"):
+            return await self.app(scope, receive, send)
+
+        async def send_with_cache(message):
+            if message["type"] == "http.response.start" and 200 <= message.get("status", 500) < 300:
+                headers = [(k, v) for k, v in message.get("headers", []) if k.lower() != b"cache-control"]
+                headers.append((b"cache-control", b"public, max-age=600, stale-while-revalidate=3600"))
+                message = {**message, "headers": headers}
+            await send(message)
+
+        return await self.app(scope, receive, send_with_cache)
+
+
 def create_app(service_name: str, title: str, version: str, description: str = "") -> FastAPI:
     from fastapi.middleware.cors import CORSMiddleware
 
@@ -15,6 +35,7 @@ def create_app(service_name: str, title: str, version: str, description: str = "
     app.add_middleware(CORSMiddleware, allow_origins=allowed_origins(), allow_credentials=True,
                        allow_methods=["*"], allow_headers=["*"], expose_headers=["X-Request-ID"])
     app.add_middleware(RequestIdMiddleware)
+    app.add_middleware(CacheHeaderMiddleware)
     install_error_handlers(app)
 
     @app.get("/healthz", tags=["ops"], operation_id="healthz", summary="서비스 상태")

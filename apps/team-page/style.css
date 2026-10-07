@@ -1,4 +1,4 @@
-/* 힌드사이트 발표 페이지 — 밝은 바탕, 큰 글씨, insung_introduction 톤(남색 본문 · 파란 포인트 · Pretendard) */
+/* 하인드사이트 발표 페이지 — 밝은 바탕, 큰 글씨, insung_introduction 톤(남색 본문 · 파란 포인트 · Pretendard) */
 :root {
   --bg: #fbfbfc; --surface: #ffffff; --text: #14213d; --muted: #5f6b80; --border: #e4e8ef;
   --accent: #2f5bea; --accent-soft: rgba(47, 91, 234, .10); --navy: #14213d;

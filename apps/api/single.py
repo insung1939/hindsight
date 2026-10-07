@@ -42,6 +42,7 @@ for svc in SERVICES:
 
 from fastapi import FastAPI, Request  # noqa: E402  (환경변수 세팅 뒤에 import — hs_common 이 import 시점에 .env 를 읽는다)
 from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
+from fastapi.middleware.gzip import GZipMiddleware  # noqa: E402
 from fastapi.openapi.docs import get_swagger_ui_html  # noqa: E402
 
 apps: dict[str, FastAPI] = {}
@@ -55,10 +56,11 @@ for svc in SERVICES:
 for m in LOCAL_MODULES:  # 마지막 서비스의 짧은 이름이 남지 않게
     sys.modules.pop(m, None)
 
-app = FastAPI(title="힌드사이트 API", version="1.3.1", docs_url=None, redoc_url=None, openapi_url=None,
+app = FastAPI(title="하인드사이트 API", version="1.4.0", docs_url=None, redoc_url=None, openapi_url=None,
               description="유튜버가 말한 종목, 그 뒤에 어떻게 됐나 — market-data · youtube · mentions · stats 네 서비스를 한 프로세스·한 주소로.")
 _origins = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "http://localhost:5173").split(",") if o.strip()]
 app.add_middleware(CORSMiddleware, allow_origins=_origins, allow_methods=["GET"], allow_headers=["*"])
+app.add_middleware(GZipMiddleware, minimum_size=1024)  # 사전·요약처럼 큰 JSON 을 1/8 로 (마운트된 앱 응답에도 적용)
 for svc, sub in apps.items():
     app.mount(f"/{svc}", sub)
 
@@ -110,7 +112,7 @@ def merged_openapi() -> dict:
     if _merged:
         return _merged
     out = {"openapi": "3.1.0",
-           "info": {"title": "힌드사이트 API (합본)", "version": app.version,
+           "info": {"title": "하인드사이트 API (합본)", "version": app.version,
                     "description": "네 서비스의 명세를 경로 접두사로 합쳤다. 원본 명세는 contracts/<service>.yaml, 서비스별 Swagger 는 /<service>/docs."},
            "paths": {}, "components": {"schemas": {}}, "tags": []}
     for svc, sub in apps.items():
@@ -137,5 +139,5 @@ def openapi_json(request: Request):
 
 @app.get("/docs", include_in_schema=False)
 def docs():
-    return get_swagger_ui_html(openapi_url="/openapi.json", title="힌드사이트 API — Swagger UI",
+    return get_swagger_ui_html(openapi_url="/openapi.json", title="하인드사이트 API — Swagger UI",
                                swagger_ui_parameters={"docExpansion": "list", "defaultModelsExpandDepth": -1})
