@@ -19,7 +19,7 @@ Render 무료 플랜은 15분 유휴 시 잠든다. 첫 요청이 30~60초 걸�
 |---|---|
 | 교수님 요구사항·중간 피드백 원문, 우리 해석, 필수 항목 대응표 | [requirements.md](requirements.md) |
 | 문제 정의 · 사용자 · 화면 · 차별점 · 비즈니스 모델 · 지켜야 할 선 | [PLAN.md](../PLAN.md) 1장 |
-| 발표에서 말할 순서로 보고 싶다 | 발표 페이지 1~3장, 14장(BM) |
+| 발표에서 말할 순서로 보고 싶다 | 발표 페이지 1~3장, 13장(BM) |
 
 ## 2. 데이터 — 무엇을 어디서 어떻게 가공해 무슨 질문에 답하나 (평가의 핵심)
 
@@ -47,7 +47,7 @@ Render 무료 플랜은 15분 유휴 시 잠든다. 첫 요청이 30~60초 걸�
 | 계층 | 선택 | 이유 |
 |---|---|---|
 | 프론트 | React 18 + Vite, 순수 SVG 차트 | 수업 기본. 평가 제외라 라이브러리 최소 |
-| 백엔드 | Python 3.12, FastAPI, Pydantic, SQLAlchemy 2, httpx | 수업 기본. 서비스별 폴더 분리 + 공통 라이브러리 `libs/hs-common` |
+| 백엔드 | Python 3.12, FastAPI, Pydantic, SQLAlchemy 2, httpx | 수업 기본. 서비스별 폴더 분리 + 공통 라이브러리 `libs/hs-common`. gzip·Cache-Control 10분·가벼운 목록 엔드포인트 |
 | DB | PostgreSQL (Supabase), 로컬은 SQLite | `DATABASE_URL` 하나로 전환. 서비스마다 스키마 하나 |
 | 배포 | Vercel(프론트·발표) · Render(Docker 1개, 프로세스 1개) · GitHub Actions(매일 배치) | 수업 플랫폼. Render 무료(512MB·콜드스타트) 때문에 한 프로세스 합본 |
 | 품질 | pytest 31개, OpenAPI 계약 + Spectral + oasdiff CI, problem+json, X-Request-ID | AI 생성 코드를 규칙·테스트로 검증 |
@@ -69,7 +69,7 @@ Render 무료 플랜은 15분 유휴 시 잠든다. 첫 요청이 30~60초 걸�
 | 전체·시장별·테마·종목별 분포 | 서비스 **언급 뒤에** 탭 |
 | 채널별 성적 상·하위 3, 전체 랭킹 | 서비스 **채널** 탭 (`GET /stats/v1/channels/ranking`) |
 | 종목 하나의 언급 시점과 주가, 공시 | 서비스 **종목 타임라인** 탭 |
-| 발표용 요약과 "발견" 문장 | 발표 페이지 11~13장 (숫자는 `apps/team-page/data/snapshot.json`, API 가 깨어 있으면 실시간) |
+| 발표용 요약과 "발견" 문장 | 발표 페이지 10~12장 (숫자는 `apps/team-page/data/snapshot.json`, API 가 깨어 있으면 실시간) |
 
 ## 7. 진행 상태와 남은 일
 

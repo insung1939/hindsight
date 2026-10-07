@@ -102,3 +102,56 @@ ol.steps li::before { content: counter(s); width: 36px; height: 36px; border-rad
 .ticker { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
 .ticker span { font-size: 14px; padding: 6px 12px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); color: var(--muted); }
 .ticker span b { color: var(--text); }
+
+/* ── 2차 개편: 큰 글씨, 적은 글자, 5조 강조 ── */
+.slide.cover .in { text-align: left; }
+.display { font-size: clamp(40px, 6.4vw, 84px); line-height: 1.04; letter-spacing: -.04em; font-weight: 850; margin: 10px 0 20px; }
+.display-sm { font-size: clamp(32px, 4.6vw, 60px); line-height: 1.08; letter-spacing: -.035em; font-weight: 850; margin: 0 0 18px; }
+.display-sm u { text-decoration: none; background: linear-gradient(transparent 62%, var(--accent-soft) 62%); }
+h2:not(.display):not(.display-sm) { font-size: clamp(30px, 4vw, 52px); }
+.lead { font-size: clamp(18px, 2.1vw, 26px); line-height: 1.45; }
+.note { font-size: 14.5px; }
+.team-badge { display: inline-flex; align-items: baseline; gap: 4px; background: var(--navy); color: #fff; border-radius: 18px; padding: 10px 22px 10px 16px; margin-bottom: 8px; box-shadow: var(--shadow-lg); }
+.team-badge .num5 { font-size: clamp(34px, 4vw, 52px); font-weight: 900; letter-spacing: -.04em; line-height: 1; color: #9db4ff; }
+.team-badge span:last-child { font-size: 20px; font-weight: 750; }
+.bar .brand em { font-style: normal; background: var(--accent); color: #fff; border-radius: 999px; padding: 1px 9px; font-size: 12px; margin-left: 4px; }
+.members { list-style: none; padding: 0; margin: 0 0 26px; display: flex; flex-wrap: wrap; gap: 10px; }
+.members li { font-size: 18px; font-weight: 750; padding: 10px 18px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); }
+.members.big li { font-size: clamp(20px, 2.4vw, 30px); padding: 14px 26px; }
+.pillrow { display: flex; flex-wrap: wrap; gap: 8px; } .pillrow span { font-size: 14px; padding: 7px 14px; border-radius: 999px; background: var(--up-soft); color: var(--up); font-weight: 650; }
+.flow { display: flex; align-items: stretch; gap: 12px; flex-wrap: wrap; margin: 28px 0 18px; }
+.flow .f { flex: 1; min-width: 160px; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 20px 18px; box-shadow: var(--shadow); }
+.flow .f b { display: block; font-size: clamp(20px, 2.2vw, 28px); letter-spacing: -.02em; } .flow .f span { color: var(--muted); font-size: 14px; }
+.flow .f.acc { background: var(--navy); color: #fff; border-color: var(--navy); } .flow .f.acc span { color: rgba(255,255,255,.75); }
+.flow i { align-self: center; color: var(--accent); font-style: normal; font-size: 26px; font-weight: 800; }
+.src-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+@media (max-width: 900px) { .src-grid { grid-template-columns: 1fr; } }
+.src { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 18px 20px; box-shadow: var(--shadow); }
+.src b { font-size: 18px; } .src small { display: block; color: var(--muted); font-size: 12.5px; margin-bottom: 8px; }
+.src p { margin: 0; font-size: clamp(16px, 1.6vw, 20px); font-weight: 700; color: var(--accent); } .src em { font-style: normal; color: var(--muted); font-size: 13px; }
+.bignums { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin: 24px 0; }
+.bignums div { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 16px 24px; box-shadow: var(--shadow); min-width: 180px; }
+.bignums div b { display: block; font-size: clamp(36px, 5vw, 64px); font-weight: 900; letter-spacing: -.04em; line-height: 1; font-variant-numeric: tabular-nums; }
+.bignums div span { color: var(--muted); font-size: 13.5px; } .bignums div.acc { background: var(--navy); color: #fff; border-color: var(--navy); } .bignums div.acc span { color: rgba(255,255,255,.75); }
+.bignums i { font-style: normal; font-size: 28px; color: var(--accent); font-weight: 800; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; } .three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; } .five { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+@media (max-width: 900px) { .two, .three, .five { grid-template-columns: 1fr; } }
+.card h3 { font-size: 15.5px; color: var(--muted); font-weight: 650; margin-bottom: 8px; }
+.card .big { margin: 0 0 6px; } .card .big small { display: block; font-size: 13px; color: var(--muted); font-weight: 600; margin-top: 4px; letter-spacing: 0; }
+.five .card { padding: 18px; } .five .card p { margin: 10px 0 0; font-size: 14.5px; }
+h3.sub { font-size: 16px; color: var(--muted); font-weight: 650; margin-bottom: 10px; }
+table.compact td { padding: 9px 10px; font-size: 14px; } table.compact td:first-child { white-space: nowrap; color: var(--accent); }
+ul.plain { margin: 0; padding-left: 18px; font-size: 16px; line-height: 1.8; }
+.ranks { display: grid; gap: 6px; margin-bottom: 10px; }
+.ranks .r { display: grid; grid-template-columns: 28px 1fr auto; gap: 10px; align-items: center; padding: 9px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; font-size: 14.5px; }
+.ranks .r i { font-style: normal; font-weight: 800; width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; }
+.ranks.top .r i { background: var(--up-soft); color: var(--up); } .ranks.bottom .r i { background: var(--down-soft); color: var(--down); }
+.ranks .r b { font-weight: 700; } .ranks .r small { color: var(--muted); font-size: 12px; margin-left: 6px; } .ranks .r .v { font-weight: 800; font-variant-numeric: tabular-nums; }
+.findings { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 900px) { .findings { grid-template-columns: 1fr; } }
+.findings .card { display: grid; grid-template-columns: 40px 1fr; gap: 14px; align-items: start; } .findings .card.wide { grid-column: 1 / -1; }
+.findings .n { width: 36px; height: 36px; border-radius: 10px; background: var(--navy); color: #fff; display: grid; place-items: center; font-weight: 800; }
+.findings p { margin: 0; font-size: clamp(16px, 1.5vw, 20px); line-height: 1.5; }
+ol.lessons { margin: 0; padding-left: 22px; font-size: 16px; line-height: 1.7; } ol.lessons li { margin-bottom: 8px; } ol.lessons b { color: var(--accent); }
+.doclinks { display: flex; flex-wrap: wrap; gap: 10px; margin: 22px 0 10px; } .doclinks a { padding: 8px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); font-weight: 650; font-size: 14px; }
+.story img { max-height: 420px; object-fit: cover; }
