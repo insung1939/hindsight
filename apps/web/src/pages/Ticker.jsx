@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { api, assetNames, channelMap, dateOnly, num, pct, pct0, sign, MARKET_LABEL, STANCES, STANCE_LABEL } from "../api";
 import { Disclaimer, ErrorBox, SkeletonRows, Stat, Term, useLoad } from "../components";
 
-function Chart({ prices, events, disclosures = [], onHover, hover }) {
+function Chart({ prices, events, disclosures = [], news = [], onHover, hover }) {
   if (!prices?.length) return <p className="muted">시세가 없습니다.</p>;
   const W = 900, H = 260, P = 14, PB = 24;
   const t = (d) => new Date(d).getTime();
@@ -18,6 +18,8 @@ function Chart({ prices, events, disclosures = [], onHover, hover }) {
   return (
     <svg className="chart" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="주가와 언급 시점">
       <defs><linearGradient id="g" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stopColor="var(--accent)" stopOpacity=".18" /><stop offset="1" stopColor="var(--accent)" stopOpacity="0" /></linearGradient></defs>
+      {news.length > 0 && (() => { const nmax = Math.max(...news.map((n) => n.count), 1); return news.filter((n) => t(n.news_date) >= x0 && t(n.news_date) <= x1).map((n) => (
+        <rect key={n.news_date} x={X(t(n.news_date)) - 2} width="4" y={H - PB - 2 - (n.count / nmax) * 40} height={(n.count / nmax) * 40} rx="1" fill="var(--accent)" opacity=".35"><title>{n.news_date} 기사 {n.count}건</title></rect>)); })()}
       <path d={area} fill="url(#g)" />
       <path d={path} fill="none" stroke="var(--text)" strokeOpacity=".7" strokeWidth="1.6" />
       {months.filter((_, i) => i % 2 === 0).map((p) => <text key={p.trade_date} x={X(t(p.trade_date))} y={H - 6} fontSize="10" fill="var(--muted)" textAnchor="middle" fontFamily="inherit">{p.trade_date.slice(2, 7)}</text>)}
@@ -44,14 +46,15 @@ export default function Ticker({ assetId, go }) {
   const data = useLoad(async () => {
     if (!assetId) return null;
     const from = new Date(Date.now() - 400 * 864e5).toISOString().slice(0, 10);
-    const [p, e, d, s] = await Promise.all([
+    const [p, e, d, s, n] = await Promise.all([
       api("marketData", `/v1/assets/${assetId}/prices`, { params: { from, limit: 5000 } }),
       api("stats", `/v1/assets/${assetId}/events`),
       api("marketData", "/v1/disclosures", { params: { asset_ids: assetId, from, limit: 5000 } }).then((r) => ({ items: r.items.filter((x) => ["실적", "계약", "자금조달", "주요사항"].includes(x.kind)) })).catch(() => ({ items: [] })),
       api("stats", "/v1/summary", { params: { scope: `asset:${assetId}`, horizon: 20, stance } }).then((r) => r.value).catch(() => null),
+      api("marketData", "/v1/news-daily", { params: { asset_ids: assetId, from }, ttl: 5 * 60e3 }).catch(() => ({ items: [] })),
     ]);
     setHover(null);
-    return { prices: p.items, events: e.items, disc: d.items, sum: s };
+    return { prices: p.items, events: e.items, disc: d.items, sum: s, news: n.items };
   }, [assetId, stance]);
   const all = names.data || {};
   const candidates = useMemo(() => {
@@ -88,9 +91,9 @@ export default function Ticker({ assetId, go }) {
           <div className="col-3"><Stat k="win" label="20거래일 뒤 오른 비율" loading={data.loading && !d} value={pct0(sum?.win_rate)} sub={sum ? `시장 대비 ${pct(sum.excess_mean)}` : ""} /></div>
           <div className="col-3"><Stat k="vol" label="거래량 비율" loading={data.loading && !d} value={sum?.vol_ratio_median ? `${sum.vol_ratio_median}배` : "—"} sub="언급 뒤 5일 ÷ 언급 전 20일" /></div>
           <div className="card col-12">
-            <div className="card-head"><div><h3>주가와 언급 시점</h3><p>점 = <Term k="t0">사건일</Term> 종가 · 빨강 20일 뒤 상승 · 파랑 하락 · 회색 아직{d?.disc?.length > 0 && ` · 노란 눈금 = 주요 공시 ${d.disc.length}건`}</p></div>
+            <div className="card-head"><div><h3>주가와 언급 시점</h3><p>점 = <Term k="t0">사건일</Term> 종가 · 빨강 20일 뒤 상승 · 파랑 하락 · 회색 아직{d?.disc?.length > 0 && ` · 노란 눈금 = 주요 공시 ${d.disc.length}건`}{d?.news?.length > 0 && ` · 파란 막대 = 일별 뉴스 기사 수(네이버 증권 크롤링, ${d.news.length}일)`}</p></div>
               {hover && <span className="chip accent">{dateOnly(hover.published_at)} · {chs.data?.[hover.channel_id]?.title || "채널"} · 20일 {pct(hover.r20)}</span>}</div>
-            {data.loading && !d ? <div className="sk" style={{ height: 260 }} /> : <Chart prices={d.prices} events={shown} disclosures={d.disc} onHover={setHover} hover={hover} />}
+            {data.loading && !d ? <div className="sk" style={{ height: 260 }} /> : <Chart prices={d.prices} events={shown} disclosures={d.disc} news={d.news} onHover={setHover} hover={hover} />}
           </div>
           <div className="card col-12">
             <div className="card-head"><div><h3>언급별 기록</h3><p>최근 순 · 행에 올리면 차트의 점이 커진다</p></div></div>
