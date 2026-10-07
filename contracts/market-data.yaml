@@ -307,6 +307,137 @@ paths:
         '500':
           description: 서버 내부 오류
           content: *id001
+  /v1/disclosures:
+    get:
+      tags:
+      - attention
+      summary: DART 공시 (asset_ids 쉼표 구분, 기간). stats 가 '언급 전후 공시 여부' 에, 타임라인이 표시에 쓴다
+      operationId: list_disclosures
+      parameters:
+      - name: asset_ids
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Asset Ids
+      - name: from
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: From
+      - name: to
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: To
+      - name: kind
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Kind
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 20000
+          default: 2000
+          title: Limit
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListDisclosures'
+        '422':
+          description: Validation Error
+          content: *id001
+        '500':
+          description: 서버 내부 오류
+          content: *id001
+  /v1/coverage:
+    get:
+      tags:
+      - ops
+      summary: '수집 현황 (데이터 페이지용): 사전·시세·거래량·공시·뉴스 건수'
+      operationId: get_market_coverage
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarketCoverage'
+        '500':
+          description: 서버 내부 오류
+          content: *id001
+      parameters:
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+  /internal/sync-attention:
+    post:
+      tags:
+      - ops
+      summary: tracked 국내 종목의 DART 공시 수집 (days 소급). DART_KEY 없으면 건너뜀
+      operationId: sync_attention
+      parameters:
+      - name: days
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 800
+          default: 7
+          title: Days
+      - name: X-Internal-Token
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Internal-Token
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttentionSyncResult'
+        '422':
+          description: Validation Error
+          content: *id001
+        '500':
+          description: 서버 내부 오류
+          content: *id001
   /internal/sync:
     post:
       tags:
@@ -402,6 +533,25 @@ components:
       - asset_type
       - tracked
       title: AssetOut
+    AttentionSyncResult:
+      properties:
+        disclosures_added:
+          type: integer
+          title: Disclosures Added
+        assets_scanned:
+          type: integer
+          title: Assets Scanned
+        skipped:
+          items:
+            type: string
+          type: array
+          title: Skipped
+      type: object
+      required:
+      - disclosures_added
+      - assets_scanned
+      - skipped
+      title: AttentionSyncResult
     BatchPrices:
       properties:
         series:
@@ -435,6 +585,10 @@ components:
         market:
           type: string
           title: Market
+        asset_type:
+          type: string
+          title: Asset Type
+          default: stock
         ambiguous:
           type: boolean
           title: Ambiguous
@@ -450,6 +604,32 @@ components:
       - ambiguous
       - curated
       title: DictionaryEntry
+    DisclosureOut:
+      properties:
+        rcept_no:
+          type: string
+          title: Rcept No
+        asset_id:
+          type: string
+          title: Asset Id
+        rcept_dt:
+          type: string
+          format: date
+          title: Rcept Dt
+        report_nm:
+          type: string
+          title: Report Nm
+        kind:
+          type: string
+          title: Kind
+      type: object
+      required:
+      - rcept_no
+      - asset_id
+      - rcept_dt
+      - report_nm
+      - kind
+      title: DisclosureOut
     ListAssets:
       properties:
         items:
@@ -488,6 +668,22 @@ components:
       - items
       - ambiguous_names
       title: ListDictionary
+    ListDisclosures:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/DisclosureOut'
+          type: array
+          title: Items
+        next_cursor:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Next Cursor
+      type: object
+      required:
+      - items
+      title: ListDisclosures
     ListPrices:
       properties:
         items:
@@ -504,6 +700,49 @@ components:
       required:
       - items
       title: ListPrices
+    MarketCoverage:
+      properties:
+        assets_by_market:
+          additionalProperties:
+            additionalProperties:
+              type: integer
+            type: object
+          type: object
+          title: Assets By Market
+        prices:
+          type: integer
+          title: Prices
+        prices_with_volume:
+          type: integer
+          title: Prices With Volume
+        last_trade_date:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Last Trade Date
+        disclosures:
+          type: integer
+          title: Disclosures
+        disclosure_assets:
+          type: integer
+          title: Disclosure Assets
+        last_disclosure_date:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Last Disclosure Date
+      type: object
+      required:
+      - assets_by_market
+      - prices
+      - prices_with_volume
+      - last_trade_date
+      - disclosures
+      - disclosure_assets
+      - last_disclosure_date
+      title: MarketCoverage
     PriceOut:
       properties:
         asset_id:
@@ -516,6 +755,11 @@ components:
         close:
           type: number
           title: Close
+        volume:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Volume
         currency:
           type: string
           title: Currency
@@ -584,6 +828,7 @@ components:
       - status
 tags:
 - name: assets
+- name: attention
 - name: dictionary
 - name: ops
 - name: prices

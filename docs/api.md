@@ -20,6 +20,9 @@
 | POST | `/v1/assets/{asset_id}/track` | 시세 수집 대상으로 켠다 (mentions 가 새 종목을 발견했을 때 호출) | asset_id | — | 200 AssetOut |
 | GET | `/v1/assets/{asset_id}/prices` | 일별 종가 이력 | asset_id, from, to, limit | — | 200 ListPrices |
 | GET | `/v1/prices` | 여러 종목 시세를 한 번에 (stats 서비스용). asset_ids 는 쉼표 구분 | asset_ids, from, to | — | 200 BatchPrices |
+| GET | `/v1/disclosures` | DART 공시 (asset_ids 쉼표 구분, 기간). stats 가 '언급 전후 공시 여부' 에, 타임라인이 표시에 쓴다 | asset_ids, from, to, kind, limit | — | 200 ListDisclosures |
+| GET | `/v1/coverage` | 수집 현황 (데이터 페이지용): 사전·시세·거래량·공시·뉴스 건수 | — | — | 200 MarketCoverage |
+| POST | `/internal/sync-attention` | tracked 국내 종목의 DART 공시 수집 (days 소급). DART_KEY 없으면 건너뜀 | days, X-Internal-Token | — | 200 AttentionSyncResult |
 | POST | `/internal/sync` | 사전 갱신(DART·업비트) + tracked 종목 시세 수집 | days, dictionary, X-Internal-Token | — | 200 SyncResult |
 
 ## youtube
@@ -50,7 +53,7 @@
 | Method | Path | 기능 | 파라미터 | 요청 본문 | 응답 |
 |---|---|---|---|---|---|
 | GET | `/healthz` | 서비스 상태 | — | — | 200 json |
-| GET | `/v1/mentions` | 언급 목록 | asset_id, channel_id, since, limit | — | 200 ListMentions |
+| GET | `/v1/mentions` | 언급 목록 | asset_id, channel_id, since, after_id, limit | — | 200 ListMentions |
 | GET | `/v1/mentions/trending` | 최근 N일 언급 급증 종목 (직전 N일 대비) | days, limit | — | 200 ListTrending |
 | GET | `/v1/unmatched` | 종목을 못 잡은 영상 제목 (별칭 사전 보강용) | limit | — | 200 ListUnmatched |
 | GET | `/v1/coverage` | 매칭 성공률 (데이터 페이지용) | — | — | 200 CoverageOut |
@@ -66,8 +69,9 @@
 | Method | Path | 기능 | 파라미터 | 요청 본문 | 응답 |
 |---|---|---|---|---|---|
 | GET | `/healthz` | 서비스 상태 | — | — | 200 json |
-| GET | `/v1/summary` | 전체 분포 (scope=overall | market:KRX | market:US | market:CRYPTO) | scope, horizon | — | 200 SummaryOut |
+| GET | `/v1/summary` | 전체 분포 (scope=overall | market:KRX | market:US | market:CRYPTO | kind:theme | asset:<id> | channel:<id>) | scope, horizon | — | 200 SummaryOut |
 | GET | `/v1/summaries` | 요약 전부 (prefix 로 필터: overall · market · channel · asset) | prefix | — | 200 ListSummaries |
+| GET | `/v1/coverage` | 계산 현황 (데이터 페이지용): 언급별 수익률이 몇 건 채워졌나 | — | — | 200 StatsCoverage |
 | GET | `/v1/assets/{asset_id}/events` | 종목 하나의 언급별 이후 수익률 (타임라인 화면) | asset_id | — | 200 ListEvents |
 | GET | `/v1/channels/{channel_id}/events` | 채널 하나의 언급별 이후 수익률 (익명 코드로만 노출) | channel_id | — | 200 ListEvents |
 | POST | `/internal/sync` | 새 언급의 수익률 계산 + 미완성 값 채우기 + 요약 갱신 | since_days, X-Internal-Token | — | 200 SyncResult |

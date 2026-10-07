@@ -2,7 +2,9 @@
 
 KAIST 디지털금융MBA 〈클라우드컴퓨팅실습〉 팀 프로젝트. 주식·코인 유튜브 채널이 영상 제목에서 언급한 종목을 모아, **언급 뒤 5·20·60 거래일 동안 주가가 실제로 어떻게 움직였는지** 통계로 보여준다. 채널은 익명(A·B·C) 집계, 종목 추천 문구 없음.
 
-기획·일정·역할은 [PLAN.md](PLAN.md), API 설명은 [docs/api.md](docs/api.md), 테이블은 [docs/db.md](docs/db.md), 데이터 출처는 [docs/data-sources.md](docs/data-sources.md), 배포는 [docs/deploy.md](docs/deploy.md), 세미나 데모는 [docs/seminar-demo.md](docs/seminar-demo.md).
+**교수님 요구사항·중간 피드백·디자인 원칙(흰 바탕·검은 글씨)은 [docs/requirements.md](docs/requirements.md)**, 현재 상태와 10/21 까지의 할 일은 [docs/checklist.md](docs/checklist.md). 기획·역할은 [PLAN.md](PLAN.md), API 설명은 [docs/api.md](docs/api.md), 테이블은 [docs/db.md](docs/db.md), 데이터 출처는 [docs/data-sources.md](docs/data-sources.md), 배포는 [docs/deploy.md](docs/deploy.md), 세미나 데모는 [docs/seminar-demo.md](docs/seminar-demo.md).
+
+> 평가 포인트(교수 피드백): **어떤 소스에서 데이터를 가져와 어떻게 가공해 무슨 가치를 주는가.** UI 가 아니라 데이터와 API 호출이 중심. 발표의 절반은 파이프라인(소스 → 수집 → 매칭 → 계산 → 결과)에 실제 건수를 붙여 설명한다.
 
 ## 구조 — 서비스 4개 (데이터 소유권 기준)
 
@@ -36,9 +38,11 @@ hindsight/
 ├── libs/hs-common      앱 골격 · 오류 포맷 · 요청 ID · DB · 서비스 간 클라이언트 · .env 로더
 ├── services/<svc>/     FastAPI + SQLAlchemy, Dockerfile, tests/(계약 드리프트 + 매칭 규칙)
 ├── apps/web/           React (Vite) — 이번 주 언급 · 언급 뒤에(분석) · 종목 타임라인 · 데이터
+├── apps/api/           합본 배포(Render 1개): 서비스 4개 + 게이트웨이(/docs 하나) — launcher.py · gateway.py · Dockerfile
+├── apps/team-page/     발표 페이지(정적)
 ├── platform/           compose(서비스+게이트웨이+관측) · gateway(APISIX) · k8s(kustomize) · backstage
-├── docs/               api.md · db.md · data-sources.md · deploy.md · seminar-demo.md
-├── scripts/            dev_up/down · smoke.py · export_contracts.py · gen_api_docs.py
+├── docs/               requirements · checklist · data-plan · channel-selection · api · db · data-sources · deploy · seminar-demo
+├── scripts/            dev_up/down · smoke.py · discover_channels.py(채널 선정) · register_channels.py · migrate_sqlite_to_pg.py · export_contracts.py · gen_api_docs.py
 └── .github/workflows/  contracts(Spectral·oasdiff) · services(pytest·GHCR 이미지) · sync(매일 수집)
 ```
 
@@ -75,7 +79,7 @@ Docker: `make compose` (서비스 4개) · `make compose-all` (+ APISIX 9080 · 
 | 계층 | 팀 운영 (수업 제출) | 세미나 실험실 |
 |---|---|---|
 | 프론트 | Vercel (`apps/web`) | 동일 |
-| 백엔드 4개 | Render — [render.yaml](render.yaml) Blueprint (Docker) | kind/minikube → EC2 k3s (`platform/k8s`) + APISIX |
+| 백엔드 | Render 웹 서비스 **1개** — [render.yaml](render.yaml) → `apps/api`(서비스 4개 + 게이트웨이, Swagger 하나) | kind/minikube → EC2 k3s (`platform/k8s`) + APISIX, 서비스별 컨테이너 |
 | DB | Supabase (스키마 `market` `yt` `mentions` `stats`) | 동일 |
 | 관측 | OTel → Grafana Cloud | OTel → Prometheus · Tempo · Grafana |
 | 수집 | GitHub Actions `sync.yml` 매일 07:10 | k8s CronJob |
@@ -91,6 +95,8 @@ Docker: `make compose` (서비스 4개) · `make compose-all` (+ APISIX 9080 · 
 | 코인 마켓 목록 · 일봉 | 업비트 Open API | 불필요 |
 
 자막·댓글은 수집하지 않는다. 채널 실명은 화면·통계·발표 어디에도 내지 않는다.
+
+피드백 반영으로 추가한 것: 거래량(Yahoo·업비트 응답에 포함) · 업종·테마 사전 20개(반도체·2차전지 등 → 대표 ETF 시세) · DART 공시(언급 전후 공시 여부, 키 대기). 네이버 뉴스 API 는 소급 불가·과금 우려로 제외. 상세는 [docs/data-plan.md](docs/data-plan.md).
 
 ## AI 활용
 

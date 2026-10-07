@@ -47,7 +47,7 @@ def channel_by_handle(handle: str) -> dict:
             "subscriber_count": int(c["statistics"].get("subscriberCount", 0) or 0)}
 
 
-def uploads_since(playlist_id: str, since: datetime, max_pages: int = 40) -> list[dict]:
+def uploads_since(playlist_id: str, since: datetime, max_pages: int = 240) -> list[dict]:  # 240쪽 = 12,000편(주 100편 채널의 1년 = 약 105쪽)
     """업로드 재생목록을 최신순으로 넘기며 since 이전 영상이 나오면 멈춘다. 페이지당 1 유닛(50개)."""
     out, token, pages = [], None, 0
     while pages < max_pages:

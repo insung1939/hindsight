@@ -5,12 +5,12 @@ from datetime import date, datetime, timedelta
 
 from fastapi import Depends, HTTPException, Query
 from pydantic import BaseModel
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 import collectors
 from hs_common import InternalOnly, create_app
-from models import Asset, Price, db
+from models import Asset, Disclosure, Price, db
 from seed import AMBIGUOUS_NAMES, seed_assets
 
 app = create_app("market-data", "힌드사이트 market-data", "0.2.0",
@@ -45,6 +45,7 @@ class DictionaryEntry(BaseModel):
     name: str
     aliases: list[str]
     market: str
+    asset_type: str = "stock"  # theme 이면 업종·테마(대표 ETF 로 수익률을 잰다)
     ambiguous: bool  # 단독 매칭 금지
     curated: bool  # 시드(팀 확인) 종목이면 True. 자동 수집 코인은 문맥 규칙이 붙는다
 
@@ -53,6 +54,7 @@ class PriceOut(BaseModel):
     asset_id: str
     trade_date: date
     close: float
+    volume: float | None = None
     currency: str
     model_config = {"from_attributes": True}
 
@@ -76,7 +78,7 @@ class ListPrices(BaseModel):
 class PriceSeries(BaseModel):
     asset_id: str
     currency: str
-    points: list[list]  # [["2026-01-02", 71000.0], ...] — 여러 종목을 한 번에 줄 때 가볍게
+    points: list[list]  # [["2026-01-02", 71000.0, 12345678.0], ...] — [일자, 종가, 거래량(없으면 null)]
 
 
 class BatchPrices(BaseModel):
@@ -90,6 +92,37 @@ class SyncResult(BaseModel):
     skipped: list[str]
 
 
+class DisclosureOut(BaseModel):
+    rcept_no: str
+    asset_id: str
+    rcept_dt: date
+    report_nm: str
+    kind: str
+    model_config = {"from_attributes": True}
+
+
+class ListDisclosures(BaseModel):
+    items: list[DisclosureOut]
+    next_cursor: str | None = None
+
+
+
+class MarketCoverage(BaseModel):
+    assets_by_market: dict[str, dict[str, int]]  # {KRX: {total, tracked, theme}, …}
+    prices: int
+    prices_with_volume: int
+    last_trade_date: date | None
+    disclosures: int
+    disclosure_assets: int
+    last_disclosure_date: date | None
+
+
+class AttentionSyncResult(BaseModel):
+    disclosures_added: int
+    assets_scanned: int
+    skipped: list[str]
+
+
 # ── 사전 · 자산 ─────────────────────────────────────────
 @app.get("/v1/dictionary", response_model=ListDictionary, tags=["dictionary"], operation_id="get_dictionary",
          summary="종목 사전 전체 (이름·별칭 → asset_id). mentions 서비스가 매칭에 쓴다")
@@ -99,7 +132,7 @@ def get_dictionary(market: str | None = None, s: Session = Depends(db.session)):
         q = q.where(Asset.market == market)
     rows = s.scalars(q).all()
     return {"items": [{"asset_id": a.asset_id, "name": a.name, "aliases": a.aliases or [], "market": a.market,
-                       "ambiguous": a.name in AMBIGUOUS_NAMES, "curated": bool(a.curated)} for a in rows],
+                       "asset_type": a.asset_type, "ambiguous": a.name in AMBIGUOUS_NAMES, "curated": bool(a.curated)} for a in rows],
             "next_cursor": None, "ambiguous_names": sorted(AMBIGUOUS_NAMES)}
 
 
@@ -168,10 +201,85 @@ def batch_prices(asset_ids: str, from_date: date | None = Query(default=None, al
     by = {i: [] for i in ids}
     cur = {}
     for p in s.scalars(q.order_by(Price.trade_date)).all():
-        by[p.asset_id].append([str(p.trade_date), p.close])
+        by[p.asset_id].append([str(p.trade_date), p.close, p.volume])
         cur[p.asset_id] = p.currency
     return {"series": [{"asset_id": i, "currency": cur.get(i, ""), "points": pts} for i, pts in by.items() if pts],
             "missing": [i for i, pts in by.items() if not pts]}
+
+
+# ── 관심 데이터: 공시 · 뉴스 ─────────────────────────────
+@app.get("/v1/disclosures", response_model=ListDisclosures, tags=["attention"], operation_id="list_disclosures",
+         summary="DART 공시 (asset_ids 쉼표 구분, 기간). stats 가 '언급 전후 공시 여부' 에, 타임라인이 표시에 쓴다")
+def list_disclosures(asset_ids: str, from_date: date | None = Query(default=None, alias="from"),
+                     to_date: date | None = Query(default=None, alias="to"), kind: str | None = None,
+                     limit: int = Query(default=2000, le=20000), s: Session = Depends(db.session)):
+    ids = [x.strip() for x in asset_ids.split(",") if x.strip()][:500]
+    q = select(Disclosure).where(Disclosure.asset_id.in_(ids))
+    if from_date:
+        q = q.where(Disclosure.rcept_dt >= from_date)
+    if to_date:
+        q = q.where(Disclosure.rcept_dt <= to_date)
+    if kind:
+        q = q.where(Disclosure.kind == kind)
+    return {"items": s.scalars(q.order_by(Disclosure.rcept_dt).limit(limit)).all(), "next_cursor": None}
+
+
+
+@app.get("/v1/coverage", response_model=MarketCoverage, tags=["ops"], operation_id="get_market_coverage",
+         summary="수집 현황 (데이터 페이지용): 사전·시세·거래량·공시·뉴스 건수")
+def market_coverage(s: Session = Depends(db.session)):
+    by: dict[str, dict[str, int]] = {}
+    for market, asset_type, tracked, n in s.execute(select(Asset.market, Asset.asset_type, Asset.tracked, func.count()).group_by(Asset.market, Asset.asset_type, Asset.tracked)).all():
+        d_ = by.setdefault(market, {"total": 0, "tracked": 0, "theme": 0})
+        d_["total"] += n
+        if tracked:
+            d_["tracked"] += n
+        if asset_type == "theme":
+            d_["theme"] += n
+    return {"assets_by_market": by,
+            "prices": s.scalar(select(func.count()).select_from(Price)) or 0,
+            "prices_with_volume": s.scalar(select(func.count()).select_from(Price).where(Price.volume.is_not(None))) or 0,
+            "last_trade_date": s.scalar(select(func.max(Price.trade_date))),
+            "disclosures": s.scalar(select(func.count()).select_from(Disclosure)) or 0,
+            "disclosure_assets": s.scalar(select(func.count(func.distinct(Disclosure.asset_id)))) or 0,
+            "last_disclosure_date": s.scalar(select(func.max(Disclosure.rcept_dt)))}
+
+
+@app.post("/internal/sync-attention", response_model=AttentionSyncResult, tags=["ops"], operation_id="sync_attention",
+          summary="tracked 국내 종목의 DART 공시 수집 (days 소급). DART_KEY 없으면 건너뜀", dependencies=[InternalOnly])
+def sync_attention(days: int = Query(default=7, le=800), s: Session = Depends(db.session)):
+    skipped, d_added, scanned = [], 0, 0
+    tracked = s.scalars(select(Asset).where(Asset.tracked == True, Asset.asset_type.in_(["stock", "crypto"]))).all()  # noqa: E712
+    # DART: corp_code 가 비어 있으면 corpCode 목록으로 채운다(월 1회면 충분하지만 가볍다)
+    krx = [a for a in tracked if a.market == "KRX"]
+    if krx and any(a.corp_code is None for a in krx):
+        try:
+            by_code = {c["stock_code"]: c["corp_code"] for c in collectors.dart_listed_companies()}
+            for a in krx:
+                if a.corp_code is None and a.symbol in by_code:
+                    a.corp_code = by_code[a.symbol]
+            s.flush()
+        except Exception as e:
+            skipped.append(f"dart corpCode: {e}")
+    if not collectors.env("DART_KEY"):
+        skipped.append("dart: DART_KEY 없음 — 공시 건너뜀")
+    else:
+        begin = date.today() - timedelta(days=days)
+        existing = {r for (r,) in s.execute(select(Disclosure.rcept_no).where(Disclosure.rcept_dt >= begin)).all()}
+        for a in krx:
+            if not a.corp_code:
+                continue
+            try:
+                for d_ in collectors.dart_disclosures(a.corp_code, begin, date.today()):
+                    if d_["rcept_no"] in existing:
+                        continue
+                    s.add(Disclosure(asset_id=a.asset_id, **{k: d_[k] for k in ("rcept_no", "rcept_dt", "report_nm", "kind")}))
+                    existing.add(d_["rcept_no"]); d_added += 1
+                scanned += 1
+            except Exception as e:
+                skipped.append(f"dart {a.asset_id}: {e}")
+    s.commit()
+    return {"disclosures_added": d_added, "assets_scanned": scanned, "skipped": skipped[:50]}
 
 
 # ── 수집 ────────────────────────────────────────────────
@@ -189,11 +297,17 @@ def sync(days: int = Query(default=400, le=5000), dictionary: bool = True, s: Se
                 skipped.append(f"{asset.asset_id}: 출처 없음")
                 continue
         except Exception as e:
-            skipped.append(f"{asset.asset_id}: {e}")
+            skipped.append(f"{asset.asset_id}: {_safe(e)}")
             continue
         upserted += _upsert_prices(s, asset, rows)
     s.commit()
     return {"assets_added": added, "prices_upserted": upserted, "skipped": skipped[:50]}
+
+
+def _safe(e: Exception) -> str:
+    """오류 문자열에서 URL 쿼리(키가 들어 있을 수 있다)를 지운다."""
+    import re
+    return re.sub(r"\?[^'\s]*", "?…", str(e))[:200]
 
 
 def _fetch_prices(asset: Asset, since: date, days: int):
@@ -203,11 +317,17 @@ def _fetch_prices(asset: Asset, since: date, days: int):
     if asset.source == "yahoo":
         return [r for r in collectors.yahoo_daily(asset.symbol, years) if r[0] >= since]
     if asset.source == "datagokr":
-        rows = collectors.datagokr_krx_daily(asset.name, since, date.today())
+        try:
+            rows = collectors.datagokr_krx_daily(asset.name, since, date.today())
+        except Exception:  # 키 미승인(403)·장애 → 조용히 Yahoo 대체. 출처는 데이터 페이지에 Yahoo 로 표시된다
+            rows = []
         if rows:
             return rows
-        if asset.yahoo_symbol:  # 키가 없거나 결과가 없으면 Yahoo 국내 심볼로 대체
-            return [r for r in collectors.yahoo_daily(asset.yahoo_symbol, years) if r[0] >= since]
+        if asset.yahoo_symbol:  # 키가 없거나 결과가 없으면 Yahoo 국내 심볼로 대체. DART 는 거래소를 안 알려줘 .KS 가 비면 .KQ(코스닥)
+            rows = [r for r in collectors.yahoo_daily(asset.yahoo_symbol, years) if r[0] >= since]
+            if not rows and asset.yahoo_symbol.endswith(".KS"):
+                rows = [r for r in collectors.yahoo_daily(asset.yahoo_symbol[:-3] + ".KQ", years) if r[0] >= since]
+            return rows
         return None
     return None
 
@@ -240,7 +360,7 @@ def _sync_dictionary(s: Session, skipped: list[str]) -> int:
             name = collectors.normalize_corp_name(c["corp_name"])
             s.add(Asset(asset_id=aid, market="KRX", symbol=c["stock_code"], name=name, aliases=[], currency="KRW",
                         asset_type="stock", source="datagokr", yahoo_symbol=f"{c['stock_code']}.KS",
-                        benchmark_id="INDEX:KOSPI", tracked=False))
+                        benchmark_id="INDEX:KOSPI", tracked=False, corp_code=c.get("corp_code")))
             existing.add(aid); added += 1
     except Exception as e:
         skipped.append(f"dart: {e}")
@@ -251,9 +371,9 @@ def _sync_dictionary(s: Session, skipped: list[str]) -> int:
 def _upsert_prices(s: Session, asset: Asset, rows) -> int:
     existing = {d for (d,) in s.execute(select(Price.trade_date).where(Price.asset_id == asset.asset_id)).all()}
     n = 0
-    for d, close in rows:
+    for d, close, *rest in rows:
         if d in existing:
             continue
-        s.add(Price(asset_id=asset.asset_id, trade_date=d, close=close, currency=asset.currency))
+        s.add(Price(asset_id=asset.asset_id, trade_date=d, close=close, volume=(rest[0] if rest else None), currency=asset.currency))
         existing.add(d); n += 1
     return n

@@ -21,12 +21,13 @@ class Asset(Base):
     name: Mapped[str] = mapped_column(String(100), index=True)
     aliases: Mapped[list] = mapped_column(JSON, default=list)
     currency: Mapped[str] = mapped_column(String(3))
-    asset_type: Mapped[str] = mapped_column(String(10))  # stock · etf · crypto · index
+    asset_type: Mapped[str] = mapped_column(String(10))  # stock · etf · crypto · index · theme(업종·테마 대표 ETF)
     source: Mapped[str] = mapped_column(String(30))  # 시세 어댑터: datagokr · yahoo · upbit
     yahoo_symbol: Mapped[str | None] = mapped_column(String(30), nullable=True)  # 국내 종목 Yahoo 대체 심볼(005930.KS)
     benchmark_id: Mapped[str | None] = mapped_column(String(40), nullable=True)  # 초과수익 기준 지수
     tracked: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
     curated: Mapped[bool] = mapped_column(Boolean, default=False)  # 팀이 손으로 넣은 종목(시드). 자동 수집(업비트·DART)은 False
+    corp_code: Mapped[str | None] = mapped_column(String(8), nullable=True)  # DART 고유번호 (국내 종목, 공시 조회용)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 
@@ -39,5 +40,18 @@ class Price(Base):
     asset_id: Mapped[str] = mapped_column(String(40), index=True)
     trade_date: Mapped[date] = mapped_column(Date, index=True)
     close: Mapped[float] = mapped_column(Float)
+    volume: Mapped[float | None] = mapped_column(Float, nullable=True)  # 거래량(주·코인 수량). 출처에 없으면 null
     currency: Mapped[str] = mapped_column(String(3))
+    collected_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class Disclosure(Base):
+    """DART 공시 (언급된 국내 종목만). '언급이 공시 직후에 몰리나' 를 보기 위한 사건 데이터."""
+
+    __tablename__ = "disclosures"
+    rcept_no: Mapped[str] = mapped_column(String(14), primary_key=True)  # 접수번호
+    asset_id: Mapped[str] = mapped_column(String(40), index=True)
+    rcept_dt: Mapped[date] = mapped_column(Date, index=True)
+    report_nm: Mapped[str] = mapped_column(String(200))
+    kind: Mapped[str] = mapped_column(String(10), index=True)  # 실적 · 계약 · 자금조달 · 주요사항 · 지분 · 기타
     collected_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)

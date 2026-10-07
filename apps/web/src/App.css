@@ -49,3 +49,6 @@ tr.hl td { background: color-mix(in srgb, var(--brand) 14%, transparent); }
 .hist-col { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; }
 .hist-bar { width: 100%; border-radius: 4px 4px 0 0; min-height: 2px; }
 .hist-label { font-size: 10px; color: var(--muted); text-align: center; margin-top: 4px; white-space: nowrap; }
+
+.step { position: relative; padding-top: 22px; }
+.step-n { position: absolute; top: 10px; right: 14px; font-size: 20px; color: var(--brand); font-weight: 700; }

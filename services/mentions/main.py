@@ -91,15 +91,21 @@ class SyncResult(BaseModel):
 
 @app.get("/v1/mentions", response_model=ListMentions, tags=["mentions"], operation_id="list_mentions", summary="언급 목록")
 def list_mentions(asset_id: str | None = None, channel_id: str | None = None, since: datetime | None = None,
+                  after_id: int | None = Query(default=None, description="이 id 보다 큰 것만, id 오름차순 (배치용 페이징)"),
                   limit: int = Query(default=500, le=5000), s: Session = Depends(db.session)):
     q = select(Mention)
+    if after_id is not None:
+        q = q.where(Mention.id > after_id)
     if asset_id:
         q = q.where(Mention.asset_id == asset_id)
     if channel_id:
         q = q.where(Mention.channel_id == channel_id)
     if since:
         q = q.where(Mention.published_at >= since)
-    return {"items": s.scalars(q.order_by(Mention.published_at.desc()).limit(limit)).all(), "next_cursor": None}
+    order = Mention.id.asc() if after_id is not None else Mention.published_at.desc()
+    rows = s.scalars(q.order_by(order).limit(limit)).all()
+    nxt = str(rows[-1].id) if after_id is not None and len(rows) == limit else None
+    return {"items": rows, "next_cursor": nxt}
 
 
 @app.get("/v1/mentions/trending", response_model=ListTrending, tags=["mentions"], operation_id="trending_mentions",

@@ -1,6 +1,6 @@
 from datetime import date, datetime
 
-from sqlalchemy import JSON, Date, DateTime, Float, Integer, String, UniqueConstraint
+from sqlalchemy import JSON, Boolean, Date, DateTime, Float, Integer, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from hs_common import Database
@@ -20,6 +20,7 @@ class EventReturn(Base):
     asset_id: Mapped[str] = mapped_column(String(40), index=True)
     channel_id: Mapped[str] = mapped_column(String(40), index=True)
     market: Mapped[str] = mapped_column(String(10), index=True)
+    kind: Mapped[str] = mapped_column(String(10), default="stock", index=True)  # stock(종목·코인) · theme(업종·테마 ETF)
     benchmark_id: Mapped[str | None] = mapped_column(String(40), nullable=True)
     published_at: Mapped[datetime] = mapped_column(DateTime, index=True)
     t0_date: Mapped[date | None] = mapped_column(Date, nullable=True)
@@ -30,11 +31,13 @@ class EventReturn(Base):
     x5: Mapped[float | None] = mapped_column(Float, nullable=True)
     x20: Mapped[float | None] = mapped_column(Float, nullable=True)
     x60: Mapped[float | None] = mapped_column(Float, nullable=True)
+    vol_ratio: Mapped[float | None] = mapped_column(Float, nullable=True)  # 언급 뒤 5일 평균 거래량 ÷ 언급 전 20일 평균
+    near_disclosure: Mapped[bool | None] = mapped_column(Boolean, nullable=True)  # 사건일 ±3일에 DART 주요 공시(실적·계약·자금조달·주요사항)가 있었나 (국내 종목만, 공시 데이터 없으면 null)
     computed_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 
 class Summary(Base):
-    """집계 캐시. key 예: overall:20, market:KRX:20, channel:UC…:20, asset:KRX:005930:20"""
+    """집계 캐시. key 예: overall:20(종목·코인, 테마 제외), market:KRX:20, kind:theme:20, channel:UC…:20, asset:KRX:005930:20"""
 
     __tablename__ = "summaries"
     key: Mapped[str] = mapped_column(String(80), primary_key=True)

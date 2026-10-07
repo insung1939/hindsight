@@ -46,7 +46,7 @@ _US = [
     ("ARM", "Arm", ["암홀딩스"]), ("QCOM", "Qualcomm", ["퀄컴"]), ("ORCL", "Oracle", ["오라클"]), ("CRM", "Salesforce", ["세일즈포스"]),
     ("ADBE", "Adobe", ["어도비"]), ("UBER", "Uber", ["우버"]), ("RIVN", "Rivian", ["리비안"]), ("SMCI", "Super Micro", ["슈퍼마이크로"]),
     ("IONQ", "IonQ", ["아이온큐"]), ("RKLB", "Rocket Lab", ["로켓랩"]), ("HIMS", "Hims & Hers", ["힘스"]),
-    ("SPY", "SPDR S&P 500 ETF", ["S&P500 ETF"]), ("QQQ", "Invesco QQQ", ["나스닥100 ETF"]), ("SOXL", "SOXL", ["속슬"]),
+    ("SPY", "SPDR S&P 500 ETF", ["S&P500 ETF", "S&P500", "S&P 500", "에스앤피"]), ("QQQ", "Invesco QQQ", ["나스닥100 ETF", "나스닥"]), ("SOXL", "SOXL", ["속슬"]),
     ("TQQQ", "TQQQ", ["티큐"]), ("SCHD", "SCHD", ["슈드"]), ("JEPI", "JEPI", ["제피"]), ("JEPQ", "JEPQ", ["제픽"]),
 ]
 
@@ -54,6 +54,33 @@ _US = [
 _CRYPTO = [
     ("KRW-BTC", "비트코인", ["BTC", "빗코"]), ("KRW-ETH", "이더리움", ["ETH", "이더"]), ("KRW-XRP", "리플", ["XRP"]),
     ("KRW-SOL", "솔라나", ["SOL"]), ("KRW-DOGE", "도지코인", ["DOGE", "도지"]),
+]
+
+
+# ── 업종·테마 (제목에 종목 없이 "반도체 급등", "코스피 폭락" 처럼 나오는 사건) → 대표 ETF 로 수익률을 잰다 ──
+# (ETF 코드, 표시 이름, 제목에서 쓰이는 표현). 코드는 KRX 상장 ETF, 시세는 Yahoo <코드>.KS
+# 한 글자·흔한 단어("금", "게임", "조선", "은행")는 오탐이 커서 복합 표현만 둔다.
+_THEMES = [
+    ("069500", "코스피", ["코스피", "KOSPI", "코스피200", "국장"]),
+    ("229200", "코스닥", ["코스닥", "KOSDAQ"]),
+    ("091160", "반도체", ["반도체", "반도체주", "반도체株"]),
+    ("305720", "2차전지", ["2차전지", "이차전지", "배터리주", "배터리"]),
+    ("244580", "바이오", ["바이오", "바이오주", "제약바이오"]),
+    ("466920", "조선", ["조선주", "조선업", "조선 3사", "조선3사", "K-조선", "K조선"]),
+    ("449450", "방산", ["방산", "방산주", "K-방산", "K방산", "방위산업"]),
+    ("434730", "원전", ["원전", "원전주", "원자력"]),
+    ("445290", "로봇", ["로봇", "로봇주", "휴머노이드"]),
+    ("091180", "자동차", ["자동차주", "자동차 관세", "완성차"]),
+    ("091170", "은행", ["은행주", "금융주", "4대 금융"]),
+    ("102970", "증권", ["증권주"]),
+    ("117700", "건설", ["건설주", "건설업"]),
+    ("117680", "철강", ["철강", "철강주"]),
+    ("300950", "게임", ["게임주", "게임산업"]),
+    ("266360", "엔터", ["엔터주", "엔터테인먼트", "K팝", "K-POP", "케이팝"]),
+    ("228790", "화장품", ["화장품", "화장품주", "K뷰티", "K-뷰티"]),
+    ("132030", "금", ["금값", "금 가격", "골드", "금 투자", "금투자", "금선물"]),
+    ("261240", "달러", ["달러", "환율", "원달러", "원·달러", "원/달러"]),
+    ("261220", "원유", ["유가", "원유", "WTI", "국제유가"]),
 ]
 
 
@@ -67,6 +94,10 @@ def seed_assets() -> list[dict]:
         out.append({"asset_id": f"US:{ticker}", "market": "US", "symbol": ticker, "name": name, "aliases": aliases,
                     "currency": "USD", "asset_type": "etf" if ticker in ("SPY", "QQQ", "SOXL", "TQQQ", "SCHD", "JEPI", "JEPQ") else "stock",
                     "source": "yahoo", "benchmark_id": "INDEX:SPX", "tracked": True, "curated": True})
+    for code, name, aliases in _THEMES:
+        out.append({"asset_id": f"KRX:{code}", "market": "KRX", "symbol": f"{code}.KS", "name": name, "aliases": aliases,
+                    "currency": "KRW", "asset_type": "theme", "source": "yahoo", "yahoo_symbol": f"{code}.KS",
+                    "benchmark_id": "INDEX:KOSPI", "tracked": True, "curated": True})
     for mkt, name, aliases in _CRYPTO:
         out.append({"asset_id": f"CRYPTO:{mkt}", "market": "CRYPTO", "symbol": mkt, "name": name, "aliases": aliases,
                     "currency": "KRW", "asset_type": "crypto", "source": "upbit", "benchmark_id": "CRYPTO:KRW-BTC", "tracked": True, "curated": True})
@@ -74,4 +105,6 @@ def seed_assets() -> list[dict]:
 
 
 # 단독으로는 종목을 가리키지 않는 흔한 단어 — mentions 가 매칭에서 제외한다
-AMBIGUOUS_NAMES = {"KT", "LG", "SK", "한국", "대한", "동양", "삼성", "현대", "한화", "두산", "메타", "비자", "암홀딩스", "구글"}
+AMBIGUOUS_NAMES = {"KT", "LG", "SK", "한국", "대한", "동양", "삼성", "현대", "한화", "두산", "메타", "비자", "암홀딩스", "구글",
+                   # 테마 표시 이름 중 일상어와 겹치는 것 — 복합 표현(은행주·증권주·조선주 …)만 잡는다
+                   "은행", "증권", "건설", "게임", "엔터", "조선", "자동차", "금", "달러", "원유"}
