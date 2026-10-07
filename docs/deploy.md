@@ -77,4 +77,5 @@ gh workflow run sync && gh run watch   # 최초는 inputs 로 youtube_days=365, 
 | Vercel 대시보드에 Error 배포가 쌓임 | hindsight-web 은 git 연결을 끊고 CLI(`apps/web` 에서 `npx vercel --prod`)로만 배포한다. 발표 페이지(hindsight)는 Root Directory=apps/team-page 로 git 자동 배포 |
 | `no route to host` / `ENOTFOUND` | Direct 대신 Session pooler, 사용자명 `postgres.<ref>` |
 | `/internal/sync` 401 | `X-Internal-Token` 이 Render 의 `INTERNAL_TOKEN` 과 다름 |
+| 배포 시 `EMAXCONNSESSION max clients reached … pool_size: 15` 로 기동 실패 | Supabase Session pooler 동시 접속 15개 한도. 이전 인스턴스·배치·로컬 스크립트가 연결을 쥐고 있으면 새 인스턴스가 못 뜬다. 2026-10-07 엔진당 풀을 1(+2) 로 제한. 로컬에서 Supabase 로 스크립트를 돌릴 땐 배포 중이 아닌지 확인 |
 | 메모리 초과로 재시작 (502 뒤 잠깐 HTML 오류 페이지, Render 메일) | 무료 512MB. 처음엔 프로세스 5개가 기본 350MB 를 써 배치(사전 갱신·stats 재계산) 중 OOM → 2026-10-07 **한 프로세스 마운트(single.py)** 로 전환, OTel 지연 import, DART iterparse, stats 요약은 튜플 조회, 사전 갱신은 **일요일만**. 로컬 재현: `docker run -m 512m …` 로 배치 호출하며 `docker stats` |
