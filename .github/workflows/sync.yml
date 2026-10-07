@@ -62,7 +62,17 @@ jobs:
         if: env.MARKET_DATA_URL != ''
         run: |
           curl -sS --max-time 1500 --retry 2 --retry-delay 30 -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "$MARKET_DATA_URL/internal/sync-attention" || echo "attention sync 실패(무시)"
-      - name: stats (수익률·거래량 비율·요약)
+      - name: stats (수익률·거래량 비율·요약 — 백그라운드 실행 후 상태 폴링)
         if: env.STATS_URL != ''
         run: |
-          curl -sS --fail --max-time 1500 --retry 3 --retry-delay 30 -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "$STATS_URL/internal/sync"
+          # Render 는 긴 요청을 15분쯤에 끊으므로 202 로 시작시키고 /internal/sync-status 를 본다
+          curl -sS --fail --max-time 120 --retry 3 --retry-delay 30 -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "$STATS_URL/internal/sync?background=true"
+          for i in $(seq 1 90); do
+            sleep 30
+            S=$(curl -sS --max-time 60 -H "X-Internal-Token: $INTERNAL_TOKEN" "$STATS_URL/internal/sync-status" || echo '{"state":"unknown"}')
+            STATE=$(echo "$S" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("state"))' 2>/dev/null || echo unknown)
+            echo "[$i] $STATE"
+            [ "$STATE" = "done" ] && { echo "$S" | head -c 600; echo; exit 0; }
+            [ "$STATE" = "failed" ] && { echo "$S"; exit 1; }
+          done
+          echo "45분 안에 안 끝남"; exit 1

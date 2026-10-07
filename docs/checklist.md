@@ -33,7 +33,7 @@
 - [x] Render Blueprint → `hindsight-api` (실주소 hindsight-api-edab, 이름 충돌로 접미사) (10/7)
 - [x] `scripts/migrate_sqlite_to_pg.py` 로 로컬 데이터 → Supabase 복사 (10/7 밤)
 - [x] Vercel `hindsight-web`(apps/web) · `hindsight`(apps/team-page, 저장소 루트에서 배포, Root Directory 설정) (10/7)
-- [x] GitHub Secrets `API_URL` · `INTERNAL_TOKEN` 등록 (10/7) · [ ] `sync.yml` 수동 실행 성공 확인 (1차: 토큰 불일치 401 → 재등록, 2차: 사전 갱신 OOM 502 → 메모리 수정·일요일만 갱신)
+- [x] GitHub Secrets `API_URL` · `INTERNAL_TOKEN` 등록 (10/7) · [x] `sync.yml` 끝까지 성공 (10/7 16:11 KST, 6단계 전부 success). 과정: 토큰 불일치 401 → 재등록 / 사전 갱신 OOM → 한 프로세스·일요일만 / stats 단계가 Render 에서 20~40분(첫 시도 502 뒤 재시도 성공) → 다음 할 일에 bulk update 최적화
 - [x] 발표 페이지 `deck.js` · 프론트 env · README · deploy.md 에 실제 주소 반영
 
 ### B. 데이터 — 10/9~10/15. 평가의 핵심
@@ -82,6 +82,7 @@
 3. **스크린샷·시연 순서** — 발표 당일 Render 콜드스타트 대비 `/healthz` 호출, 시연은 홈 → 종목(삼성전자) → 채널 TOP3 → 데이터.
 4. **D4 좋아요·댓글 수 가중** (선택) — 반나절. 안 해도 평가에 영향 없음.
 5. **급증 정의 재검토** — 지금은 최근 N일 ÷ 직전 N일. "직전 4주 평균" 으로 바꾸면 더 안정적. 1시간.
+6. ~~stats 배치 속도~~ — 10/7 해결: bulk INSERT/UPDATE(로컬 전체 재계산 8분 → 4초) + `background=true` 비동기 실행과 `/internal/sync-status` 폴링(Render 가 15분 넘는 요청을 끊는 문제 회피). 워크플로 반영.
 
 ### 한계 (발표에서 먼저 말할 것)
 - 제목만 본다 → 매수·매도 방향을 모른다. 그래서 "언급" 자체를 사건으로 본다.
