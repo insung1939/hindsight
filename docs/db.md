@@ -21,7 +21,7 @@ Supabase(PostgreSQL) 프로젝트 하나에 **서비스마다 스키마 하나**
 | `channels` | channel_id, handle, title, category(stock·crypto), anon_code, uploads_playlist_id, subscriber_count, tracked, added_at | PK channel_id · UQ anon_code |
 | `videos` | video_id, channel_id, title, description, published_at, view_count, collected_at | PK video_id · FK channel_id |
 
-`handle`·`title` 은 API 응답에 내지 않는다(익명 원칙). 자막·댓글 컬럼 없음.
+`title`·`handle` 은 API 로 내보낸다(2026-10-07 실명 표시 결정). `anon_code` 는 발표 자료 등에서 짧게 부를 때 쓴다. 자막·댓글 컬럼 없음.
 
 ## mentions
 

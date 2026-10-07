@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: 힌드사이트 stats
-  description: 언급 뒤 5·20·60 거래일 수익률과 벤치마크 대비 초과수익. 채널은 익명 집계.
+  description: 언급 뒤 5·20·60 거래일 수익률과 벤치마크 대비 초과수익. 채널별 랭킹 포함.
   contact:
     name: stats owner
     url: https://github.com/insung1939/hindsight
@@ -131,6 +131,67 @@ paths:
         schema:
           type: string
         description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+  /v1/channels/ranking:
+    get:
+      tags:
+      - summary
+      summary: 채널 랭킹 — 언급 뒤 수익률 기준 상·하위 (metric=excess_mean|mean|win_rate, 표본 min_n
+        이상만)
+      operationId: channel_ranking
+      parameters:
+      - name: horizon
+        in: query
+        required: false
+        schema:
+          type: integer
+          description: 5 · 20 · 60
+          default: 20
+          title: Horizon
+        description: 5 · 20 · 60
+      - name: metric
+        in: query
+        required: false
+        schema:
+          type: string
+          pattern: ^(excess_mean|mean|win_rate)$
+          default: excess_mean
+          title: Metric
+      - name: min_n
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          default: 30
+          title: Min N
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 20
+          minimum: 1
+          default: 3
+          title: Limit
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelRanking'
+        '422':
+          description: Validation Error
+          content: *id001
+        '500':
+          description: 서버 내부 오류
+          content: *id001
   /v1/assets/{asset_id}/events:
     get:
       tags:
@@ -170,7 +231,7 @@ paths:
     get:
       tags:
       - events
-      summary: 채널 하나의 언급별 이후 수익률 (익명 코드로만 노출)
+      summary: 채널 하나의 언급별 이후 수익률
       operationId: channel_events
       parameters:
       - name: channel_id
@@ -248,6 +309,84 @@ paths:
           content: *id001
 components:
   schemas:
+    ChannelRank:
+      properties:
+        channel_id:
+          type: string
+          title: Channel Id
+        n:
+          type: integer
+          title: N
+        mean:
+          type: number
+          title: Mean
+        median:
+          type: number
+          title: Median
+        win_rate:
+          type: number
+          title: Win Rate
+        excess_mean:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Excess Mean
+        excess_win_rate:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Excess Win Rate
+        vol_ratio_median:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Vol Ratio Median
+      type: object
+      required:
+      - channel_id
+      - n
+      - mean
+      - median
+      - win_rate
+      - excess_mean
+      - excess_win_rate
+      - vol_ratio_median
+      title: ChannelRank
+    ChannelRanking:
+      properties:
+        horizon:
+          type: integer
+          title: Horizon
+        metric:
+          type: string
+          title: Metric
+        min_n:
+          type: integer
+          title: Min N
+        top:
+          items:
+            $ref: '#/components/schemas/ChannelRank'
+          type: array
+          title: Top
+        bottom:
+          items:
+            $ref: '#/components/schemas/ChannelRank'
+          type: array
+          title: Bottom
+        all:
+          items:
+            $ref: '#/components/schemas/ChannelRank'
+          type: array
+          title: All
+      type: object
+      required:
+      - horizon
+      - metric
+      - min_n
+      - top
+      - bottom
+      - all
+      title: ChannelRanking
     EventOut:
       properties:
         mention_id:

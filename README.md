@@ -2,7 +2,7 @@
 
 **배포 주소 (2026-10-07)** · 서비스 https://hindsight-web.vercel.app · Swagger https://hindsight-api-edab.onrender.com/docs · 발표 페이지 https://hindsight-gold.vercel.app · 저장소 https://github.com/insung1939/hindsight
 
-KAIST 디지털금융MBA 〈클라우드컴퓨팅실습〉 팀 프로젝트. 주식·코인 유튜브 채널이 영상 제목에서 언급한 종목을 모아, **언급 뒤 5·20·60 거래일 동안 주가가 실제로 어떻게 움직였는지** 통계로 보여준다. 채널은 익명(A·B·C) 집계, 종목 추천 문구 없음.
+KAIST 디지털금융MBA 〈클라우드컴퓨팅실습〉 팀 프로젝트. 주식·코인 유튜브 채널이 영상 제목에서 언급한 종목을 모아, **언급 뒤 5·20·60 거래일 동안 주가가 실제로 어떻게 움직였는지** 통계로 보여준다. 채널 실명과 채널별 성적(상·하위)을 보여주되 학습용 통계임을 고지하고, 종목 추천 문구는 없다.
 
 **처음 보면 [docs/overview.md](docs/overview.md)(검토 가이드) 부터.** 교수님 요구사항·중간 피드백·디자인 원칙은 [docs/requirements.md](docs/requirements.md), 현재 상태와 10/21 까지의 할 일은 [docs/checklist.md](docs/checklist.md). 기획·역할은 [PLAN.md](PLAN.md), API 설명은 [docs/api.md](docs/api.md), 테이블은 [docs/db.md](docs/db.md), 데이터 출처는 [docs/data-sources.md](docs/data-sources.md), 배포는 [docs/deploy.md](docs/deploy.md), 세미나 데모는 [docs/seminar-demo.md](docs/seminar-demo.md).
 
@@ -13,7 +13,7 @@ KAIST 디지털금융MBA 〈클라우드컴퓨팅실습〉 팀 프로젝트. 주
 | 서비스 | 담당 질문 | 소유 데이터 | 호출하는 서비스 | 로컬 포트 |
 |---|---|---|---|---|
 | `market-data` | 이 종목이 언제 얼마였나, 종목 사전은 | 자산 마스터+별칭, 일별 시세, 지수 | — | 8001 |
-| `youtube` | 어떤 채널이 언제 무슨 영상을 올렸나 | 채널(익명 코드), 영상 메타 | — | 8002 |
+| `youtube` | 어떤 채널이 언제 무슨 영상을 올렸나 | 채널(실명·핸들·구독자), 영상 메타 | — | 8002 |
 | `mentions` | 이 영상이 어떤 종목을 말했나 | 언급, 못 잡은 제목 | youtube, market-data | 8003 |
 | `stats` | 언급 뒤 주가는 어땠나 | 언급별 수익률, 요약 캐시 | mentions, market-data | 8004 |
 
@@ -96,7 +96,7 @@ Docker: `make compose` (서비스 4개) · `make compose-all` (+ APISIX 9080 · 
 | 미국 시세 · 코스피/S&P500 지수 · 국내 대체 | Yahoo Finance chart API | 불필요 |
 | 코인 마켓 목록 · 일봉 | 업비트 Open API | 불필요 |
 
-자막·댓글은 수집하지 않는다. 채널 실명은 화면·통계·발표 어디에도 내지 않는다.
+자막·댓글은 수집하지 않는다. 채널은 실명으로 보여주되(2026-10-07 팀 결정) 학습용 통계이며 추천이 아님을 화면에 고정 고지한다.
 
 피드백 반영으로 추가한 것: 거래량(Yahoo·업비트 응답에 포함) · 업종·테마 사전 20개(반도체·2차전지 등 → 대표 ETF 시세) · DART 공시(언급 전후 공시 여부, 키 대기). 네이버 뉴스 API 는 소급 불가·과금 우려로 제외. 상세는 [docs/data-plan.md](docs/data-plan.md).
 
