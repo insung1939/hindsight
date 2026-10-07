@@ -25,3 +25,5 @@ dist-ssr
 .env
 .vercel
 .env*
+# 배포 API 주소 — 비밀 아님, 커밋한다 (gitignore 는 줄 끝 주석을 지원하지 않는다)
+!.env.production

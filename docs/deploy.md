@@ -71,8 +71,10 @@ gh workflow run sync && gh run watch   # 최초는 inputs 로 youtube_days=365, 
 | 증상 | 원인 · 조치 |
 |---|---|
 | 빌드 실패 `COPY libs/...` | Blueprint 의 `dockerContext: .` 누락. render.yaml 그대로면 없다 |
-| `/healthz` 가 degraded | 자식 서비스 하나가 안 떴다. Render Logs 에서 `[launcher]` 줄 확인(대개 DATABASE_URL 오타) |
+| 기동 실패 | Render Logs 의 Python 예외 확인 (대개 DATABASE_URL 오타). 네 서비스가 한 프로세스라 하나가 못 뜨면 전체가 안 뜬다 |
 | 프론트 `blocked by CORS policy` | `ALLOWED_ORIGINS` 에 Vercel 주소가 정확히(https, `/` 없이) 있는지 |
+| 프론트가 `localhost:800x` 를 부름 ("서버를 깨우는 중" 이 안 끝남) | `apps/web/.env` 에 `VITE_STATS_URL` 같은 서비스별 주소가 있으면 Vite 가 **배포 빌드에도** 넣어 게이트웨이 주소보다 우선한다. `.env` 는 비워 두고 배포 주소는 `.env.production`(커밋됨)에만 |
+| Vercel 대시보드에 Error 배포가 쌓임 | hindsight-web 은 git 연결을 끊고 CLI(`apps/web` 에서 `npx vercel --prod`)로만 배포한다. 발표 페이지(hindsight)는 Root Directory=apps/team-page 로 git 자동 배포 |
 | `no route to host` / `ENOTFOUND` | Direct 대신 Session pooler, 사용자명 `postgres.<ref>` |
 | `/internal/sync` 401 | `X-Internal-Token` 이 Render 의 `INTERNAL_TOKEN` 과 다름 |
-| 메모리 초과로 재시작 (502 뒤 잠깐 HTML 오류 페이지) | 무료 512MB. 프로세스 5개 기본 약 310MB. DART 상장사 목록 갱신(`dictionary=true`)이 가장 무거워 **일요일에만** 돌린다(sync.yml). 2026-10-07 OTel 지연 import·iterparse 로 최대 약 340MB 로 낮춤. 로컬 재현: `docker run -m 512m …` |
+| 메모리 초과로 재시작 (502 뒤 잠깐 HTML 오류 페이지, Render 메일) | 무료 512MB. 처음엔 프로세스 5개가 기본 350MB 를 써 배치(사전 갱신·stats 재계산) 중 OOM → 2026-10-07 **한 프로세스 마운트(single.py)** 로 전환, OTel 지연 import, DART iterparse, stats 요약은 튜플 조회, 사전 갱신은 **일요일만**. 로컬 재현: `docker run -m 512m …` 로 배치 호출하며 `docker stats` |

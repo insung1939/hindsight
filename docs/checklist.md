@@ -29,7 +29,7 @@
 ### A. 배포 — 10/8~10/10. 주소 3개를 먼저 만든다
 - [x] 커밋·푸시 (10/7)
 - [x] (사용자) Supabase 프로젝트 → 루트 `.env` 의 `DATABASE_URL` (10/7 접속 확인, PostgreSQL 17 서울 pooler)
-- [x] 합본 앱 `apps/api`(launcher + gateway, /docs 하나) · `render.yaml` · Dockerfile — 로컬 검증 완료
+- [x] 합본 앱 `apps/api/single.py`(한 프로세스 마운트, /docs 하나) · `render.yaml` · Dockerfile — 512MB 컨테이너 검증
 - [x] Render Blueprint → `hindsight-api` (실주소 hindsight-api-edab, 이름 충돌로 접미사) (10/7)
 - [x] `scripts/migrate_sqlite_to_pg.py` 로 로컬 데이터 → Supabase 복사 (10/7 밤)
 - [x] Vercel `hindsight-web`(apps/web) · `hindsight`(apps/team-page, 저장소 루트에서 배포, Root Directory 설정) (10/7)

@@ -1,6 +1,6 @@
 # 수집 스케줄 — 매일 순서대로: market-data(사전·시세·거래량) → youtube(새 영상) → mentions(매칭) → market-data(새로 tracked 된 종목 시세)
 #               → market-data(공시) → stats(수익률·거래량 비율·요약)
-# Secrets: API_URL (합본 게이트웨이, 예 https://hindsight-api.onrender.com), INTERNAL_TOKEN
+# Secrets: API_URL (합본 API, 예 https://hindsight-api-edab.onrender.com), INTERNAL_TOKEN
 #          분리 배포라면 API_URL 대신 MARKET_DATA_URL · YOUTUBE_URL · MENTIONS_URL · STATS_URL 을 넣는다.
 name: sync
 

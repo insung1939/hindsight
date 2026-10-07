@@ -40,7 +40,7 @@ hindsight/
 ├── libs/hs-common      앱 골격 · 오류 포맷 · 요청 ID · DB · 서비스 간 클라이언트 · .env 로더
 ├── services/<svc>/     FastAPI + SQLAlchemy, Dockerfile, tests/(계약 드리프트 + 매칭 규칙)
 ├── apps/web/           React (Vite) — 이번 주 언급 · 언급 뒤에(분석) · 종목 타임라인 · 데이터
-├── apps/api/           합본 배포(Render 1개): 서비스 4개 + 게이트웨이(/docs 하나) — launcher.py · gateway.py · Dockerfile
+├── apps/api/           합본 배포(Render 1개): 서비스 4개를 한 프로세스에 마운트(/docs 하나) — single.py · Dockerfile
 ├── apps/team-page/     발표 페이지(정적)
 ├── platform/           compose(서비스+게이트웨이+관측) · gateway(APISIX) · k8s(kustomize) · backstage
 ├── docs/               requirements · checklist · data-plan · channel-selection · api · db · data-sources · deploy · seminar-demo
