@@ -38,6 +38,9 @@ def top_assets(h=20, kind="stock", n=12):
 
 
 trend = get("mentions", "/v1/mentions/trending", days=30, limit=10)["items"]
+chmap = {c["channel_id"]: c for c in channels}
+rk = get("stats", "/v1/channels/ranking", horizon=20, metric="excess_mean", min_n=30, limit=3)
+ranking = {side: [{"title": chmap.get(r["channel_id"], {}).get("title", r["channel_id"]), "n": r["n"], "mean": r["mean"], "excess_mean": r["excess_mean"], "win_rate": r["win_rate"]} for r in rk[side]] for side in ("top", "bottom")}
 snap = {
     "generated_at": datetime.now().isoformat(timespec="minutes"),
     "youtube": get("youtube", "/v1/coverage"),
@@ -50,6 +53,7 @@ snap = {
     "top_assets_20": top_assets(20, "stock"), "top_themes_20": top_assets(20, "theme"),
     "trending_30d": [{"asset_id": t["asset_id"], "name": names.get(t["asset_id"], {}).get("name", t["asset_id"]), "mentions": t["mentions"], "prev": t["prev_mentions"], "channels": t["channels"]} for t in trend],
     "unmatched_sample": [u["title"] for u in get("mentions", "/v1/unmatched", limit=8)["items"]],
+    "channel_ranking": ranking,
 }
 out = ROOT / "apps" / "team-page" / "data" / "snapshot.json"
 out.write_text(json.dumps(snap, ensure_ascii=False, indent=1, default=str), encoding="utf-8")

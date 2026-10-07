@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-07T13:15",
+ "generated_at": "2026-10-07T16:09",
  "youtube": {
   "channels": 51,
   "videos": 44620,
@@ -57,7 +57,7 @@
   "r60_filled": 37311,
   "vol_ratio_filled": 48121,
   "disclosure_checked": 16466,
-  "last_computed_at": "2026-10-07T04:15:21.554442",
+  "last_computed_at": "2026-10-07T05:59:50.431798",
   "summaries": 2847
  },
  "channels": {
@@ -79,9 +79,9 @@
    "p10": -0.1183,
    "p90": 0.1015,
    "vol_ratio_median": 0.924,
-   "vol_up_rate": 0.3992,
+   "vol_up_rate": 0.399,
    "vol_n": 38145,
-   "disclosure_rate": 0.2427,
+   "disclosure_rate": 0.2448,
    "disclosure_n": 16466,
    "histogram": [
     {
@@ -140,9 +140,9 @@
    "p10": -0.2548,
    "p90": 0.1915,
    "vol_ratio_median": 0.924,
-   "vol_up_rate": 0.3992,
+   "vol_up_rate": 0.399,
    "vol_n": 38145,
-   "disclosure_rate": 0.2427,
+   "disclosure_rate": 0.2448,
    "disclosure_n": 16466,
    "histogram": [
     {
@@ -201,9 +201,9 @@
    "p10": -0.342,
    "p90": 0.3818,
    "vol_ratio_median": 0.924,
-   "vol_up_rate": 0.3992,
+   "vol_up_rate": 0.399,
    "vol_n": 38145,
-   "disclosure_rate": 0.2427,
+   "disclosure_rate": 0.2448,
    "disclosure_n": 16466,
    "histogram": [
     {
@@ -262,9 +262,9 @@
    "p10": -0.3206,
    "p90": 0.2826,
    "vol_ratio_median": 0.905,
-   "vol_up_rate": 0.3787,
+   "vol_up_rate": 0.3782,
    "vol_n": 16096,
-   "disclosure_rate": 0.2427,
+   "disclosure_rate": 0.2448,
    "disclosure_n": 16466,
    "histogram": [
     {
@@ -628,9 +628,9 @@
    "p10": -0.1558,
    "p90": 0.1474,
    "vol_ratio_median": 0.905,
-   "vol_up_rate": 0.3787,
+   "vol_up_rate": 0.3782,
    "vol_n": 16096,
-   "disclosure_rate": 0.2427,
+   "disclosure_rate": 0.2448,
    "disclosure_n": 16466,
    "histogram": [
     {
@@ -811,9 +811,9 @@
    "p10": -0.3974,
    "p90": 0.6864,
    "vol_ratio_median": 0.905,
-   "vol_up_rate": 0.3787,
+   "vol_up_rate": 0.3782,
    "vol_n": 16096,
-   "disclosure_rate": 0.2427,
+   "disclosure_rate": 0.2448,
    "disclosure_n": 16466,
    "histogram": [
     {
@@ -1285,8 +1285,8 @@
   {
    "asset_id": "KRX:091160",
    "name": "반도체",
-   "mentions": 337,
-   "prev": 307,
+   "mentions": 335,
+   "prev": 308,
    "channels": 27
   },
   {
@@ -1300,15 +1300,8 @@
    "asset_id": "US:QQQ",
    "name": "Invesco QQQ",
    "mentions": 47,
-   "prev": 23,
+   "prev": 22,
    "channels": 14
-  },
-  {
-   "asset_id": "KRX:069500",
-   "name": "코스피",
-   "mentions": 190,
-   "prev": 167,
-   "channels": 17
   },
   {
    "asset_id": "US:INTC",
@@ -1325,6 +1318,20 @@
    "channels": 10
   },
   {
+   "asset_id": "KRX:069500",
+   "name": "코스피",
+   "mentions": 185,
+   "prev": 172,
+   "channels": 17
+  },
+  {
+   "asset_id": "US:AAPL",
+   "name": "Apple",
+   "mentions": 56,
+   "prev": 45,
+   "channels": 12
+  },
+  {
    "asset_id": "US:IONQ",
    "name": "IonQ",
    "mentions": 45,
@@ -1332,18 +1339,11 @@
    "channels": 5
   },
   {
-   "asset_id": "US:AAPL",
-   "name": "Apple",
-   "mentions": 56,
-   "prev": 46,
-   "channels": 12
-  },
-  {
-   "asset_id": "US:PLTR",
-   "name": "Palantir",
-   "mentions": 54,
-   "prev": 44,
-   "channels": 6
+   "asset_id": "US:ORCL",
+   "name": "Oracle",
+   "mentions": 15,
+   "prev": 6,
+   "channels": 8
   }
  ],
  "unmatched_sample": [
@@ -1355,5 +1355,53 @@
   "당신의 투자 고민, 시원하게 날려주는 맞춤형 투자상담 방송!_26.10.07. | 여도은, 허재무, 박지훈 [아침N투자]",
   "야간 옵션 만기주 손실보다 수익이 클겁니다｜민경무 대표｜ 일발장전｜261006",
   "'이때'를 기점으로 투자판이 완전히 바뀐다 (박세익 전무 & 윤지호 경제평론가)ㅣ주식프리미어리그"
- ]
+ ],
+ "channel_ranking": {
+  "top": [
+   {
+    "title": "안정모의 주식투자",
+    "n": 331,
+    "mean": 0.1083,
+    "excess_mean": 0.0552,
+    "win_rate": 0.6888
+   },
+   {
+    "title": "킴스 미국주식",
+    "n": 552,
+    "mean": 0.0475,
+    "excess_mean": 0.0368,
+    "win_rate": 0.4837
+   },
+   {
+    "title": "실전투자대회1위 전태룡 주식내비",
+    "n": 197,
+    "mean": 0.0803,
+    "excess_mean": 0.0337,
+    "win_rate": 0.6041
+   }
+  ],
+  "bottom": [
+   {
+    "title": "주식전망TV",
+    "n": 2834,
+    "mean": -0.1761,
+    "excess_mean": -0.0988,
+    "win_rate": 0.1718
+   },
+   {
+    "title": "민박사 ㅣ 주식 끝까지 간다!",
+    "n": 128,
+    "mean": -0.0655,
+    "excess_mean": -0.08,
+    "win_rate": 0.3828
+   },
+   {
+    "title": "mediaAUTO 미디어오토",
+    "n": 77,
+    "mean": -0.015,
+    "excess_mean": -0.0576,
+    "win_rate": 0.4026
+   }
+  ]
+ }
 }

@@ -48,10 +48,9 @@ function renderOverall(d) {
     const v = s[`overall:${h}`];
     if (!v || !v.n) return card(`${h}거래일 뒤`, "—", "표본 없음");
     const cls = v.mean > 0 ? "pos-v" : v.mean < 0 ? "neg-v" : "";
-    return card(`${h}거래일 뒤 · 표본 ${fmt.n(v.n)}건${v.low_sample ? " (참고용)" : ""}`,
+    return card(`${h}거래일 뒤 · n=${fmt.n(v.n)}`,
       `${fmt.pct1(v.mean)}<small>평균</small>`,
-      `중앙값 ${fmt.pct1(v.median)} · 상승 확률 <b>${fmt.pct0(v.win_rate)}</b> · 벤치마크 대비 <b>${fmt.pct1(v.excess_mean)}</b>` +
-      (v.vol_ratio_median ? ` · 거래량 <b>${v.vol_ratio_median}배</b>` : ""), cls);
+      `상승 <b>${fmt.pct0(v.win_rate)}</b> · 시장 대비 <b>${fmt.pct1(v.excess_mean)}</b>` + (v.vol_ratio_median ? ` · 거래량 <b>${v.vol_ratio_median}배</b>` : ""), cls);
   }).join("");
 }
 function renderHist(d) {
@@ -65,10 +64,14 @@ function row(cells) { return `<tr>${cells.map((c, i) => `<td class="${i ? "r" : 
 function renderTables(d) {
   const s = d.summary || {};
   const tm = $("#tbl-market tbody");
-  if (tm) tm.innerHTML = [["종목·코인 전체", "overall:20"], ["국내 주식", "market:KRX:20"], ["미국 주식", "market:US:20"], ["코인", "market:CRYPTO:20"], ["업종·테마 (ETF)", "kind:theme:20"]]
+  if (tm) tm.innerHTML = [["전체", "overall:20"], ["국내", "market:KRX:20"], ["미국", "market:US:20"], ["코인", "market:CRYPTO:20"], ["업종·테마", "kind:theme:20"]]
     .map(([l, k]) => { const v = s[k]; return v && v.n ? row([`<b>${l}</b>`, fmt.n(v.n), `<span class="${v.mean > 0 ? "pos-v" : "neg-v"}">${fmt.pct1(v.mean)}</span>`, fmt.pct0(v.win_rate), fmt.pct1(v.excess_mean), v.vol_ratio_median ? v.vol_ratio_median + "배" : "—"]) : row([l, "—", "—", "—", "—", "—"]); }).join("");
   const ta = $("#tbl-assets tbody");
   if (ta) ta.innerHTML = (d.top_assets_20 || []).slice(0, 10).map((a) => row([`<b>${a.name}</b> <span class="note">${a.market}</span>`, fmt.n(a.n), `<span class="${a.mean > 0 ? "pos-v" : "neg-v"}">${fmt.pct1(a.mean)}</span>`, fmt.pct0(a.win_rate), a.vol_ratio_median ? a.vol_ratio_median + "배" : "—"])).join("");
+  const rk = d.channel_ranking || {};
+  const rrow = (r, i) => `<div class="r"><i>${i + 1}</i><span><b>${r.title}</b><small>n=${fmt.n(r.n)} · 평균 ${fmt.pct1(r.mean)} · 상승 ${fmt.pct0(r.win_rate)}</small></span><span class="v ${r.excess_mean >= 0 ? "pos-v" : "neg-v"}">${fmt.pct1(r.excess_mean)}</span></div>`;
+  if ($("#rank-top")) { $("#rank-top").className = "ranks top"; $("#rank-top").innerHTML = (rk.top || []).map(rrow).join(""); }
+  if ($("#rank-bottom")) { $("#rank-bottom").className = "ranks bottom"; $("#rank-bottom").innerHTML = (rk.bottom || []).map(rrow).join(""); }
   const tt = $("#tbl-themes tbody");
   if (tt) tt.innerHTML = (d.top_themes_20 || []).slice(0, 8).map((a) => row([`<b>${a.name}</b>`, fmt.n(a.n), `<span class="${a.mean > 0 ? "pos-v" : "neg-v"}">${fmt.pct1(a.mean)}</span>`, fmt.pct0(a.win_rate)])).join("");
   const tr = $("#tbl-trend tbody");
@@ -77,14 +80,14 @@ function renderTables(d) {
 function renderFindings(d) {
   const s = d.summary || {}; const o = s["overall:20"], o5 = s["overall:5"], o60 = s["overall:60"]; const th = s["kind:theme:20"];
   const f = {};
-  if (o && o.n) f[1] = `언급 뒤 20거래일 평균 수익률은 <b>${fmt.pct1(o.mean)}</b>, 상승 확률은 <b>${fmt.pct0(o.win_rate)}</b>였다(표본 ${fmt.n(o.n)}건). ${o.win_rate >= 0.45 && o.win_rate <= 0.55 ? "동전 던지기와 다르지 않다 — 언급은 방향 정보가 아니다." : o.win_rate > 0.55 ? "오른 경우가 더 많았다. 다만 시장 전체가 오른 기간인지 초과수익으로 확인해야 한다." : "내린 경우가 더 많았다. 언급이 몰리는 시점은 이미 오른 뒤일 가능성을 시사한다."}`;
-  if (o && o.excess_mean != null) f[2] = `같은 기간 벤치마크(코스피·S&P500·비트코인)를 빼면 초과수익은 <b>${fmt.pct1(o.excess_mean)}</b>, 시장을 이긴 비율은 <b>${fmt.pct0(o.excess_win_rate)}</b>. ${Math.abs(o.excess_mean) < 0.01 ? "종목이 오른 건 대체로 시장이 오른 덕이었다." : o.excess_mean > 0 ? "시장보다 조금 더 올랐다." : "시장보다 덜 올랐다 — 언급 뒤에 사면 평균적으로 시장을 못 따라갔다."}`;
+  if (o && o.n) f[1] = `언급 뒤 20거래일 평균 <b>${fmt.pct1(o.mean)}</b>, 상승 확률 <b>${fmt.pct0(o.win_rate)}</b> (n=${fmt.n(o.n)}). ${o.win_rate >= 0.45 && o.win_rate <= 0.55 ? "동전 던지기와 같다. 언급은 방향 정보가 아니다." : o.win_rate > 0.55 ? "오른 쪽이 많았다. 시장 효과는 다음 줄에서." : "내린 쪽이 많았다. 언급이 몰릴 땐 이미 오른 뒤였다."}`;
+  if (o && o.excess_mean != null) f[2] = `시장을 빼면 <b>${fmt.pct1(o.excess_mean)}</b>, 시장을 이긴 비율 <b>${fmt.pct0(o.excess_win_rate)}</b>. ${Math.abs(o.excess_mean) < 0.01 ? "오른 건 시장 덕이었다." : o.excess_mean > 0 ? "시장보다 조금 더 올랐다." : "언급 뒤에 사면 시장을 못 따라갔다."}`;
   if (o && o.vol_ratio_median) f[3] = o.vol_ratio_median < 1
-    ? `거래량은 언급 <b>뒤</b>보다 <b>앞</b>이 더 많았다. 언급 뒤 5거래일 거래량은 언급 전 20일 평균의 <b>${o.vol_ratio_median}배</b>(중앙값), 거래량이 늘어난 언급은 <b>${fmt.pct0(o.vol_up_rate)}</b>뿐. 관심이 먼저 몰리고 유튜브가 뒤따른다는 뜻이다.`
-    : `가격과 별개로 <b>관심은 분명히 움직였다</b>. 언급 뒤 5거래일 거래량은 언급 전 20일 평균의 <b>${o.vol_ratio_median}배</b>(중앙값), 거래량이 늘어난 언급이 <b>${fmt.pct0(o.vol_up_rate)}</b>였다.`;
-  if (o5 && o60 && o5.n && o60.n) f[4] = `기간을 늘릴수록 평균은 5일 ${fmt.pct1(o5.mean)} → 20일 ${fmt.pct1(o.mean)} → 60일 ${fmt.pct1(o60.mean)}로 움직였다${th && th.n ? `. 종목 없이 "반도체·코스피"만 말한 업종 언급(${fmt.n(th.n)}건)은 20일 뒤 ${fmt.pct1(th.mean)}, 상승 확률 ${fmt.pct0(th.win_rate)}로 종목 언급과 ${Math.abs(th.win_rate - o.win_rate) < 0.05 ? "비슷했다" : th.win_rate > o.win_rate ? "달리 더 자주 올랐다" : "달리 덜 올랐다"}` : ""}.`;
+    ? `거래량은 언급 <b>앞</b>이 더 많았다 (언급 뒤 5일 ÷ 앞 20일 = <b>${o.vol_ratio_median}배</b>, 늘어난 언급 <b>${fmt.pct0(o.vol_up_rate)}</b>). 관심이 먼저, 유튜브는 뒤따른다.`
+    : `언급 뒤 거래량이 <b>${o.vol_ratio_median}배</b>로 늘었다 (늘어난 언급 <b>${fmt.pct0(o.vol_up_rate)}</b>). 가격과 별개로 관심은 움직였다.`;
+  if (o5 && o60 && o5.n && o60.n) f[4] = `5일 ${fmt.pct1(o5.mean)} → 20일 ${fmt.pct1(o.mean)} → 60일 ${fmt.pct1(o60.mean)}${th && th.n ? `. 종목 없이 업종만 말한 언급(${fmt.n(th.n)}건)은 20일 ${fmt.pct1(th.mean)}, 상승 ${fmt.pct0(th.win_rate)} — 종목 언급보다 ${th.win_rate > o.win_rate + 0.03 ? "자주 올랐다" : th.win_rate < o.win_rate - 0.03 ? "덜 올랐다" : "비슷했다"}` : ""}.`;
   const kr = s["market:KRX:20"];
-  if (kr && kr.disclosure_n) f[5] = `국내 종목 언급 ${fmt.n(kr.disclosure_n)}건 중 <b>${fmt.pct0(kr.disclosure_rate)}</b>는 사건일 ±3일 안에 DART 주요 공시(실적·계약·자금조달·주요사항)가 있었다. ${kr.disclosure_rate >= 0.3 ? "유튜브 언급의 상당수는 공시라는 공개 정보를 뒤따라 나온 해설이다." : "대부분의 언급은 공시와 무관하게 나왔다 — 공시 외의 재료(수급·테마)가 언급을 만든다."}`;
+  if (kr && kr.disclosure_n) f[5] = `국내 언급 ${fmt.n(kr.disclosure_n)}건 중 <b>${fmt.pct0(kr.disclosure_rate)}</b>는 사건일 ±3일에 DART 주요 공시가 있었다. ${kr.disclosure_rate >= 0.3 ? "언급의 상당수는 공시를 뒤따른 해설이다." : "대부분은 공시와 무관했다. 수급·테마가 언급을 만든다."}`;
   Object.entries(f).forEach(([k, v]) => { const el = $(`[data-finding="${k}"]`); if (el) el.innerHTML = v; });
 }
 
@@ -95,11 +98,14 @@ async function loadSnapshot() {
 async function loadLive() {
   const api = CONFIG.api; const j = async (p) => (await fetch(api + p, { signal: AbortSignal.timeout(8000) })).json();
   try {
-    const [yt, me, mk, st, ch, sums] = await Promise.all([j("/youtube/v1/coverage"), j("/mentions/v1/coverage"), j("/market-data/v1/coverage"), j("/stats/v1/coverage"), j("/youtube/v1/channels"), j("/stats/v1/summaries")]);
+    const [yt, me, mk, st, ch, sums, rk] = await Promise.all([j("/youtube/v1/coverage"), j("/mentions/v1/coverage"), j("/market-data/v1/coverage"), j("/stats/v1/coverage"), j("/youtube/v1/channels"), j("/stats/v1/summaries?slim=true"), j("/stats/v1/channels/ranking?horizon=20&limit=3")]);
     const summary = Object.fromEntries(sums.items.map((i) => [i.key, i.value]));
+    if (window.__snap?.summary) Object.keys(window.__snap.summary).forEach((k) => { if (summary[k] && !summary[k].histogram && window.__snap.summary[k]) summary[k].histogram = window.__snap.summary[k].histogram; });
+    const chm = Object.fromEntries(ch.items.map((c) => [c.channel_id, c]));
+    const channel_ranking = Object.fromEntries(["top", "bottom"].map((side) => [side, rk[side].map((r) => ({ ...r, title: chm[r.channel_id]?.title || r.channel_id }))]));
     const d = derive({ youtube: yt, mentions: me, market: mk, stats: st, summary,
       channels: { total: ch.items.length, stock: ch.items.filter((c) => c.category === "stock").length, crypto: ch.items.filter((c) => c.category === "crypto").length },
-      generated_at: "실시간", top_assets_20: window.__snap?.top_assets_20, top_themes_20: window.__snap?.top_themes_20, trending_30d: window.__snap?.trending_30d });
+      generated_at: "실시간", top_assets_20: window.__snap?.top_assets_20, top_themes_20: window.__snap?.top_themes_20, trending_30d: window.__snap?.trending_30d, channel_ranking });
     bind(d);
     $$(".live").forEach((e) => { e.classList.add("on"); e.querySelector("span").textContent = "실시간 · " + api.replace(/^https?:\/\//, ""); });
   } catch (e) { /* Render 가 자고 있으면 스냅샷 유지 */ }
