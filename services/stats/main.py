@@ -80,6 +80,9 @@ class ChannelRank(BaseModel):
     excess_mean: float | None
     excess_win_rate: float | None
     vol_ratio_median: float | None
+    assets_n: int | None = None  # 언급한 종목 수
+    assets_up: int | None = None  # 그중 평균 수익률이 양(+)인 종목 수
+    asset_win_rate: float | None = None  # assets_up / assets_n
 
 
 class ChannelRanking(BaseModel):
@@ -138,17 +141,20 @@ def stats_coverage(s: Session = Depends(db.session)):
 
 
 @app.get("/v1/channels/ranking", response_model=ChannelRanking, tags=["summary"], operation_id="channel_ranking",
-         summary="채널 랭킹 — 언급 뒤 수익률 기준 상·하위 (metric=excess_mean|mean|win_rate, 표본 min_n 이상만)")
-def channel_ranking(horizon: int = Query(default=20, description="5 · 20 · 60"), metric: str = Query(default="excess_mean", pattern="^(excess_mean|mean|win_rate)$"),
-                    min_n: int = Query(default=30, ge=1), limit: int = Query(default=3, ge=1, le=20), s: Session = Depends(db.session)):
+         summary="채널 랭킹 — 언급 뒤 수익률 기준 상·하위 (metric=excess_mean|mean|win_rate|asset_win_rate, 표본 min_n 이상만)")
+def channel_ranking(horizon: int = Query(default=20, description="5 · 20 · 60"), metric: str = Query(default="excess_mean", pattern="^(excess_mean|mean|win_rate|asset_win_rate)$"),
+                    min_n: int = Query(default=30, ge=1), min_assets: int = Query(default=10, ge=1, description="asset_win_rate 기준일 때 최소 언급 종목 수"),
+                    limit: int = Query(default=3, ge=1, le=20), s: Session = Depends(db.session)):
     rows = []
     for sm in s.scalars(select(Summary).where(Summary.key.like(f"channel:%:{horizon}"))).all():
         v = sm.value
         if (v.get("n") or 0) < min_n or v.get(metric) is None:
             continue
+        if metric == "asset_win_rate" and (v.get("assets_n") or 0) < min_assets:
+            continue
         rows.append({"channel_id": sm.key[len("channel:"):-(len(str(horizon)) + 1)], "n": v["n"], "mean": v["mean"], "median": v["median"],
                      "win_rate": v["win_rate"], "excess_mean": v.get("excess_mean"), "excess_win_rate": v.get("excess_win_rate"),
-                     "vol_ratio_median": v.get("vol_ratio_median")})
+                     "vol_ratio_median": v.get("vol_ratio_median"), "assets_n": v.get("assets_n"), "assets_up": v.get("assets_up"), "asset_win_rate": v.get("asset_win_rate")})
     rows.sort(key=lambda r: r[metric], reverse=True)
     return {"horizon": horizon, "metric": metric, "min_n": min_n, "top": rows[:limit], "bottom": list(reversed(rows[-limit:])) if len(rows) > limit else [], "all": rows}
 
@@ -282,12 +288,26 @@ def _rebuild_summaries(s: Session) -> int:
             groups.setdefault(f"channel:{channel_id}", []).append(payload)
         groups.setdefault(f"asset:{asset_id}", []).append(payload)
     idx = {5: (0, 3), 20: (1, 4), 60: (2, 5)}  # (r 위치, x 위치) in payload
+    # 채널별 "언급한 종목 n개 중 평균 수익률이 양(+)인 종목 비중" — 언급 건 기준 상승 확률과 다른, 종목 기준 지표
+    by_channel_asset: dict[str, dict[str, list]] = {}
+    for row in s.execute(select(EventReturn.channel_id, EventReturn.asset_id, EventReturn.r5, EventReturn.r20, EventReturn.r60).where(EventReturn.kind != "theme")).yield_per(5000):
+        by_channel_asset.setdefault(row[0], {}).setdefault(row[1], []).append(row[2:])
     n = 0
     for key, evs in groups.items():
         for h in HORIZONS:
             ri, xi = idx[h]
             val = summarize([{"r": e[ri], "x": e[xi], "v": e[6], "d": e[7]} for e in evs], h)
             val["scope"] = key
+            if key.startswith("channel:"):
+                per_asset = by_channel_asset.get(key[8:], {})
+                means = []
+                for rows_ in per_asset.values():
+                    rs = [r_[ri] for r_ in rows_ if r_[ri] is not None]
+                    if rs:
+                        means.append(sum(rs) / len(rs))
+                val["assets_n"] = len(means)
+                val["assets_up"] = sum(1 for m_ in means if m_ > 0)
+                val["asset_win_rate"] = round(val["assets_up"] / len(means), 4) if means else None
             k = f"{key}:{h}"
             row = s.get(Summary, k)
             if row:

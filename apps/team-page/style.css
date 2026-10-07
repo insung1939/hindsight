@@ -155,3 +155,26 @@ ul.plain { margin: 0; padding-left: 18px; font-size: 16px; line-height: 1.8; }
 ol.lessons { margin: 0; padding-left: 22px; font-size: 16px; line-height: 1.7; } ol.lessons li { margin-bottom: 8px; } ol.lessons b { color: var(--accent); }
 .doclinks { display: flex; flex-wrap: wrap; gap: 10px; margin: 22px 0 10px; } .doclinks a { padding: 8px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); font-weight: 650; font-size: 14px; }
 .story img { max-height: 420px; object-fit: cover; }
+
+
+/* ── 3차: 한 화면에 한 장 (슬라이드 모드) ── */
+html.deck-mode, html.deck-mode body { height: 100%; overflow: hidden; }
+html.deck-mode main { scroll-snap-type: none; }
+html.deck-mode .slide { position: fixed; inset: 0; min-height: 0; padding: 76px clamp(28px, 6vw, 110px) 56px; opacity: 0; pointer-events: none; transform: translateY(14px) scale(.985); transition: opacity .45s ease, transform .45s cubic-bezier(.22,1,.36,1); overflow: auto; }
+html.deck-mode .slide.active { opacity: 1; pointer-events: auto; transform: none; }
+html.deck-mode .slide > .in { max-width: 1480px; }
+html.deck-mode .rv { transition-delay: .15s; } html.deck-mode .rv.d1 { transition-delay: .25s; } html.deck-mode .rv.d2 { transition-delay: .35s; } html.deck-mode .rv.d3 { transition-delay: .45s; } html.deck-mode .rv.d4 { transition-delay: .55s; }
+.slide.kick, .slide.kick.alt { background: var(--navy); color: #fff; border: 0; }
+.slide.kick .hero-bg { display: none; }
+.kick-nums { display: flex; gap: 16px; flex-wrap: wrap; margin: 28px 0; }
+.kick-nums div { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16); border-radius: 20px; padding: 20px 28px; min-width: 220px; }
+.kick-nums b { display: block; font-size: clamp(44px, 6vw, 80px); font-weight: 900; letter-spacing: -.04em; line-height: 1; color: #9db4ff; font-variant-numeric: tabular-nums; }
+.kick-nums span { color: rgba(255,255,255,.75); font-size: 15px; }
+.dots { position: fixed; right: 18px; top: 50%; transform: translateY(-50%); display: grid; gap: 8px; z-index: 25; }
+.dots button { width: 8px; height: 8px; border-radius: 50%; border: 0; background: var(--border); padding: 0; cursor: pointer; transition: all .2s; }
+.dots button.on { background: var(--accent); height: 22px; border-radius: 4px; }
+.navhint { position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); font-size: 12px; color: var(--muted); z-index: 25; display: flex; gap: 8px; align-items: center; }
+@media (max-width: 760px) { .dots, .navhint { display: none; } html.deck-mode .slide { padding: 70px 18px 40px; } }
+.card { padding: 18px 20px; }
+.pipe .v { font-size: clamp(28px, 3vw, 44px); }
+.src p { font-size: clamp(17px, 1.7vw, 22px); }

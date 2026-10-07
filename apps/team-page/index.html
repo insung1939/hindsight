@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#fbfbfc">
-<title>하인드사이트 — 유튜버가 말한 종목, 그 뒤에 어떻게 됐나 · 5조</title>
+<title>HINDSIGHT — 유튜버가 말한 종목, 그 뒤에 어떻게 됐나 · 5조</title>
 <meta name="description" content="KAIST 디지털금융MBA 클라우드컴퓨팅실습 5조 발표. 주식·코인 유튜브 채널 51개의 1년치 영상 제목에서 종목을 찾아 언급 뒤 5·20·60거래일 수익률을 센 서비스.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
@@ -13,10 +13,10 @@
 <body>
 <div class="progress" id="progress"></div>
 <header class="bar">
-  <span class="brand"><img src="favicon.svg" alt="" width="22" height="22" style="border-radius:6px">하인드사이트 <em>5조</em></span>
+  <span class="brand"><img src="favicon.svg" alt="" width="22" height="22" style="border-radius:6px">HINDSIGHT <em>5조</em></span>
   <span class="sp"></span>
   <span class="live" id="live"><i></i><span>스냅샷</span></span>
-  <span class="pos" id="pos">1 / 14</span>
+  <span class="pos" id="pos">1 / 15</span>
   <span class="links"><a href="https://github.com/insung1939/hindsight" target="_blank" rel="noreferrer">GitHub</a><a id="lnk-web" href="#" target="_blank" rel="noreferrer">서비스</a><a id="lnk-docs" href="#" target="_blank" rel="noreferrer">Swagger</a></span>
 </header>
 
@@ -258,6 +258,21 @@
   </div>
 </section>
 
+
+<!-- 12b 한 문장 -->
+<section class="slide kick" id="s-kick">
+  <div class="in">
+    <p class="kicker rv" style="color:#9db4ff">데이터가 말하는 한 문장</p>
+    <h2 class="display rv d1" style="color:#fff">유튜브가 말할 때는<br>이미 늦었다</h2>
+    <div class="kick-nums rv d2">
+      <div><b data-bind="summary.overall:20.win_rate" data-fmt="pct0">45%</b><span>언급 뒤 20일 상승 확률</span></div>
+      <div><b data-bind="summary.overall:20.excess_mean" data-fmt="pct1">−2.0%</b><span>시장 대비</span></div>
+      <div><b data-bind="summary.overall:20.vol_ratio_median" data-fmt="x">0.92배</b><span>언급 뒤 ÷ 앞 거래량</span></div>
+    </div>
+    <p class="lead rv d3" style="color:rgba(255,255,255,.8)">영상이 말한 종목을 사기 전에, 그 종목이 전에 떴을 때 어땠는지 먼저 본다 — 그게 이 서비스가 하는 일</p>
+  </div>
+</section>
+
 <!-- 13 BM + 막힌 것 -->
 <section class="slide" id="s-bm">
   <div class="in">
@@ -286,7 +301,7 @@
 <section class="slide alt cover" id="s-end">
   <div class="in">
     <div class="team-badge rv"><span class="num5">5</span><span>조</span></div>
-    <h2 class="display rv d1">외부 API 6개 → 하루 한 번 가공 →<br>한 질문에 답하는 숫자</h2>
+    <h2 class="display rv d1">외부 API 6개 →<br>하루 한 번 가공 →<br>한 질문에 답하는 숫자</h2>
     <ul class="members big rv d2"><li>김지환</li><li>오선호</li><li>조인성</li><li>채재희</li><li>김현준</li></ul>
     <div class="links rv d3">
       <a class="btn primary" id="btn-web2" href="#" target="_blank" rel="noreferrer">서비스 <span class="u" data-url="web"></span></a>
@@ -304,7 +319,7 @@
 </section>
 
 </main>
-<footer class="foot">하인드사이트 · KAIST 디지털금융MBA 클라우드컴퓨팅실습 5조 · 2026</footer>
+<footer class="foot">HINDSIGHT · KAIST 디지털금융MBA 클라우드컴퓨팅실습 5조 · 2026</footer>
 <script src="deck.js"></script>
 </body>
 </html>

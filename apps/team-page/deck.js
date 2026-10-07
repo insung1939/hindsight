@@ -11,6 +11,7 @@ const fmt = {
   pct1: (v) => (v == null ? "—" : (v > 0 ? "+" : "") + (v * 100).toFixed(1) + "%"),
   date: (v) => (v ? String(v).slice(0, 10) : ""),
   x: (v) => (v == null ? "—" : Number(v).toFixed(2) + "배"),
+  pct1s: (v) => (v == null ? "—" : (v * 100).toFixed(1) + "%"),
 };
 const get = (o, path) => path.split(".").reduce((a, k) => (a == null ? undefined : a[k]), o);
 
@@ -115,24 +116,49 @@ async function loadLive() {
   if (location.hostname !== "localhost" && location.hostname !== "127.0.0.1") loadLive(); else if (new URLSearchParams(location.search).has("live")) loadLive();
 })();
 
-// ── 등장 애니메이션 · 진행 · 키보드 ──
-const STATIC = new URLSearchParams(location.search).has("static");  // ?static : 애니메이션·부드러운 스크롤 끄기 (인쇄·스크린샷용)
-if (STATIC) { document.documentElement.style.scrollBehavior = "auto"; $$(".rv").forEach((x) => x.classList.add("on")); }
+// ── 슬라이드 모드: 한 화면에 한 장, ← → 로 넘긴다. ?scroll 이면 옛 스크롤 모드 ──
+const STATIC = new URLSearchParams(location.search).has("static");
+const SCROLL = new URLSearchParams(location.search).has("scroll");
 const slides = $$(".slide");
-const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { $$(".rv", e.target).forEach((x) => x.classList.add("on")); } }), { threshold: 0.18 });
-slides.forEach((s) => io.observe(s));
-// 백그라운드 탭·인쇄·구형 브라우저 대비: 1초 뒤에는 무조건 다 보이게 (애니메이션은 덤이지 조건이 아니다)
-setTimeout(() => $$(".rv").forEach((x) => x.classList.add("on")), 1000);
-document.addEventListener("visibilitychange", () => { if (!document.hidden) $$(".rv").forEach((x) => x.classList.add("on")); });
-if (location.hash) setTimeout(() => $(location.hash)?.scrollIntoView({ behavior: STATIC ? "auto" : "smooth" }), STATIC ? 0 : 50);
-function current() { const y = window.scrollY + window.innerHeight / 2; let i = 0; slides.forEach((s, k) => { if (s.offsetTop <= y) i = k; }); return i; }
-function update() { const i = current(); $("#pos").textContent = `${i + 1} / ${slides.length}`; $("#progress").style.width = `${((i + 1) / slides.length) * 100}%`; }
-window.addEventListener("scroll", update, { passive: true }); update();
-window.addEventListener("keydown", (e) => {
-  if (["INPUT", "TEXTAREA"].includes(document.activeElement.tagName)) return;
-  const i = current();
-  if (["ArrowRight", "ArrowDown", "PageDown", " "].includes(e.key)) { e.preventDefault(); slides[Math.min(i + 1, slides.length - 1)].scrollIntoView({ behavior: "smooth" }); }
-  if (["ArrowLeft", "ArrowUp", "PageUp"].includes(e.key)) { e.preventDefault(); slides[Math.max(i - 1, 0)].scrollIntoView({ behavior: "smooth" }); }
-  if (e.key === "Home") slides[0].scrollIntoView({ behavior: "smooth" });
-  if (e.key === "End") slides[slides.length - 1].scrollIntoView({ behavior: "smooth" });
-});
+let cur = 0;
+function reveal(el) { $$(".rv", el).forEach((x) => x.classList.add("on")); }
+function show(i, push = true) {
+  cur = Math.max(0, Math.min(slides.length - 1, i));
+  slides.forEach((s, k) => s.classList.toggle("active", k === cur));
+  reveal(slides[cur]);
+  slides[cur].scrollTop = 0;
+  $("#pos").textContent = `${cur + 1} / ${slides.length}`;
+  $("#progress").style.width = `${((cur + 1) / slides.length) * 100}%`;
+  $$(".dots button").forEach((b, k) => b.classList.toggle("on", k === cur));
+  if (push) history.replaceState(null, "", `#${cur + 1}`);
+}
+if (!SCROLL) {
+  document.documentElement.classList.add("deck-mode");
+  const dots = document.createElement("div"); dots.className = "dots";
+  slides.forEach((s, k) => { const b = document.createElement("button"); b.title = s.querySelector("h1,h2")?.textContent?.slice(0, 30) || `${k + 1}`; b.onclick = () => show(k); dots.appendChild(b); });
+  document.body.appendChild(dots);
+  const hint = document.createElement("div"); hint.className = "navhint"; hint.innerHTML = '<span class="kbd">←</span><span class="kbd">→</span> 넘기기 · <span class="kbd">Home</span> 처음';
+  document.body.appendChild(hint);
+  const fromHash = parseInt((location.hash || "#1").slice(1), 10);
+  const byId = location.hash && location.hash.length > 3 ? slides.findIndex((s) => "#" + s.id === location.hash) : -1;
+  show(byId >= 0 ? byId : (isNaN(fromHash) ? 0 : fromHash - 1), false);
+  if (STATIC) $$(".rv").forEach((x) => x.classList.add("on"));
+  window.addEventListener("keydown", (e) => {
+    if (["INPUT", "TEXTAREA"].includes(document.activeElement.tagName)) return;
+    if (["ArrowRight", "ArrowDown", "PageDown", " ", "Enter"].includes(e.key)) { e.preventDefault(); show(cur + 1); }
+    if (["ArrowLeft", "ArrowUp", "PageUp", "Backspace"].includes(e.key)) { e.preventDefault(); show(cur - 1); }
+    if (e.key === "Home") show(0);
+    if (e.key === "End") show(slides.length - 1);
+  });
+  let touchX = null;
+  window.addEventListener("touchstart", (e) => { touchX = e.touches[0].clientX; }, { passive: true });
+  window.addEventListener("touchend", (e) => { if (touchX == null) return; const dx = e.changedTouches[0].clientX - touchX; if (Math.abs(dx) > 60) show(cur + (dx < 0 ? 1 : -1)); touchX = null; });
+  window.addEventListener("hashchange", () => { const n = parseInt(location.hash.slice(1), 10); if (!isNaN(n) && n - 1 !== cur) show(n - 1, false); });
+} else {
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) reveal(e.target); }), { threshold: 0.18 });
+  slides.forEach((s) => io.observe(s));
+  setTimeout(() => $$(".rv").forEach((x) => x.classList.add("on")), 1000);
+  function current() { const y = window.scrollY + window.innerHeight / 2; let i = 0; slides.forEach((s, k) => { if (s.offsetTop <= y) i = k; }); return i; }
+  function update() { const i = current(); $("#pos").textContent = `${i + 1} / ${slides.length}`; $("#progress").style.width = `${((i + 1) / slides.length) * 100}%`; }
+  window.addEventListener("scroll", update, { passive: true }); update();
+}

@@ -17,7 +17,7 @@ export default function Home({ go }) {
     <div className="page container">
       <section className="hero">
         <div>
-          <div className="eyebrow" style={{ color: "#9db4ff" }}>Hindsight · 유튜브 언급의 사후 성적표</div>
+          <div className="eyebrow" style={{ color: "#9db4ff" }}>HINDSIGHT · 유튜브 언급의 사후 성적표</div>
           <h1>유튜버가 말한 종목,<br />그 뒤에 어떻게 됐나</h1>
           <p>주식·코인 채널 {yt ? yt.channels : 51}개의 1년치 영상 제목에서 종목을 찾아, 언급 뒤 5·20·60거래일 주가를 셌다.</p>
           <div className="flow"><span>YouTube 제목</span><i>→</i><span>종목·테마 매칭</span><i>→</i><span>시세·거래량·공시</span><i>→</i><span>언급 뒤 수익률</span></div>
@@ -44,7 +44,7 @@ export default function Home({ go }) {
             <table>
               <thead><tr>
                 <th>종목</th><th className="num"><Term k="mention">언급</Term></th><th className="num"><Term k="prev">직전</Term></th><th className="num"><Term k="surge">급증</Term></th>
-                <th className="num"><Term k="channels">채널 수</Term></th><th className="num"><Term k="views">조회수</Term></th><th>마지막 언급</th><th className="num"><Term k="past">과거 반응 (20일)</Term></th>
+                <th className="num"><Term k="channels">채널 수</Term></th><th className="num"><Term k="views">조회수</Term></th><th>마지막 언급</th><th className="num"><Term k="past">과거 언급 뒤 20일 평균</Term></th>
               </tr></thead>
               <tbody>
                 {rows.map((r) => {

@@ -29,7 +29,7 @@ export default function App() {
       <LoadingBar />
       <header className="topbar">
         <div className="container">
-          <a className="brand" href="#home"><span className="logo"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M4 17l5-6 4 3 7-9" /></svg></span>하인드사이트 <small>유튜버가 말한 종목, 그 뒤에</small></a>
+          <a className="brand" href="#home"><img src="/logo.svg" alt="" width="28" height="28" style={{ borderRadius: 8 }} /><span className="wordmark">HINDSIGHT</span><small>유튜버가 말한 종목, 그 뒤에</small></a>
           <nav className="nav">{TABS.map(([k, l]) => <a key={k} href={"#" + k} className={route.tab === k ? "on" : ""}>{l}</a>)}</nav>
         </div>
       </header>
@@ -44,7 +44,7 @@ export default function App() {
       </main>
       <footer>
         <div className="container">
-          <span>하인드사이트 · KAIST 디지털금융MBA 클라우드컴퓨팅실습 5조 · 학습용 통계, 투자 권유 아님</span>
+          <span>HINDSIGHT · KAIST 디지털금융MBA 클라우드컴퓨팅실습 5조 · 학습용 통계, 투자 권유 아님</span>
           <span><a href="https://github.com/insung1939/hindsight" target="_blank" rel="noreferrer">GitHub</a> · <a href={(import.meta.env.VITE_API_URL || "http://localhost:8000") + "/docs"} target="_blank" rel="noreferrer">API 문서</a></span>
         </div>
       </footer>

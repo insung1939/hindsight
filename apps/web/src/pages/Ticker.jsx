@@ -80,8 +80,8 @@ export default function Ticker({ assetId, go }) {
       {assetId && (
         <div className="grid">
           <div className="col-3"><Stat k="mention" label="언급" loading={data.loading && !d} value={d ? `${num(d.events.length)}건` : "—"} sub="최근 1년" /></div>
-          <div className="col-3"><Stat k="horizon" label="20거래일 평균" loading={data.loading && !d} value={pct(sum?.mean)} cls={sign(sum?.mean)} sub={sum?.n ? `n=${sum.n}${sum.low_sample ? " · 참고용" : ""}` : "계산 전"} /></div>
-          <div className="col-3"><Stat k="win" label="상승 확률 (20일)" loading={data.loading && !d} value={pct0(sum?.win_rate)} sub={sum ? `시장 대비 ${pct(sum.excess_mean)}` : ""} /></div>
+          <div className="col-3"><Stat k="past" label="언급 뒤 20거래일 수익률 평균" loading={data.loading && !d} value={pct(sum?.mean)} cls={sign(sum?.mean)} sub={sum?.n ? `n=${sum.n}${sum.low_sample ? " · 참고용" : ""}` : "계산 전"} /></div>
+          <div className="col-3"><Stat k="win" label="20거래일 뒤 오른 비율" loading={data.loading && !d} value={pct0(sum?.win_rate)} sub={sum ? `시장 대비 ${pct(sum.excess_mean)}` : ""} /></div>
           <div className="col-3"><Stat k="vol" label="거래량 비율" loading={data.loading && !d} value={sum?.vol_ratio_median ? `${sum.vol_ratio_median}배` : "—"} sub="언급 뒤 5일 ÷ 언급 전 20일" /></div>
           <div className="card col-12">
             <div className="card-head"><div><h3>주가와 언급 시점</h3><p>점 = <Term k="t0">사건일</Term> 종가 · 빨강 20일 뒤 상승 · 파랑 하락 · 회색 아직{d?.disc?.length > 0 && ` · 노란 눈금 = 주요 공시 ${d.disc.length}건`}</p></div>
