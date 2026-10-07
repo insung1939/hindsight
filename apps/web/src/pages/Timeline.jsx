@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { api, assetNames, dateOnly, pct } from "../api";
 
 // 종목 하나: 주가 선 위에 언급 시점을 점으로. 점을 누르면 그 언급의 5·20·60일 결과.
-function Chart({ prices, events, onHover }) {
+function Chart({ prices, events, disclosures = [], onHover }) {
   if (!prices?.length) return <p className="muted">시세가 없습니다.</p>;
   const W = 900, H = 240, P = 10;
   const t = (d) => new Date(d).getTime();
@@ -16,6 +16,10 @@ function Chart({ prices, events, onHover }) {
   return (
     <svg className="chart" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" style={{ height: 260 }}>
       <path d={path} fill="none" stroke="currentColor" strokeOpacity=".6" strokeWidth="1.5" />
+      {disclosures.filter((d) => t(d.rcept_dt) >= x0 && t(d.rcept_dt) <= x1).map((d) => (
+        <line key={d.rcept_no} x1={X(t(d.rcept_dt))} x2={X(t(d.rcept_dt))} y1={H - P} y2={H - P - 14} stroke="var(--warn)" strokeWidth="2">
+          <title>{d.rcept_dt} 공시 · {d.kind} · {d.report_nm}</title></line>
+      ))}
       {events.filter((e) => e.t0_date).map((e) => (
         <circle key={e.mention_id} cx={X(t(e.t0_date))} cy={Y(e.t0_close)} r="6"
           fill={e.r20 == null ? "var(--muted)" : e.r20 >= 0 ? "var(--good)" : "var(--bad)"} stroke="var(--card)" strokeWidth="2"
@@ -30,6 +34,7 @@ export default function Timeline({ assetId, onChange }) {
   const [q, setQ] = useState("");
   const [prices, setPrices] = useState([]);
   const [events, setEvents] = useState([]);
+  const [disc, setDisc] = useState([]);
   const [hover, setHover] = useState(null);
   const [err, setErr] = useState(null);
 
@@ -39,11 +44,12 @@ export default function Timeline({ assetId, onChange }) {
     (async () => {
       try {
         const from = new Date(Date.now() - 400 * 864e5).toISOString().slice(0, 10);
-        const [p, e] = await Promise.all([
+        const [p, e, d] = await Promise.all([
           api("marketData", `/v1/assets/${assetId}/prices`, { params: { from, limit: 5000 } }),
           api("stats", `/v1/assets/${assetId}/events`),
+          api("marketData", "/v1/disclosures", { params: { asset_ids: assetId, from } }).catch(() => ({ items: [] })),
         ]);
-        setPrices(p.items); setEvents(e.items); setHover(null); setErr(null);
+        setPrices(p.items); setEvents(e.items); setDisc(d.items); setHover(null); setErr(null);
       } catch (e) { setErr(e); }
     })();
   }, [assetId]);
@@ -65,12 +71,12 @@ export default function Timeline({ assetId, onChange }) {
       {assetId && (<>
         <div className="card wide">
           <h2 style={{ marginBottom: 4 }}>{a?.name || assetId} <span className="muted" style={{ fontSize: 14 }}>{assetId} · 언급 {events.length}건</span></h2>
-          <p className="muted">점 = 언급 시점(T0 종가). 초록은 20거래일 뒤 상승, 빨강은 하락, 회색은 아직 20일이 안 지남.</p>
-          <Chart prices={prices} events={events} onHover={setHover} />
+          <p className="muted">점 = 언급 시점(T0 종가). 초록은 20거래일 뒤 상승, 빨강은 하락, 회색은 아직 20일이 안 지남.{disc.length > 0 && ` 아래 노란 눈금 = DART 공시 ${disc.length}건.`}</p>
+          <Chart prices={prices} events={events} disclosures={disc} onHover={setHover} />
         </div>
         <div className="card wide">
           <table>
-            <thead><tr><th>언급일</th><th>T0</th><th className="num">T0 종가</th><th className="num">5일</th><th className="num">20일</th><th className="num">60일</th><th className="num">20일 초과</th></tr></thead>
+            <thead><tr><th>언급일</th><th>T0</th><th className="num">T0 종가</th><th className="num">5일</th><th className="num">20일</th><th className="num">60일</th><th className="num">20일 초과</th><th className="num">거래량</th></tr></thead>
             <tbody>{[...events].reverse().map((e) => (
               <tr key={e.mention_id} className={hover?.mention_id === e.mention_id ? "hl" : ""}>
                 <td>{dateOnly(e.published_at)}</td><td>{e.t0_date || "—"}</td><td className="num">{e.t0_close?.toLocaleString() ?? "—"}</td>
@@ -78,6 +84,7 @@ export default function Timeline({ assetId, onChange }) {
                 <td className={"num " + (e.r20 > 0 ? "good" : e.r20 < 0 ? "bad" : "")}>{pct(e.r20)}</td>
                 <td className={"num " + (e.r60 > 0 ? "good" : e.r60 < 0 ? "bad" : "")}>{pct(e.r60)}</td>
                 <td className="num">{pct(e.x20)}</td>
+                <td className={"num " + (e.vol_ratio > 1.5 ? "warn" : "")}>{e.vol_ratio ? `${e.vol_ratio.toFixed(1)}배` : "—"}</td>
               </tr>
             ))}</tbody>
           </table>

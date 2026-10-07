@@ -75,8 +75,9 @@ class SyncResult(BaseModel):
 
 # ── 채널 ────────────────────────────────────────────────
 def _next_anon(s: Session) -> str:
+    """A…Z 다음은 AA, AB … (채널 51개도 두 글자면 충분)."""
     n = s.scalar(select(func.count()).select_from(Channel)) or 0
-    return chr(ord("A") + n) if n < 26 else f"A{n - 25}"
+    return chr(ord("A") + n) if n < 26 else chr(ord("A") + n // 26 - 1) + chr(ord("A") + n % 26)
 
 
 @app.post("/v1/channels", response_model=ChannelOut, status_code=201, tags=["channels"], operation_id="add_channel",

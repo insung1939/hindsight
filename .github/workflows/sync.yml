@@ -1,42 +1,67 @@
-# 수집 스케줄 — 매일 순서대로: market-data(사전·시세) → youtube(새 영상) → mentions(매칭) → market-data(새로 tracked 된 종목 시세) → stats(수익률)
-# Secrets: MARKET_DATA_URL, YOUTUBE_URL, MENTIONS_URL, STATS_URL (https://….onrender.com), INTERNAL_TOKEN
+# 수집 스케줄 — 매일 순서대로: market-data(사전·시세·거래량) → youtube(새 영상) → mentions(매칭) → market-data(새로 tracked 된 종목 시세)
+#               → market-data(공시) → stats(수익률·거래량 비율·요약)
+# Secrets: API_URL (합본 게이트웨이, 예 https://hindsight-api.onrender.com), INTERNAL_TOKEN
+#          분리 배포라면 API_URL 대신 MARKET_DATA_URL · YOUTUBE_URL · MENTIONS_URL · STATS_URL 을 넣는다.
 name: sync
 
 on:
   schedule:
-    - cron: "10 22 * * *"   # 매일 07:10 KST
+    - cron: "10 22 * * *"   # 매일 07:10 KST (국내 전일 종가·미국 당일 종가가 모두 나온 뒤)
   workflow_dispatch:
+    inputs:
+      youtube_days:
+        description: "유튜브를 며칠 거슬러 받을지 (최초 백필 365)"
+        default: "3"
+      price_days:
+        description: "시세를 며칠 거슬러 받을지 (최초 420)"
+        default: "30"
 
 jobs:
   sync:
     runs-on: ubuntu-latest
     env:
+      API_URL: ${{ secrets.API_URL }}
       MARKET_DATA_URL: ${{ secrets.MARKET_DATA_URL }}
       YOUTUBE_URL: ${{ secrets.YOUTUBE_URL }}
       MENTIONS_URL: ${{ secrets.MENTIONS_URL }}
       STATS_URL: ${{ secrets.STATS_URL }}
       INTERNAL_TOKEN: ${{ secrets.INTERNAL_TOKEN }}
+      YT_DAYS: ${{ github.event.inputs.youtube_days || '3' }}
+      PRICE_DAYS: ${{ github.event.inputs.price_days || '30' }}
     steps:
-      - name: skipped
-        if: env.MARKET_DATA_URL == ''
-        run: echo "MARKET_DATA_URL secret 이 없어 건너뜀 (Render 배포 후 등록)"
-      - name: market-data (사전 + 시세)
+      - name: 주소 정하기 (합본이면 API_URL/<service>)
+        run: |
+          if [ -n "$API_URL" ]; then
+            echo "MARKET_DATA_URL=$API_URL/market-data" >> $GITHUB_ENV
+            echo "YOUTUBE_URL=$API_URL/youtube" >> $GITHUB_ENV
+            echo "MENTIONS_URL=$API_URL/mentions" >> $GITHUB_ENV
+            echo "STATS_URL=$API_URL/stats" >> $GITHUB_ENV
+          fi
+          if [ -z "$API_URL" ] && [ -z "$MARKET_DATA_URL" ]; then echo "API_URL secret 이 없어 건너뜀 (Render 배포 후 등록)"; fi
+      - name: Render 깨우기 (무료 플랜 콜드 스타트)
+        if: env.API_URL != ''
+        run: curl -sS --max-time 120 --retry 5 --retry-delay 20 --retry-all-errors "$API_URL/healthz" || true
+      - name: market-data (사전 + 시세·거래량)
         if: env.MARKET_DATA_URL != ''
         run: |
-          curl -sS --max-time 600 --retry 3 --retry-delay 30 -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "$MARKET_DATA_URL/internal/sync?days=30"
+          curl -sS --fail --max-time 1500 --retry 3 --retry-delay 30 -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "$MARKET_DATA_URL/internal/sync?days=$PRICE_DAYS"
       - name: youtube (새 영상)
         if: env.YOUTUBE_URL != ''
         run: |
-          curl -sS --max-time 600 --retry 3 --retry-delay 30 -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "$YOUTUBE_URL/internal/sync?days=3"
+          curl -sS --fail --max-time 1500 --retry 3 --retry-delay 30 -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "$YOUTUBE_URL/internal/sync?days=$YT_DAYS"
       - name: mentions (매칭)
         if: env.MENTIONS_URL != ''
         run: |
-          curl -sS --max-time 600 --retry 3 --retry-delay 30 -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "$MENTIONS_URL/internal/sync"
+          curl -sS --fail --max-time 1500 --retry 3 --retry-delay 30 -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "$MENTIONS_URL/internal/sync"
       - name: market-data (새로 언급된 종목 시세)
         if: env.MARKET_DATA_URL != ''
         run: |
-          curl -sS --max-time 600 --retry 3 --retry-delay 30 -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "$MARKET_DATA_URL/internal/sync?days=120&dictionary=false"
-      - name: stats (수익률·요약)
+          curl -sS --fail --max-time 1500 --retry 3 --retry-delay 30 -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "$MARKET_DATA_URL/internal/sync?days=120&dictionary=false"
+      - name: market-data (DART 공시 — 키 없으면 건너뜀)
+        if: env.MARKET_DATA_URL != ''
+        run: |
+          curl -sS --max-time 1500 --retry 2 --retry-delay 30 -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "$MARKET_DATA_URL/internal/sync-attention" || echo "attention sync 실패(무시)"
+      - name: stats (수익률·거래량 비율·요약)
         if: env.STATS_URL != ''
         run: |
-          curl -sS --max-time 600 --retry 3 --retry-delay 30 -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "$STATS_URL/internal/sync"
+          curl -sS --fail --max-time 1500 --retry 3 --retry-delay 30 -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "$STATS_URL/internal/sync"

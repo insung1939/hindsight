@@ -1,65 +1,30 @@
-# Render Blueprint — New → Blueprint 에서 이 저장소를 고르면 서비스 4개가 한 번에 만들어진다. (docs/deploy.md)
-# sync: false 항목은 대시보드에서 직접 넣는다.
-#   DATABASE_URL     = Supabase Session pooler 주소 (4개 전부 같은 값, 스키마는 서비스가 만든다)
-#   ALLOWED_ORIGINS  = Vercel 주소 (끝에 / 없이)
-#   INTERNAL_TOKEN   = 4개 전부 같은 값. GitHub Secrets 의 INTERNAL_TOKEN 과 동일하게.
-#   YOUTUBE_API_KEY  = youtube 서비스만
+# Render Blueprint — 수업 제출용 합본 1개 (apps/api: 서비스 4개 + 게이트웨이를 한 컨테이너에).
+# dashboard.render.com → New → Blueprint → 이 저장소 선택 → sync:false 항목 입력 → Apply.
+# 세미나용 분리 배포(서비스별 컨테이너)는 platform/k8s 를 쓴다.
 services:
   - type: web
-    name: hindsight-market-data
+    name: hindsight-api
     runtime: docker
     plan: free
-    dockerfilePath: ./services/market-data/Dockerfile
+    region: singapore
+    dockerfilePath: apps/api/Dockerfile
     dockerContext: .
     healthCheckPath: /healthz
+    autoDeploy: true
     envVars:
-      - { key: DATABASE_URL, sync: false }
-      - { key: ALLOWED_ORIGINS, sync: false }
-      - { key: INTERNAL_TOKEN, sync: false }
-      - { key: DATA_GO_KR_KEY, sync: false }
-      - { key: DART_KEY, sync: false }
-
-  - type: web
-    name: hindsight-youtube
-    runtime: docker
-    plan: free
-    dockerfilePath: ./services/youtube/Dockerfile
-    dockerContext: .
-    healthCheckPath: /healthz
-    envVars:
-      - { key: DATABASE_URL, sync: false }
-      - { key: ALLOWED_ORIGINS, sync: false }
-      - { key: INTERNAL_TOKEN, sync: false }
-      - { key: YOUTUBE_API_KEY, sync: false }
-
-  - type: web
-    name: hindsight-mentions
-    runtime: docker
-    plan: free
-    dockerfilePath: ./services/mentions/Dockerfile
-    dockerContext: .
-    healthCheckPath: /healthz
-    envVars:
-      - { key: DATABASE_URL, sync: false }
-      - { key: ALLOWED_ORIGINS, sync: false }
-      - { key: INTERNAL_TOKEN, sync: false }
-      - key: MARKET_DATA_URL
-        fromService: { type: web, name: hindsight-market-data, property: host }
-      - key: YOUTUBE_URL
-        fromService: { type: web, name: hindsight-youtube, property: host }
-
-  - type: web
-    name: hindsight-stats
-    runtime: docker
-    plan: free
-    dockerfilePath: ./services/stats/Dockerfile
-    dockerContext: .
-    healthCheckPath: /healthz
-    envVars:
-      - { key: DATABASE_URL, sync: false }
-      - { key: ALLOWED_ORIGINS, sync: false }
-      - { key: INTERNAL_TOKEN, sync: false }
-      - key: MARKET_DATA_URL
-        fromService: { type: web, name: hindsight-market-data, property: host }
-      - key: MENTIONS_URL
-        fromService: { type: web, name: hindsight-mentions, property: host }
+      - key: DATABASE_URL          # Supabase Session pooler (IPv4). 네 서비스가 같은 DB 의 스키마 market·yt·mentions·stats 를 나눠 쓴다
+        sync: false
+      - key: INTERNAL_TOKEN        # /internal/* 보호. GitHub Secrets 와 같은 값 (openssl rand -hex 24)
+        sync: false
+      - key: ALLOWED_ORIGINS       # Vercel 프론트 주소 (https, 끝에 / 없이). 로컬도 쓰면 ,http://localhost:5173
+        sync: false
+      - key: YOUTUBE_API_KEY
+        sync: false
+      - key: DART_KEY              # 없으면 비움 (시드 사전만)
+        sync: false
+      - key: DATA_GO_KR_KEY        # 없으면 비움 (Yahoo 대체)
+        sync: false
+      - key: PUBLIC_URL
+        value: https://hindsight-api.onrender.com
+      - key: PYTHONUNBUFFERED
+        value: "1"

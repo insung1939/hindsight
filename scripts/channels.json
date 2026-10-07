@@ -1,0 +1,512 @@
+[
+ {
+  "handle": "@stockoutlooktv",
+  "channel_id": "UC_gStEqBaP3XLnDaJ0_7f3g",
+  "title": "주식전망TV",
+  "category": "stock",
+  "tier": "A",
+  "subscribers": 4080000,
+  "uploads_per_week": 8.8,
+  "mention_rate": 0.28
+ },
+ {
+  "handle": "@3protv",
+  "channel_id": "UChlv4GSd7OQl3js-jkLOnFA",
+  "title": "삼프로TV 3PROTV",
+  "category": "stock",
+  "tier": "A",
+  "subscribers": 3040000,
+  "uploads_per_week": 71.6,
+  "mention_rate": 0.22
+ },
+ {
+  "handle": "@ch신사임당",
+  "channel_id": "UCaJdckl6MBdDPDf75Ec_bJA",
+  "title": "신사임당",
+  "category": "stock",
+  "tier": "A",
+  "subscribers": 2820000,
+  "uploads_per_week": 101.2,
+  "mention_rate": 0.38
+ },
+ {
+  "handle": "@lucky_tv",
+  "channel_id": "UCvil4OAt-zShzkKHsg9EQAw",
+  "title": "김작가 TV",
+  "category": "stock",
+  "tier": "A",
+  "subscribers": 2730000,
+  "uploads_per_week": 28.6,
+  "mention_rate": 0.28
+ },
+ {
+  "handle": "@talentinvestment",
+  "channel_id": "UCBM86JVoHLqg9irpR2XKvGw",
+  "title": "달란트투자",
+  "category": "stock",
+  "tier": "A",
+  "subscribers": 1590000,
+  "uploads_per_week": 38.5,
+  "mention_rate": 0.16
+ },
+ {
+  "handle": "@815moneytalk",
+  "channel_id": "UCCG6BEYjfQMGzypJw2EJCDQ",
+  "title": "815머니톡",
+  "category": "stock",
+  "tier": "A",
+  "subscribers": 1290000,
+  "uploads_per_week": 46.2,
+  "mention_rate": 0.5
+ },
+ {
+  "handle": "@moneydo",
+  "channel_id": "UCznImSIaxZR7fdLCICLdgaQ",
+  "title": "전인구경제연구소",
+  "category": "stock",
+  "tier": "A",
+  "subscribers": 1280000,
+  "uploads_per_week": 7.6,
+  "mention_rate": 0.24
+ },
+ {
+  "handle": "@재테크읽어주는파일럿",
+  "channel_id": "UCaWi2foADm_lKAKnmeQwLSA",
+  "title": "재테크읽어주는 파일럿",
+  "category": "stock",
+  "tier": "A",
+  "subscribers": 1280000,
+  "uploads_per_week": 2.7,
+  "mention_rate": 0.24
+ },
+ {
+  "handle": "@futuresnow",
+  "channel_id": "UC_JJ_NhRqPKcIOj5Ko3W_3w",
+  "title": "오선의 미국 증시 라이브",
+  "category": "stock",
+  "tier": "A",
+  "subscribers": 1220000,
+  "uploads_per_week": 10.0,
+  "mention_rate": 0.3
+ },
+ {
+  "handle": "@chaprofessor",
+  "channel_id": "UCfta6PF9AYIUTb89pINTxoQ",
+  "title": "차교수의 코인이야기",
+  "category": "crypto",
+  "tier": "B",
+  "subscribers": 561000,
+  "uploads_per_week": 30.0,
+  "mention_rate": 1.0
+ },
+ {
+  "handle": "@코인_천국",
+  "channel_id": "UCe1uFmR_PnYMzGF9FVJsxPg",
+  "title": "코인천국",
+  "category": "crypto",
+  "tier": "B",
+  "subscribers": 334000,
+  "uploads_per_week": 24.9,
+  "mention_rate": 0.7
+ },
+ {
+  "handle": "@bitshua",
+  "channel_id": "UCf64J3dPdVRT6OJf57m-uyw",
+  "title": "비트슈아",
+  "category": "crypto",
+  "tier": "B",
+  "subscribers": 308000,
+  "uploads_per_week": 2.4,
+  "mention_rate": 0.34
+ },
+ {
+  "handle": "@박작가의크립토연구소",
+  "channel_id": "UCqaXPyhWGtS_Vt20GQQDSbg",
+  "title": "박작가의 크립토연구소",
+  "category": "crypto",
+  "tier": "B",
+  "subscribers": 260000,
+  "uploads_per_week": 5.9,
+  "mention_rate": 0.64
+ },
+ {
+  "handle": "@wisdom_of_bitcoin",
+  "channel_id": "UCzGUaygjUeV-Zm_DRuFS0pA",
+  "title": "오태민의 지혜의족보",
+  "category": "crypto",
+  "tier": "B",
+  "subscribers": 208000,
+  "uploads_per_week": 2.5,
+  "mention_rate": 0.5
+ },
+ {
+  "handle": "@성정길",
+  "channel_id": "UCPsRj5tjL48pFVow7HyLhOQ",
+  "title": "성정길",
+  "category": "crypto",
+  "tier": "B",
+  "subscribers": 201000,
+  "uploads_per_week": 4.1,
+  "mention_rate": 0.92
+ },
+ {
+  "handle": "@kobugi7942",
+  "channel_id": "UCthu-_a9wfLCyy7Onv9fHyg",
+  "title": "코부기 - 비트코인 주식 경제 NO.1전문트레이더",
+  "category": "crypto",
+  "tier": "B",
+  "subscribers": 200000,
+  "uploads_per_week": 8.0,
+  "mention_rate": 0.82
+ },
+ {
+  "handle": "@리스펙투자플랜",
+  "channel_id": "UC1f_j9wOASvYAvADpwTXT0Q",
+  "title": "리스펙 투자플랜",
+  "category": "crypto",
+  "tier": "B",
+  "subscribers": 179000,
+  "uploads_per_week": 6.4,
+  "mention_rate": 0.64
+ },
+ {
+  "handle": "@tv-kc6ue",
+  "channel_id": "UCf6jaRSw3P2SXyI4njr_Wdg",
+  "title": "비트코인 돈복남TV",
+  "category": "crypto",
+  "tier": "B",
+  "subscribers": 168000,
+  "uploads_per_week": 5.4,
+  "mention_rate": 1.0
+ },
+ {
+  "handle": "@koshu-economy",
+  "channel_id": "UCvhsQm_E8wx2t5haDnCejMg",
+  "title": "코슈 경제채널",
+  "category": "crypto",
+  "tier": "B",
+  "subscribers": 154000,
+  "uploads_per_week": 17.5,
+  "mention_rate": 0.38
+ },
+ {
+  "handle": "@money-blahblah",
+  "channel_id": "UCglRHAqxLq0KF0ffkQXF-TA",
+  "title": "머니 블라블라",
+  "category": "crypto",
+  "tier": "B",
+  "subscribers": 144000,
+  "uploads_per_week": 9.1,
+  "mention_rate": 0.82
+ },
+ {
+  "handle": "@코인드림",
+  "channel_id": "UCKcaQ9Dvp2cdx7Fo8qMU28g",
+  "title": "코인드림_자산 인사이트",
+  "category": "crypto",
+  "tier": "B",
+  "subscribers": 125000,
+  "uploads_per_week": 12.3,
+  "mention_rate": 0.54
+ },
+ {
+  "handle": "@오뽀가디언-비트코인tv",
+  "channel_id": "UCO_Qx4bogFcXNC0N6Wn7iaw",
+  "title": "오뽀가디언- 비트코인TV",
+  "category": "crypto",
+  "tier": "B",
+  "subscribers": 109000,
+  "uploads_per_week": 9.6,
+  "mention_rate": 1.0
+ },
+ {
+  "handle": "@김단테",
+  "channel_id": "UCKTMvIu9a4VGSrpWy-8bUrQ",
+  "title": "내일은 투자왕 - 김단테",
+  "category": "stock",
+  "tier": "B",
+  "subscribers": 614000,
+  "uploads_per_week": 7.0,
+  "mention_rate": 0.54
+ },
+ {
+  "handle": "@mediaauto",
+  "channel_id": "UCT29dZNPg6exiMyMrVLL0fg",
+  "title": "mediaAUTO 미디어오토",
+  "category": "stock",
+  "tier": "B",
+  "subscribers": 458000,
+  "uploads_per_week": 8.3,
+  "mention_rate": 0.3
+ },
+ {
+  "handle": "@topicstocktv",
+  "channel_id": "UCdaKdp154PROjakChLIdSbQ",
+  "title": "종목토론TV",
+  "category": "stock",
+  "tier": "B",
+  "subscribers": 446000,
+  "uploads_per_week": 11.6,
+  "mention_rate": 0.3
+ },
+ {
+  "handle": "@달팽이주식",
+  "channel_id": "UCFznPlqnBtRKQhtkm6GGoRQ",
+  "title": "달팽이주식",
+  "category": "stock",
+  "tier": "B",
+  "subscribers": 372000,
+  "uploads_per_week": 0.6,
+  "mention_rate": 0.5
+ },
+ {
+  "handle": "@jang--in",
+  "channel_id": "UCYCJtL5PP64m4xSL27N-cJw",
+  "title": "주식장인",
+  "category": "stock",
+  "tier": "B",
+  "subscribers": 340000,
+  "uploads_per_week": 7.3,
+  "mention_rate": 0.38
+ },
+ {
+  "handle": "@미국주식",
+  "channel_id": "UCMupe3fvv1-Hi3SRxZzSsTw",
+  "title": "미국 주식 채널 - 에디 Eddie",
+  "category": "stock",
+  "tier": "B",
+  "subscribers": 266000,
+  "uploads_per_week": 13.4,
+  "mention_rate": 0.42
+ },
+ {
+  "handle": "@안정모의주식투자",
+  "channel_id": "UCVAbB2v_MCpAWNVTGxVLRxw",
+  "title": "안정모의 주식투자",
+  "category": "stock",
+  "tier": "B",
+  "subscribers": 226000,
+  "uploads_per_week": 10.4,
+  "mention_rate": 0.36
+ },
+ {
+  "handle": "@stock_timingking",
+  "channel_id": "UC8YmM3q6Y6wP1JNGAIjFz3w",
+  "title": "주식타점왕",
+  "category": "stock",
+  "tier": "B",
+  "subscribers": 207000,
+  "uploads_per_week": 3.0,
+  "mention_rate": 0.86
+ },
+ {
+  "handle": "@kbs7",
+  "channel_id": "UCgGkTSSIHd6l5VCCiC3hy5g",
+  "title": "주식홀인원",
+  "category": "stock",
+  "tier": "B",
+  "subscribers": 190000,
+  "uploads_per_week": 20.6,
+  "mention_rate": 0.94
+ },
+ {
+  "handle": "@marsrealstock",
+  "channel_id": "UCdJlth8axhHERVunTyA3qEQ",
+  "title": "마르스 김동석의 리얼주식",
+  "category": "stock",
+  "tier": "B",
+  "subscribers": 181000,
+  "uploads_per_week": 11.9,
+  "mention_rate": 1.0
+ },
+ {
+  "handle": "@kimsstock",
+  "channel_id": "UCQyhwrJjNju5sq5gA45Ppww",
+  "title": "킴스 미국주식",
+  "category": "stock",
+  "tier": "B",
+  "subscribers": 181000,
+  "uploads_per_week": 3.9,
+  "mention_rate": 0.72
+ },
+ {
+  "handle": "@전태룡주식내비",
+  "channel_id": "UCUpG4uNjNt6zIZSFynH177Q",
+  "title": "실전투자대회1위 전태룡 주식내비",
+  "category": "stock",
+  "tier": "B",
+  "subscribers": 178000,
+  "uploads_per_week": 3.5,
+  "mention_rate": 0.64
+ },
+ {
+  "handle": "@구독과공유좋아요",
+  "channel_id": "UCN9qJ2AtaU9WIy7wXqNg5lg",
+  "title": "미국주식 월가TV",
+  "category": "stock",
+  "tier": "B",
+  "subscribers": 169000,
+  "uploads_per_week": 26.8,
+  "mention_rate": 1.0
+ },
+ {
+  "handle": "@cho_manager",
+  "channel_id": "UC512T90idot46AH6UXx1SUQ",
+  "title": "주식또바기",
+  "category": "stock",
+  "tier": "B",
+  "subscribers": 169000,
+  "uploads_per_week": 10.0,
+  "mention_rate": 0.44
+ },
+ {
+  "handle": "@t3chfeed",
+  "channel_id": "UCH2sxkxg_vdJSK4KYRXNE0Q",
+  "title": "T3chfeed - 테크피드 미국 주식 인사이트",
+  "category": "stock",
+  "tier": "B",
+  "subscribers": 154000,
+  "uploads_per_week": 2.3,
+  "mention_rate": 0.54
+ },
+ {
+  "handle": "@latv8754",
+  "channel_id": "UCnwTpaRmErJXgJTrVixeSNA",
+  "title": "LA 정교수 TV",
+  "category": "stock",
+  "tier": "B",
+  "subscribers": 147000,
+  "uploads_per_week": 14.0,
+  "mention_rate": 1.0
+ },
+ {
+  "handle": "@profhalf",
+  "channel_id": "UCczff_dQVVb9sSEULFUJ-sw",
+  "title": "반교수(ProfHalf)의 미국 투자 스토리(미투리)",
+  "category": "stock",
+  "tier": "B",
+  "subscribers": 147000,
+  "uploads_per_week": 10.6,
+  "mention_rate": 1.0
+ },
+ {
+  "handle": "@econ-tv",
+  "channel_id": "UCR3tcM2ZKncmiNoGcoC--2A",
+  "title": "에스앤티투자자문 김석일 회장",
+  "category": "stock",
+  "tier": "B",
+  "subscribers": 134000,
+  "uploads_per_week": 10.0,
+  "mention_rate": 0.32
+ },
+ {
+  "handle": "@donmanytv",
+  "channel_id": "UCVZJPUp4p5G5HL8bISQVDyA",
+  "title": "한류 '돈마니주식티비'",
+  "category": "stock",
+  "tier": "B",
+  "subscribers": 127000,
+  "uploads_per_week": 4.0,
+  "mention_rate": 0.32
+ },
+ {
+  "handle": "@futurescope_go",
+  "channel_id": "UCgsW8fzux4yFsQiW7WiH4aA",
+  "title": "FutureScope",
+  "category": "stock",
+  "tier": "B",
+  "subscribers": 106000,
+  "uploads_per_week": 11.5,
+  "mention_rate": 0.8
+ },
+ {
+  "handle": "@snowballlabs",
+  "channel_id": "UCBF61jlG6g2CNHDLKaJhysw",
+  "title": "머니네버슬립",
+  "category": "stock",
+  "tier": "B",
+  "subscribers": 91600,
+  "uploads_per_week": 12.0,
+  "mention_rate": 0.46
+ },
+ {
+  "handle": "@leeseungjotv",
+  "channel_id": "UCAnMBvmFYWErcxw_YoKqUlA",
+  "title": "이승조TV",
+  "category": "stock",
+  "tier": "B",
+  "subscribers": 87700,
+  "uploads_per_week": 4.3,
+  "mention_rate": 0.96
+ },
+ {
+  "handle": "@usstockchannel",
+  "channel_id": "UCr5oaHbo3FhagiG9lrDD5uw",
+  "title": "미국주식의 모든것 - 미주모",
+  "category": "stock",
+  "tier": "B",
+  "subscribers": 80200,
+  "uploads_per_week": 5.6,
+  "mention_rate": 0.4
+ },
+ {
+  "handle": "@doki_investing",
+  "channel_id": "UCvGvjYJAr6ByOocCboX-c_w",
+  "title": "도키와 미국주식",
+  "category": "stock",
+  "tier": "B",
+  "subscribers": 72300,
+  "uploads_per_week": 2.0,
+  "mention_rate": 0.72
+ },
+ {
+  "handle": "@minparksa1000",
+  "channel_id": "UCNM28SZnV6StX_xIGhQazeg",
+  "title": "민박사 ㅣ 주식 끝까지 간다!",
+  "category": "stock",
+  "tier": "B",
+  "subscribers": 68400,
+  "uploads_per_week": 3.4,
+  "mention_rate": 0.52
+ },
+ {
+  "handle": "@mapd.chart77",
+  "channel_id": "UCjp7GHSUKx9Joji3tIz1jCg",
+  "title": "마피디미국주식(테슬라,TQQQ)",
+  "category": "stock",
+  "tier": "B",
+  "subscribers": 67100,
+  "uploads_per_week": 3.8,
+  "mention_rate": 0.3
+ },
+ {
+  "handle": "@jb_insight",
+  "channel_id": "UCeYLly7Dja5ic0RjygbAiFg",
+  "title": "제이비[JB]",
+  "category": "stock",
+  "tier": "B",
+  "subscribers": 56400,
+  "uploads_per_week": 7.8,
+  "mention_rate": 0.3
+ },
+ {
+  "handle": "@jaydidworld",
+  "channel_id": "UCnQm5yxDkKwAXt-bqedJ2bg",
+  "title": "제이디드월드",
+  "category": "stock",
+  "tier": "B",
+  "subscribers": 53400,
+  "uploads_per_week": 5.7,
+  "mention_rate": 1.0
+ },
+ {
+  "handle": "@백곰사령관",
+  "channel_id": "UC3YOGOotemEnzVLsbBU-j0A",
+  "title": "백곰사령관",
+  "category": "stock",
+  "tier": "B",
+  "subscribers": 51400,
+  "uploads_per_week": 18.7,
+  "mention_rate": 0.3
+ }
+]

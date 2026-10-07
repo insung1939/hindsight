@@ -59,3 +59,51 @@ def test_uncurated_crypto_needs_context():
 def test_uppercase_ticker_case_sensitive():
     assert ids("Subscribe link below") == set()
     assert ids("코인 LINK 급등") == {"CRYPTO:KRW-LINK"}
+
+
+# ── 테마(업종) 사전과 스톱리스트 (docs/data-plan.md D2) ──
+THEME_DICT = DICT + [
+    {"asset_id": "KRX:091160", "name": "반도체", "aliases": ["반도체주"], "market": "KRX", "asset_type": "theme", "ambiguous": False},
+    {"asset_id": "KRX:091170", "name": "은행", "aliases": ["은행주", "금융주"], "market": "KRX", "asset_type": "theme", "ambiguous": False},
+    {"asset_id": "KRX:042700", "name": "한미반도체", "aliases": [], "market": "KRX", "ambiguous": False},
+]
+THEME_TERMS = build_terms(THEME_DICT, {"KT", "비자", "은행"})  # 맨 "은행"은 흔한 단어라 모호 목록에, 복합 표현만 잡는다
+
+
+def tids(text):
+    return {aid for aid, _, _ in match(text, THEME_TERMS)}
+
+
+def test_theme_without_ticker():
+    assert tids("반도체 급등, 지금이라도 올라타야 하나") == {"KRX:091160"}
+
+
+def test_longer_stock_name_beats_theme_and_both_can_coexist():
+    assert tids("한미반도체 실적 발표") == {"KRX:042700"}  # "반도체" 는 지워진 구간이라 테마로 다시 잡히지 않는다
+    assert tids("삼성전자 덕에 반도체 전체가 들썩") == {"KRX:005930", "KRX:091160"}
+
+
+def test_stoplist_prevents_false_theme():
+    assert tids("한국은행 금리 동결") == set()  # "한국은행" 은 매칭 전에 지운다
+    assert tids("은행주 배당 시즌") == {"KRX:091170"}
+
+
+def test_auto_two_char_corp_name_not_matched():
+    terms = build_terms(DICT + [{"asset_id": "KRX:001680", "name": "대상", "aliases": [], "market": "KRX", "ambiguous": False, "curated": False},
+                                {"asset_id": "KRX:005930X", "name": "삼전", "aliases": [], "market": "KRX", "ambiguous": False, "curated": True}], set())
+    assert {a for a, _, _ in match("투자 대상 종목 정리", terms)} == set()
+    assert {a for a, _, _ in match("삼전 간다", terms)} == {"KRX:005930X"}
+
+
+def test_auto_korean_name_needs_word_boundary():
+    auto = [{"asset_id": "KRX:067390", "name": "아스트", "aliases": [], "market": "KRX", "ambiguous": False, "curated": False},
+            {"asset_id": "KRX:347700", "name": "스피어", "aliases": [], "market": "KRX", "ambiguous": False, "curated": False},
+            {"asset_id": "KRX:090710", "name": "휴림로봇", "aliases": [], "market": "KRX", "ambiguous": False, "curated": False}]
+    terms = build_terms(DICT + auto, set())
+    got = lambda t: {a for a, _, _ in match(t, terms)}  # noqa: E731
+    assert got("GPT 신모델 아스트라 효과") == set()               # 긴 단어 속 부분 일치 금지
+    assert got("투자자의 스트레스 푸는 법") == set()
+    assert got("[스피어 주가 전망] 지금이 기회") == {"KRX:347700"}  # 공백·조사 경계는 허용
+    assert got("스피어가 간다 #스피어") == {"KRX:347700"}
+    assert got("휴림로봇, 두산로보틱스 비교") == {"KRX:090710"}
+    assert got("삼성전자가 산다") == {"KRX:005930"}                # 시드(curated) 는 기존 규칙 그대로

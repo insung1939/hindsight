@@ -1,10 +1,13 @@
 // 서비스별 주소. 화면은 stats · mentions 를 주로 부르고, market-data 는 종목 이름·시세(타임라인) 읽기, youtube 는 수집 현황만.
+// 배포는 합본 게이트웨이 하나(VITE_API_URL, 예: https://hindsight-api.onrender.com)에 접두사로 붙인다.
+// 서비스별 주소(VITE_STATS_URL …)를 주면 그게 우선이라 분리 실행(로컬 8001~8004, 세미나)도 그대로 된다.
 const env = import.meta.env;
+const gw = (env.VITE_API_URL || "").replace(/\/$/, "");
 export const URLS = {
-  stats: env.VITE_STATS_URL || "http://localhost:8004",
-  mentions: env.VITE_MENTIONS_URL || "http://localhost:8003",
-  marketData: env.VITE_MARKET_DATA_URL || "http://localhost:8001",
-  youtube: env.VITE_YOUTUBE_URL || "http://localhost:8002",
+  stats: env.VITE_STATS_URL || (gw ? gw + "/stats" : "http://localhost:8004"),
+  mentions: env.VITE_MENTIONS_URL || (gw ? gw + "/mentions" : "http://localhost:8003"),
+  marketData: env.VITE_MARKET_DATA_URL || (gw ? gw + "/market-data" : "http://localhost:8001"),
+  youtube: env.VITE_YOUTUBE_URL || (gw ? gw + "/youtube" : "http://localhost:8002"),
 };
 
 export class ApiError extends Error {

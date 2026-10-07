@@ -32,7 +32,8 @@ paths:
     get:
       tags:
       - summary
-      summary: 전체 분포 (scope=overall | market:KRX | market:US | market:CRYPTO)
+      summary: 전체 분포 (scope=overall | market:KRX | market:US | market:CRYPTO | kind:theme
+        | asset:<id> | channel:<id>)
       operationId: get_summary
       parameters:
       - name: scope
@@ -107,6 +108,29 @@ paths:
         '500':
           description: 서버 내부 오류
           content: *id001
+  /v1/coverage:
+    get:
+      tags:
+      - ops
+      summary: '계산 현황 (데이터 페이지용): 언급별 수익률이 몇 건 채워졌나'
+      operationId: get_stats_coverage
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsCoverage'
+        '500':
+          description: 서버 내부 오류
+          content: *id001
+      parameters:
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
   /v1/assets/{asset_id}/events:
     get:
       tags:
@@ -235,6 +259,10 @@ components:
         market:
           type: string
           title: Market
+        kind:
+          type: string
+          title: Kind
+          default: stock
         published_at:
           type: string
           format: date-time
@@ -280,6 +308,16 @@ components:
           - type: number
           - type: 'null'
           title: X60
+        vol_ratio:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Vol Ratio
+        near_disclosure:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Near Disclosure
       type: object
       required:
       - mention_id
@@ -328,6 +366,54 @@ components:
       required:
       - items
       title: ListSummaries
+    StatsCoverage:
+      properties:
+        events:
+          type: integer
+          title: Events
+        events_theme:
+          type: integer
+          title: Events Theme
+        with_t0:
+          type: integer
+          title: With T0
+        r5_filled:
+          type: integer
+          title: R5 Filled
+        r20_filled:
+          type: integer
+          title: R20 Filled
+        r60_filled:
+          type: integer
+          title: R60 Filled
+        vol_ratio_filled:
+          type: integer
+          title: Vol Ratio Filled
+        disclosure_checked:
+          type: integer
+          title: Disclosure Checked
+        last_computed_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Last Computed At
+        summaries:
+          type: integer
+          title: Summaries
+      type: object
+      required:
+      - events
+      - events_theme
+      - with_t0
+      - r5_filled
+      - r20_filled
+      - r60_filled
+      - vol_ratio_filled
+      - disclosure_checked
+      - last_computed_at
+      - summaries
+      title: StatsCoverage
     SummaryOut:
       properties:
         key:

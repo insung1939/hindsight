@@ -60,6 +60,16 @@ paths:
             format: date-time
           - type: 'null'
           title: Since
+      - name: after_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          description: 이 id 보다 큰 것만, id 오름차순 (배치용 페이징)
+          title: After Id
+        description: 이 id 보다 큰 것만, id 오름차순 (배치용 페이징)
       - name: limit
         in: query
         required: false

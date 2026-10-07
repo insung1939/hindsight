@@ -7,9 +7,19 @@ from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 from .settings import env
 
 
+def normalize_url(url: str) -> str:
+    """Supabase 가 주는 `postgresql://…` 를 psycopg2 드라이버로 고정한다.
+    SQLAlchemy 2.1 부터 접두사 없는 postgresql:// 의 기본 드라이버가 psycopg(3)으로 바뀌어, psycopg2-binary 만 설치된 환경에서 'No module named psycopg' 가 난다."""
+    if url.startswith("postgres://"):  # Heroku 식 접두사도 허용
+        url = "postgresql://" + url[len("postgres://"):]
+    if url.startswith("postgresql://"):
+        url = "postgresql+psycopg2://" + url[len("postgresql://"):]
+    return url
+
+
 class Database:
     def __init__(self, service_name: str, schema: str):
-        self.url = env("DATABASE_URL", f"sqlite:///./{service_name}.db") or ""
+        self.url = normalize_url(env("DATABASE_URL", f"sqlite:///./{service_name}.db") or "")
         self.is_sqlite = self.url.startswith("sqlite")
         # SQLite 는 스키마가 없으므로 PostgreSQL 일 때만 스키마를 붙인다.
         self.schema = None if self.is_sqlite else schema

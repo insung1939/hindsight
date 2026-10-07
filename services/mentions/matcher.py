@@ -11,6 +11,12 @@
 import re
 from dataclasses import dataclass
 
+# 테마 표현과 겹치지만 종목·업종을 뜻하지 않는 말 — 매칭 전에 지운다 ("한국은행 금리" 가 은행주로 잡히지 않게)
+STOPLIST = ("한국은행", "중앙은행", "투자은행", "연방준비", "게임체인저", "머니게임", "조선일보", "조선시대", "조선왕조", "로봇청소기", "금리", "금융위", "금감원", "금투세")
+_STOP_RE = __import__("re").compile("|".join(map(__import__("re").escape, sorted(STOPLIST, key=len, reverse=True))))
+
+_PARTICLES = r"(?:이|가|은|는|을|를|의|도|와|과|로|에|만|주가|주|株|랑|부터|까지|에서|한테)"
+
 CRYPTO_CONTEXT = ("코인", "크립토", "비트", "알트", "업비트", "바이낸스", "빗썸", "이더", "가상자산", "암호화폐", "블록체인", "crypto", "bitcoin", "$")
 
 
@@ -36,11 +42,17 @@ def build_terms(dictionary: list[dict], ambiguous: set[str]) -> list[Term]:
             is_ascii = t.isascii()
             if (is_ascii and len(t) <= 2) or len(t) < 2:
                 continue
+            if not e.get("curated", True) and not is_ascii and len(t) <= 2 and conf == 1.0:
+                continue  # 자동 수집(DART) 2글자 회사명("대상", "동양", "하나" …)은 일상어와 겹쳐 단독 매칭하지 않는다
             if is_ascii:
                 flags = 0 if (t.isupper() and len(t) <= 5) else re.IGNORECASE  # 5자 이하 대문자 = 티커
                 pattern = re.compile(r"(?<![A-Za-z0-9])" + re.escape(t) + r"(?![A-Za-z0-9])", flags)
-            else:
+            elif e.get("curated", True):
                 pattern = re.compile(re.escape(t))
+            else:
+                # 자동 수집(DART) 한글 회사명: 앞은 한글이 아니어야 하고, 뒤는 한글이 아니거나 조사·'주가'로 끝나야 한다.
+                # "아스트라"→아스트, "이지스탁"→이지스, "스트레스"→트레스, "오로라투자자문"→오로라 같은 부분 일치를 막는다.
+                pattern = re.compile(r"(?<![가-힣])" + re.escape(t) + r"(?:(?![가-힣])|(?=" + _PARTICLES + r"(?![가-힣])))")
             key = t if (is_ascii and t.isupper() and len(t) <= 5) else t.lower()
             if key not in terms or conf > terms[key].confidence:
                 terms[key] = Term(t, e["asset_id"], conf, is_ascii, e.get("market", ""), bool(e.get("curated", True)), pattern)
@@ -56,7 +68,7 @@ def match(text: str, terms: list[Term], crypto_channel: bool = False) -> list[tu
     """text 에서 종목을 찾는다. 반환: [(asset_id, matched_text, confidence)] — 종목당 최고 confidence 하나."""
     if not text:
         return []
-    work = text
+    work = _STOP_RE.sub(lambda m: " " * len(m.group(0)), text)
     ctx = crypto_channel or has_crypto_context(text)
     found: dict[str, tuple[str, float]] = {}
     for t in terms:
