@@ -162,7 +162,8 @@ def channel_events(channel_id: str, s: Session = Depends(db.session)):
 
 @app.post("/internal/sync", response_model=SyncResult, tags=["ops"], operation_id="sync_stats",
           summary="새 언급의 수익률 계산 + 미완성 값 채우기 + 요약 갱신", dependencies=[InternalOnly])
-def sync(since_days: int = Query(default=130, le=2000, description="이 기간의 언급만 다시 계산 (최초 백필은 400). 60거래일이 채워지려면 약 90일이면 되므로 매일은 130일"), s: Session = Depends(db.session)):
+def sync(since_days: int = Query(default=130, le=2000, description="이 기간의 언급만 다시 계산 (최초 백필은 400). 60거래일이 채워지려면 약 90일이면 되므로 매일은 130일"),
+         full: bool = Query(default=False, description="true 면 이미 60일까지 채워진 언급도 다시 계산(규칙이 바뀌었을 때)"), s: Session = Depends(db.session)):
     since = datetime.utcnow() - timedelta(days=since_days)
     ments, after = [], 0
     while True:  # 2만 건도 다 받도록 id 페이징
@@ -180,7 +181,11 @@ def sync(since_days: int = Query(default=130, le=2000, description="이 기간�
     series = _load_series(asset_ids + bench_ids, since.date() - timedelta(days=10))
     disc = _load_disclosures([a for a in asset_ids if a.startswith("KRX:") and assets.get(a, {}).get("asset_type") != "theme"], since.date() - timedelta(days=10))
     added, updated, skipped = 0, 0, []
+    complete = 0
     for m in ments:
+        ev0 = existing.get(m["id"])
+        if ev0 is not None and ev0.r60 is not None and not full:
+            complete += 1; continue  # 60거래일까지 다 채워진 언급은 더 바뀌지 않는다 — 매일 배치가 2만 건을 다시 계산하지 않게
         a = assets.get(m["asset_id"])
         if not a:
             skipped.append(f"{m['asset_id']}: 사전에 없음"); continue
@@ -211,7 +216,7 @@ def sync(since_days: int = Query(default=130, le=2000, description="이 기간�
     s.flush()
     n = _rebuild_summaries(s)
     s.commit()
-    return {"events_added": added, "events_updated": updated, "summaries": n, "skipped": skipped[:50]}
+    return {"events_added": added, "events_updated": updated, "summaries": n, "skipped": ([f"이미 완료된 언급 {complete}건 건너뜀"] if complete else []) + skipped[:50]}
 
 
 MATERIAL_KINDS = {"실적", "계약", "자금조달", "주요사항"}  # 가격에 영향이 있는 공시만 (지분 보고·기타 제외)
