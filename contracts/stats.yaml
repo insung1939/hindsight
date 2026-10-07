@@ -154,8 +154,8 @@ paths:
     get:
       tags:
       - summary
-      summary: 채널 랭킹 — 언급 뒤 수익률 기준 상·하위 (metric=excess_mean|mean|win_rate, 표본 min_n
-        이상만)
+      summary: 채널 랭킹 — 언급 뒤 수익률 기준 상·하위 (metric=excess_mean|mean|win_rate|asset_win_rate,
+        표본 min_n 이상만)
       operationId: channel_ranking
       parameters:
       - name: horizon
@@ -172,7 +172,7 @@ paths:
         required: false
         schema:
           type: string
-          pattern: ^(excess_mean|mean|win_rate)$
+          pattern: ^(excess_mean|mean|win_rate|asset_win_rate)$
           default: excess_mean
           title: Metric
       - name: min_n
@@ -183,6 +183,16 @@ paths:
           minimum: 1
           default: 30
           title: Min N
+      - name: min_assets
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          description: asset_win_rate 기준일 때 최소 언급 종목 수
+          default: 10
+          title: Min Assets
+        description: asset_win_rate 기준일 때 최소 언급 종목 수
       - name: limit
         in: query
         required: false
@@ -369,6 +379,21 @@ components:
           - type: number
           - type: 'null'
           title: Vol Ratio Median
+        assets_n:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Assets N
+        assets_up:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Assets Up
+        asset_win_rate:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Asset Win Rate
       type: object
       required:
       - channel_id
