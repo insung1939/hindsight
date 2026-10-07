@@ -9,6 +9,7 @@ const SOURCES = [
   { k: "yahoo", name: "Yahoo Finance chart API", org: "Yahoo", url: "https://finance.yahoo.com", what: "미국 종가·거래량, 코스피·S&P500 지수, 업종 ETF 20개", how: "키 없이 HTTP JSON." },
   { k: "upbit", name: "업비트 Open API", org: "두나무", url: "https://docs.upbit.com", what: "KRW 마켓 목록·한글명, 일봉 종가·거래량", how: "마켓 목록으로 코인 사전을 자동으로 채운다. 언급된 코인만 시세 수집." },
   { k: "disclosures", name: "DART 공시검색", org: "금융감독원", url: "https://opendart.fss.or.kr/guide/detail.do?apiGrpCd=DS001&apiId=2019001", what: "접수일·공시명 → 실적·계약·자금조달·주요사항·지분·기타", how: "언급된 국내 종목의 1년치. 언급 전후 ±3일 주요 공시 유무를 판정." },
+  { k: "news", name: "네이버 증권 종목 뉴스 (크롤링)", org: "네이버", url: "https://m.stock.naver.com", what: "종목별 일별 뉴스 기사 수", how: "공식 API 가 아니라 페이지가 부르는 웹 엔드포인트를 읽는다(수업 5주차 크롤링). 언급 많은 국내 종목 200개, 매일 7일치." },
 ];
 
 function Step({ n, title, big, unit, sub, loading }) {
@@ -31,6 +32,7 @@ export default function DataPage() {
     if (k === "yahoo") return `미국 ${mk.assets_by_market?.US?.total ?? 0} · 지수 ${mk.assets_by_market?.INDEX?.total ?? 0}`;
     if (k === "upbit") return `코인 사전 ${mk.assets_by_market?.CRYPTO?.total ?? 0} · 추적 ${mk.assets_by_market?.CRYPTO?.tracked ?? 0}`;
     if (k === "disclosures") return mk.disclosures ? `${num(mk.disclosures)}건 · 종목 ${mk.disclosure_assets} · ~${mk.last_disclosure_date}` : "키 대기";
+    if (k === "news") return mk.news_rows ? `${num(mk.news_rows)}행 · 종목 ${mk.news_assets} · ~${mk.last_news_date}` : "수집 전";
     return "";
   };
   const totalAssets = mk ? Object.values(mk.assets_by_market).reduce((a, v) => a + v.total, 0) : null;
@@ -41,7 +43,7 @@ export default function DataPage() {
       <div className="page-head">
         <div className="eyebrow">데이터</div>
         <h1>어떤 데이터를, 어디서, 어떻게 가공했나</h1>
-        <p>공개 API 6개 → 매일 한 번 5단계 가공. 숫자는 지금 DB의 실제 건수. <a href={API_BASE + "/docs"} target="_blank" rel="noreferrer" style={{ color: "var(--accent)" }}>Swagger</a> · <a href="https://github.com/insung1939/hindsight" target="_blank" rel="noreferrer" style={{ color: "var(--accent)" }}>GitHub</a></p>
+        <p>공개 API 6개 + 크롤링 1개 → 매일 한 번 5단계 가공. 숫자는 지금 DB의 실제 건수. <a href={API_BASE + "/docs"} target="_blank" rel="noreferrer" style={{ color: "var(--accent)" }}>Swagger</a> · <a href="https://github.com/insung1939/hindsight" target="_blank" rel="noreferrer" style={{ color: "var(--accent)" }}>GitHub</a></p>
       </div>
       <ErrorBox error={d.error} />
 
@@ -50,7 +52,7 @@ export default function DataPage() {
         <div className="pipe">
           <Step n="① 영상 수집" loading={loading} big={yt && num(yt.videos)} unit="편" sub={yt && `채널 ${yt.channels}개 · ${dateOnly(yt.first_published)} ~ ${dateOnly(yt.last_published)}`} />
           <Step n="② 종목·테마 사전" loading={loading} big={totalAssets && num(totalAssets)} unit="개" sub={mk && Object.entries(mk.assets_by_market).map(([k, v]) => `${k} ${num(v.total)}`).join(" · ")} />
-          <Step n="③ 제목 매칭" loading={loading} big={cov && pct0(cov.match_rate)} unit="성공률" sub={cov && `영상 ${num(cov.videos_seen)}편 중 ${num(cov.videos_matched)}편 · 언급 ${num(cov.mentions)}건 · ${cov.assets}개 종목·테마`} />
+          <Step n="③ 제목 매칭·논조" loading={loading} big={cov && pct0(cov.match_rate)} unit="성공률" sub={cov && `언급 ${num(cov.mentions)}건 · 낙관 ${num(cov.by_stance?.bull)} · 비관 ${num(cov.by_stance?.bear)} · 중립 ${num(cov.by_stance?.neutral)}`} />
           <Step n="④ 시세·거래량·공시" loading={loading} big={mk && num(mk.prices)} unit="행" sub={mk && `추적 ${tracked}개 · 거래량 포함 ${pct0(mk.prices_with_volume / Math.max(1, mk.prices))} · 공시 ${num(mk.disclosures)}건`} />
           <Step n="⑤ 수익률 계산" loading={loading} big={st && num(st.events)} unit="건" sub={st && `20일 ${num(st.r20_filled)} · 60일 ${num(st.r60_filled)} 채워짐 · 테마 ${num(st.events_theme)}`} />
         </div>
@@ -58,7 +60,7 @@ export default function DataPage() {
 
       <div className="grid">
         <div className="card col-12">
-          <div className="card-head"><div><h2>데이터 출처 6개</h2><p>전부 공개 API · 키는 서버 환경변수에만 · 자막·댓글은 안 모은다</p></div></div>
+          <div className="card-head"><div><h2>데이터 출처 7개</h2><p>공개 API 6개 + 크롤링 1개 · 키는 서버 환경변수에만 · 자막·댓글은 안 모은다</p></div></div>
           <div className="table-wrap"><table>
             <thead><tr><th>명칭 · 기관</th><th>가져오는 것</th><th>어떻게 쓰나</th><th>지금</th></tr></thead>
             <tbody>{SOURCES.map((s) => (
@@ -91,6 +93,7 @@ export default function DataPage() {
             <li>자동 수집한 회사명은 <b style={{ color: "var(--text)" }}>한글 단어 경계</b>가 있어야 함(아스트라→아스트 ✗). 영문 티커 앞뒤에 한글이 붙으면 제외(SOL글로벌 ✗), 조사는 허용(BTC가 ✓)</li>
             <li>종목이 없어도 "반도체 급등"처럼 업종이 나오면 <Term k="theme">테마</Term> 사건으로 세고 대표 ETF로 잼</li>
             <li>자동 수집 코인(일반 단어 이름이 많음)은 코인 문맥이 있을 때만. 못 잡은 제목은 버리지 않고 남김</li>
+            <li>제목 <Term k="stance">논조</Term>는 낙관·비관 단어 사전으로 판정. 기본 통계는 낙관 언급만 쓴다</li>
           </ul>
         </div>
 

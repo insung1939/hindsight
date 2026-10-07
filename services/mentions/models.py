@@ -21,6 +21,8 @@ class Mention(Base):
     matched_text: Mapped[str] = mapped_column(String(100))  # 제목에서 실제로 잡힌 문자열
     field: Mapped[str] = mapped_column(String(12))  # title · description
     confidence: Mapped[float] = mapped_column(Float)  # 정식 이름 1.0 · 별칭 0.8
+    stance: Mapped[str] = mapped_column(String(8), default="neutral", index=True)  # 제목 논조: bull · bear · neutral
+    stance_words: Mapped[str] = mapped_column(String(100), default="")  # 논조를 판정한 단어들
     published_at: Mapped[datetime] = mapped_column(DateTime, index=True)
     view_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)

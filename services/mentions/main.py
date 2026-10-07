@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from hs_common import InternalOnly, ServiceClient, create_app
 from hs_common.settings import env
-from matcher import build_terms, match
+from matcher import build_terms, classify_stance, match
 from models import Mention, SyncState, Unmatched, db
 
 # 설명란까지 볼지. 설명란은 채널 링크·광고 문구("네이버 카페", "link") 때문에 오탐이 많아 기본은 제목만.
@@ -34,6 +34,8 @@ class MentionOut(BaseModel):
     matched_text: str
     field: str
     confidence: float
+    stance: str = "neutral"
+    stance_words: str = ""
     published_at: datetime
     view_count: int | None = None
     model_config = {"from_attributes": True}
@@ -78,6 +80,7 @@ class CoverageOut(BaseModel):
     match_rate: float
     mentions: int
     assets: int
+    by_stance: dict[str, int] = {}
     last_video_at: str | None
 
 
@@ -91,11 +94,14 @@ class SyncResult(BaseModel):
 
 @app.get("/v1/mentions", response_model=ListMentions, tags=["mentions"], operation_id="list_mentions", summary="언급 목록")
 def list_mentions(asset_id: str | None = None, channel_id: str | None = None, since: datetime | None = None,
+                  stance: str | None = Query(default=None, pattern="^(bull|bear|neutral)$", description="제목 논조로 거르기"),
                   after_id: int | None = Query(default=None, description="이 id 보다 큰 것만, id 오름차순 (배치용 페이징)"),
                   limit: int = Query(default=500, le=5000), s: Session = Depends(db.session)):
     q = select(Mention)
     if after_id is not None:
         q = q.where(Mention.id > after_id)
+    if stance:
+        q = q.where(Mention.stance == stance)
     if asset_id:
         q = q.where(Mention.asset_id == asset_id)
     if channel_id:
@@ -110,13 +116,16 @@ def list_mentions(asset_id: str | None = None, channel_id: str | None = None, si
 
 @app.get("/v1/mentions/trending", response_model=ListTrending, tags=["mentions"], operation_id="trending_mentions",
          summary="최근 N일 언급 급증 종목 (직전 N일 대비)")
-def trending(days: int = Query(default=7, ge=1, le=90), limit: int = Query(default=20, le=100), s: Session = Depends(db.session)):
+def trending(days: int = Query(default=7, ge=1, le=90), limit: int = Query(default=20, le=100),
+             stance: str | None = Query(default=None, pattern="^(bull|bear|neutral)$", description="제목 논조로 거르기 (화면 기본은 bull)"),
+             s: Session = Depends(db.session)):
     now = datetime.utcnow()
     cur_from, prev_from = now - timedelta(days=days), now - timedelta(days=2 * days)
+    cond = (Mention.stance == stance) if stance else True
     cur = s.execute(select(Mention.asset_id, func.count(), func.count(func.distinct(Mention.channel_id)),
                            func.coalesce(func.sum(Mention.view_count), 0), func.max(Mention.published_at))
-                    .where(Mention.published_at >= cur_from).group_by(Mention.asset_id)).all()
-    prev = dict(s.execute(select(Mention.asset_id, func.count()).where(Mention.published_at >= prev_from, Mention.published_at < cur_from)
+                    .where(Mention.published_at >= cur_from, cond).group_by(Mention.asset_id)).all()
+    prev = dict(s.execute(select(Mention.asset_id, func.count()).where(Mention.published_at >= prev_from, Mention.published_at < cur_from, cond)
                           .group_by(Mention.asset_id)).all())
     items = [{"asset_id": a, "mentions": n, "prev_mentions": prev.get(a, 0), "channels": c, "views": int(v), "last_mentioned_at": last}
              for a, n, c, v, last in cur]
@@ -138,6 +147,7 @@ def coverage(s: Session = Depends(db.session)):
     last = s.get(SyncState, "last_video_at")
     return {"videos_seen": seen, "videos_matched": matched, "match_rate": (matched / seen) if seen else 0.0,
             "mentions": s.scalar(select(func.count()).select_from(Mention)) or 0,
+            "by_stance": dict(s.execute(select(Mention.stance, func.count()).group_by(Mention.stance)).all()),
             "assets": s.scalar(select(func.count(func.distinct(Mention.asset_id)))) or 0,
             "last_video_at": last.value if last else None}
 
@@ -168,6 +178,7 @@ def sync(full: bool = False, s: Session = Depends(db.session)):
                     if aid not in hits or conf > hits[aid][1]:
                         hits[aid] = (txt, conf, field)
             pub = datetime.fromisoformat(v["published_at"])
+            stance, stance_words = classify_stance(v.get("title") or "")
             if not hits:
                 if not s.get(Unmatched, v["video_id"]):
                     s.add(Unmatched(video_id=v["video_id"], channel_id=v["channel_id"], title=v["title"], published_at=pub))
@@ -177,7 +188,7 @@ def sync(full: bool = False, s: Session = Depends(db.session)):
                 if exists:
                     continue
                 s.add(Mention(video_id=v["video_id"], channel_id=v["channel_id"], asset_id=aid, matched_text=txt,
-                              field=field, confidence=conf, published_at=pub, view_count=v.get("view_count")))
+                              field=field, confidence=conf, stance=stance, stance_words=stance_words, published_at=pub, view_count=v.get("view_count")))
                 added += 1
                 newly_tracked.add(aid)
             last_at = v["published_at"]

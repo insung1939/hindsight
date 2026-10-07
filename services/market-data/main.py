@@ -3,14 +3,16 @@ mentions 는 /v1/dictionary 로 사전을 받고, 새 종목이 언급되면 /v1
 stats 는 /v1/prices 로 여러 종목의 시세를 한 번에 받는다."""
 from datetime import date, datetime, timedelta
 
-from fastapi import Depends, HTTPException, Query
+import threading
+
+from fastapi import BackgroundTasks, Depends, HTTPException, Query
 from pydantic import BaseModel
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 import collectors
 from hs_common import InternalOnly, create_app
-from models import Asset, Disclosure, Price, db
+from models import Asset, Disclosure, NewsDaily, Price, db
 from seed import AMBIGUOUS_NAMES, seed_assets
 
 app = create_app("market-data", "하인드사이트 market-data", "0.2.0",
@@ -115,10 +117,39 @@ class MarketCoverage(BaseModel):
     disclosures: int
     disclosure_assets: int
     last_disclosure_date: date | None
+    news_rows: int = 0
+    news_assets: int = 0
+    last_news_date: date | None = None
+
+
+class NewsDailyOut(BaseModel):
+    asset_id: str
+    news_date: date
+    count: int
+    source: str
+    model_config = {"from_attributes": True}
+
+
+class ListNewsDaily(BaseModel):
+    items: list[NewsDailyOut]
+    next_cursor: str | None = None
+
+
+class JobStatus(BaseModel):
+    state: str
+    started_at: datetime | None = None
+    finished_at: datetime | None = None
+    result: dict | None = None
+    error: str | None = None
+
+
+_job = {"state": "idle", "started_at": None, "finished_at": None, "result": None, "error": None}
+_job_lock = threading.Lock()
 
 
 class AttentionSyncResult(BaseModel):
     disclosures_added: int
+    news_rows_upserted: int = 0
     assets_scanned: int
     skipped: list[str]
 
@@ -267,13 +298,56 @@ def market_coverage(s: Session = Depends(db.session)):
             "last_trade_date": s.scalar(select(func.max(Price.trade_date))),
             "disclosures": s.scalar(select(func.count()).select_from(Disclosure)) or 0,
             "disclosure_assets": s.scalar(select(func.count(func.distinct(Disclosure.asset_id)))) or 0,
-            "last_disclosure_date": s.scalar(select(func.max(Disclosure.rcept_dt)))}
+            "last_disclosure_date": s.scalar(select(func.max(Disclosure.rcept_dt))),
+            "news_rows": s.scalar(select(func.count()).select_from(NewsDaily)) or 0,
+            "news_assets": s.scalar(select(func.count(func.distinct(NewsDaily.asset_id)))) or 0,
+            "last_news_date": s.scalar(select(func.max(NewsDaily.news_date)))}
+
+
+@app.get("/v1/news-daily", response_model=ListNewsDaily, tags=["attention"], operation_id="list_news_daily",
+         summary="종목별 일별 뉴스 기사 수 (네이버 금융 크롤링). asset_ids 쉼표 구분, 기간")
+def list_news_daily(asset_ids: str, from_date: date | None = Query(default=None, alias="from"),
+                    to_date: date | None = Query(default=None, alias="to"), limit: int = Query(default=5000, le=50000), s: Session = Depends(db.session)):
+    ids = [x.strip() for x in asset_ids.split(",") if x.strip()][:500]
+    q = select(NewsDaily).where(NewsDaily.asset_id.in_(ids))
+    if from_date:
+        q = q.where(NewsDaily.news_date >= from_date)
+    if to_date:
+        q = q.where(NewsDaily.news_date <= to_date)
+    return {"items": s.scalars(q.order_by(NewsDaily.news_date).limit(limit)).all(), "next_cursor": None}
 
 
 @app.post("/internal/sync-attention", response_model=AttentionSyncResult, tags=["ops"], operation_id="sync_attention",
-          summary="tracked 국내 종목의 DART 공시 수집 (days 소급). DART_KEY 없으면 건너뜀", dependencies=[InternalOnly])
-def sync_attention(days: int = Query(default=7, le=800), s: Session = Depends(db.session)):
-    skipped, d_added, scanned = [], 0, 0
+          summary="tracked 국내 종목의 DART 공시(days 소급) + 네이버 증권 뉴스 크롤링(news_days, 0 이면 건너뜀). background=true 면 즉시 응답, /internal/sync-attention-status 로 확인", dependencies=[InternalOnly])
+def sync_attention(background_tasks: BackgroundTasks, days: int = Query(default=7, le=800), news_days: int = Query(default=7, le=30, description="뉴스 크롤링 소급 일수. 0 이면 안 함"),
+                   news_limit: int = Query(default=100, le=2000, description="크롤링할 종목 수 상한(국내 추적 종목 순)"),
+                   background: bool = Query(default=False, description="true 면 백그라운드 (Render 는 15분 넘는 요청을 끊는다)")):
+    if background:
+        with _job_lock:
+            if _job["state"] == "running":
+                return {"disclosures_added": 0, "news_rows_upserted": 0, "assets_scanned": 0, "skipped": ["이미 실행 중"]}
+            _job.update({"state": "running", "started_at": datetime.utcnow(), "finished_at": None, "result": None, "error": None})
+        def run():
+            try:
+                with db.SessionLocal() as s2:
+                    res = _sync_attention(s2, days, news_days, news_limit)
+                _job.update({"state": "done", "finished_at": datetime.utcnow(), "result": res})
+            except Exception as e:  # noqa: BLE001
+                _job.update({"state": "failed", "finished_at": datetime.utcnow(), "error": str(e)[:300]})
+        background_tasks.add_task(run)
+        return {"disclosures_added": 0, "news_rows_upserted": 0, "assets_scanned": 0, "skipped": ["백그라운드 시작"]}
+    with db.SessionLocal() as s:
+        return _sync_attention(s, days, news_days, news_limit)
+
+
+@app.get("/internal/sync-attention-status", response_model=JobStatus, tags=["ops"], operation_id="attention_sync_status",
+         summary="비동기 공시·뉴스 수집 상태", dependencies=[InternalOnly])
+def sync_attention_status():
+    return _job
+
+
+def _sync_attention(s: Session, days: int, news_days: int, news_limit: int) -> dict:
+    skipped, d_added, n_upserted, scanned = [], 0, 0, 0
     tracked = s.scalars(select(Asset).where(Asset.tracked == True, Asset.asset_type.in_(["stock", "crypto"]))).all()  # noqa: E712
     # DART: corp_code 가 비어 있으면 corpCode 목록으로 채운다(월 1회면 충분하지만 가볍다)
     krx = [a for a in tracked if a.market == "KRX"]
@@ -303,8 +377,23 @@ def sync_attention(days: int = Query(default=7, le=800), s: Session = Depends(db
                 scanned += 1
             except Exception as e:
                 skipped.append(f"dart {a.asset_id}: {e}")
+    # 네이버 금융 뉴스 크롤링 — 국내 종목만, 최근 언급 많은 순으로 news_limit 개
+    if news_days > 0:
+        for a in krx[:news_limit]:
+            try:
+                counts = collectors.naver_finance_news(a.symbol, days=news_days)
+            except Exception as e:
+                skipped.append(f"news {a.asset_id}: {_safe(e)}"); continue
+            for d_, n in counts.items():
+                row = s.scalar(select(NewsDaily).where(NewsDaily.asset_id == a.asset_id, NewsDaily.news_date == d_))
+                if row:
+                    if n > row.count:
+                        row.count = n; row.collected_at = datetime.utcnow()
+                else:
+                    s.add(NewsDaily(asset_id=a.asset_id, news_date=d_, count=n))
+                n_upserted += 1
     s.commit()
-    return {"disclosures_added": d_added, "assets_scanned": scanned, "skipped": skipped[:50]}
+    return {"disclosures_added": d_added, "news_rows_upserted": n_upserted, "assets_scanned": scanned, "skipped": skipped[:50]}
 
 
 # ── 수집 ────────────────────────────────────────────────

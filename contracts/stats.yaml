@@ -52,6 +52,16 @@ paths:
           default: 20
           title: Horizon
         description: 5 · 20 · 60
+      - name: stance
+        in: query
+        required: false
+        schema:
+          type: string
+          pattern: ^(all|bull|bear|neutral)$
+          description: 제목 논조. 화면 기본은 bull(낙관 언급만)
+          default: all
+          title: Stance
+        description: 제목 논조. 화면 기본은 bull(낙관 언급만)
       - name: X-Request-ID
         in: header
         required: false
@@ -99,6 +109,16 @@ paths:
           description: 5 · 20 · 60 중 하나만
           title: Horizon
         description: 5 · 20 · 60 중 하나만
+      - name: stance
+        in: query
+        required: false
+        schema:
+          type: string
+          pattern: ^(all|bull|bear|neutral)$
+          description: all 이면 전체 논조 키, 아니면 그 논조 키만
+          default: all
+          title: Stance
+        description: all 이면 전체 논조 키, 아니면 그 논조 키만
       - name: slim
         in: query
         required: false
@@ -193,6 +213,16 @@ paths:
           default: 10
           title: Min Assets
         description: asset_win_rate 기준일 때 최소 언급 종목 수
+      - name: stance
+        in: query
+        required: false
+        schema:
+          type: string
+          pattern: ^(all|bull|bear|neutral)$
+          description: 제목 논조. 화면 기본은 bull
+          default: all
+          title: Stance
+        description: 제목 논조. 화면 기본은 bull
       - name: limit
         in: query
         required: false
@@ -457,6 +487,10 @@ components:
         metric:
           type: string
           title: Metric
+        stance:
+          type: string
+          title: Stance
+          default: all
         min_n:
           type: integer
           title: Min N
@@ -502,6 +536,10 @@ components:
           type: string
           title: Kind
           default: stock
+        stance:
+          type: string
+          title: Stance
+          default: neutral
         published_at:
           type: string
           format: date-time

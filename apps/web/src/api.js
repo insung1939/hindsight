@@ -72,8 +72,10 @@ export async function assetNames(all = false) {
   return Object.fromEntries(d.items.map((a) => [a.asset_id, a]));
 }
 // 종목별 요약(한 기간, 히스토그램 없이) — asset_id → value
-export async function assetSummaries(horizon) {
-  const s = await api("stats", "/v1/summaries", { params: { prefix: "asset:", horizon, slim: true }, ttl: 5 * 60e3 });
+export const STANCES = [["bull", "낙관 언급"], ["all", "전체"], ["bear", "비관 언급"]];
+export const STANCE_LABEL = { bull: "낙관", bear: "비관", neutral: "중립", all: "전체" };
+export async function assetSummaries(horizon, stance = "bull") {
+  const s = await api("stats", "/v1/summaries", { params: { prefix: "asset:", horizon, slim: true, stance }, ttl: 5 * 60e3 });
   const suf = `:${horizon}`;
   return Object.fromEntries(s.items.map((i) => [i.key.slice(6, -suf.length), i.value]));
 }

@@ -1,5 +1,5 @@
 """매칭 규칙 테스트 — PLAN.md 4장의 규칙이 그대로 코드로 지켜지는지."""
-from matcher import build_terms, match
+from matcher import build_terms, classify_stance, match
 
 DICT = [
     {"asset_id": "KRX:005930", "name": "삼성전자", "aliases": ["삼전"], "market": "KRX", "ambiguous": False},
@@ -113,3 +113,10 @@ def test_ascii_ticker_not_inside_korean_word():
     assert ids("SOL글로벌DRAM반도체플러스 ETF 출시") == set()   # ETF 이름 속 SOL 은 솔라나가 아니다
     assert ids("BTC가 10만 달러") == {"CRYPTO:KRW-BTC"}         # 조사는 허용
     assert ids("NVIDIA를 샀다") == {"US:NVDA"}
+
+
+def test_stance_classification():
+    assert classify_stance("삼성전자 지금이 기회, 급등 임박")[0] == "bull"
+    assert classify_stance("비트코인 폭락 경고, 지금 팔아야")[0] == "bear"
+    assert classify_stance("삼성전자 실적 발표 정리")[0] == "neutral"
+    assert classify_stance("급등 뒤 급락? 조정 가능성")[0] == "bear"   # 비관 2 > 낙관 1

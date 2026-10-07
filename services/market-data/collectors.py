@@ -149,3 +149,43 @@ def classify_report(report_nm: str) -> str:
         if any(w in report_nm for w in words):
             return kind
     return "기타"
+
+
+# ── 크롤링: 네이버 증권 종목 뉴스 (수업 5주차 크롤링). 공식 Open API 가 아니라 네이버 증권 모바일 페이지가 화면을 그릴 때 부르는
+#    웹 엔드포인트(m.stock.naver.com/api/news/stock/<코드>)를 그대로 읽는다. 옛 finance.naver.com 뉴스 표는 2026년 현재 410(폐기).
+def naver_finance_news(stock_code: str, days: int = 7, max_pages: int = 15) -> dict[date, int]:
+    """최근 days 일의 날짜별 기사 수. 페이지당 20건(그 이상은 400), 요청 간격 0.3초, UA·Referer 명시. 하루 30건 종목이면 일주일 ≈ 10쪽."""
+    import time
+    since = date.today() - timedelta(days=days)
+    counts: dict[date, int] = {}
+    for page in range(1, max_pages + 1):
+        r = httpx.get(f"https://m.stock.naver.com/api/news/stock/{stock_code}", params={"pageSize": 20, "page": page},
+                      headers={**BROWSER, "Referer": f"https://m.stock.naver.com/domestic/stock/{stock_code}/news"}, timeout=20)
+        if r.status_code >= 400:
+            break
+        dates = parse_naver_news_dates(r.json())
+        if not dates:
+            break
+        stop = False
+        for d_ in dates:
+            if d_ < since:
+                stop = True
+                continue
+            counts[d_] = counts.get(d_, 0) + 1
+        if stop:
+            break
+        time.sleep(0.3)
+    return counts
+
+
+def parse_naver_news_dates(payload) -> list[date]:
+    """응답은 [{"total":n,"items":[{"datetime":"202610072052", ...}, ...]}, ...] 묶음 목록. 기사마다 날짜 하나."""
+    out = []
+    for group in payload or []:
+        for it in group.get("items", []):
+            dt = str(it.get("datetime", ""))[:8]
+            try:
+                out.append(datetime.strptime(dt, "%Y%m%d").date())
+            except ValueError:
+                pass
+    return out

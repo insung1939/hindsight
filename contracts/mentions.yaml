@@ -60,6 +60,17 @@ paths:
             format: date-time
           - type: 'null'
           title: Since
+      - name: stance
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            pattern: ^(bull|bear|neutral)$
+          - type: 'null'
+          description: 제목 논조로 거르기
+          title: Stance
+        description: 제목 논조로 거르기
       - name: after_id
         in: query
         required: false
@@ -124,6 +135,17 @@ paths:
           maximum: 100
           default: 20
           title: Limit
+      - name: stance
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            pattern: ^(bull|bear|neutral)$
+          - type: 'null'
+          description: 제목 논조로 거르기 (화면 기본은 bull)
+          title: Stance
+        description: 제목 논조로 거르기 (화면 기본은 bull)
       - name: X-Request-ID
         in: header
         required: false
@@ -260,6 +282,12 @@ components:
         assets:
           type: integer
           title: Assets
+        by_stance:
+          additionalProperties:
+            type: integer
+          type: object
+          title: By Stance
+          default: {}
         last_video_at:
           anyOf:
           - type: string
@@ -349,6 +377,14 @@ components:
         confidence:
           type: number
           title: Confidence
+        stance:
+          type: string
+          title: Stance
+          default: neutral
+        stance_words:
+          type: string
+          title: Stance Words
+          default: ''
         published_at:
           type: string
           format: date-time

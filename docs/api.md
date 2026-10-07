@@ -23,7 +23,9 @@
 | GET | `/v1/prices` | 여러 종목 시세를 한 번에 (stats 서비스용). asset_ids 는 쉼표 구분 | asset_ids, from, to | — | 200 BatchPrices |
 | GET | `/v1/disclosures` | DART 공시 (asset_ids 쉼표 구분, 기간). stats 가 '언급 전후 공시 여부' 에, 타임라인이 표시에 쓴다 | asset_ids, from, to, kind, limit | — | 200 ListDisclosures |
 | GET | `/v1/coverage` | 수집 현황 (데이터 페이지용): 사전·시세·거래량·공시·뉴스 건수 | — | — | 200 MarketCoverage |
-| POST | `/internal/sync-attention` | tracked 국내 종목의 DART 공시 수집 (days 소급). DART_KEY 없으면 건너뜀 | days, X-Internal-Token | — | 200 AttentionSyncResult |
+| GET | `/v1/news-daily` | 종목별 일별 뉴스 기사 수 (네이버 금융 크롤링). asset_ids 쉼표 구분, 기간 | asset_ids, from, to, limit | — | 200 ListNewsDaily |
+| POST | `/internal/sync-attention` | tracked 국내 종목의 DART 공시(days 소급) + 네이버 증권 뉴스 크롤링(news_days, 0 이면 건너뜀). background=true 면 즉시 응답, /internal/sync-attention-status 로 확인 | days, news_days, news_limit, background, X-Internal-Token | — | 200 AttentionSyncResult |
+| GET | `/internal/sync-attention-status` | 비동기 공시·뉴스 수집 상태 | X-Internal-Token | — | 200 JobStatus |
 | POST | `/internal/sync` | 사전 갱신(DART·업비트) + tracked 종목 시세 수집 | days, dictionary, X-Internal-Token | — | 200 SyncResult |
 
 ## youtube
@@ -54,8 +56,8 @@
 | Method | Path | 기능 | 파라미터 | 요청 본문 | 응답 |
 |---|---|---|---|---|---|
 | GET | `/healthz` | 서비스 상태 | — | — | 200 json |
-| GET | `/v1/mentions` | 언급 목록 | asset_id, channel_id, since, after_id, limit | — | 200 ListMentions |
-| GET | `/v1/mentions/trending` | 최근 N일 언급 급증 종목 (직전 N일 대비) | days, limit | — | 200 ListTrending |
+| GET | `/v1/mentions` | 언급 목록 | asset_id, channel_id, since, stance, after_id, limit | — | 200 ListMentions |
+| GET | `/v1/mentions/trending` | 최근 N일 언급 급증 종목 (직전 N일 대비) | days, limit, stance | — | 200 ListTrending |
 | GET | `/v1/unmatched` | 종목을 못 잡은 영상 제목 (별칭 사전 보강용) | limit | — | 200 ListUnmatched |
 | GET | `/v1/coverage` | 매칭 성공률 (데이터 페이지용) | — | — | 200 CoverageOut |
 | POST | `/internal/sync` | youtube 의 새 영상을 market-data 사전으로 매칭 (full=true 면 처음부터 다시) | full, X-Internal-Token | — | 200 SyncResult |
@@ -70,10 +72,10 @@
 | Method | Path | 기능 | 파라미터 | 요청 본문 | 응답 |
 |---|---|---|---|---|---|
 | GET | `/healthz` | 서비스 상태 | — | — | 200 json |
-| GET | `/v1/summary` | 전체 분포 (scope=overall | market:KRX | market:US | market:CRYPTO | kind:theme | asset:<id> | channel:<id>) | scope, horizon | — | 200 SummaryOut |
-| GET | `/v1/summaries` | 요약 전부 (prefix 로 필터: overall · market · channel · asset) | prefix, horizon, slim | — | 200 ListSummaries |
+| GET | `/v1/summary` | 전체 분포 (scope=overall | market:KRX | market:US | market:CRYPTO | kind:theme | asset:<id> | channel:<id>) | scope, horizon, stance | — | 200 SummaryOut |
+| GET | `/v1/summaries` | 요약 전부 (prefix 로 필터: overall · market · channel · asset) | prefix, horizon, stance, slim | — | 200 ListSummaries |
 | GET | `/v1/coverage` | 계산 현황 (데이터 페이지용): 언급별 수익률이 몇 건 채워졌나 | — | — | 200 StatsCoverage |
-| GET | `/v1/channels/ranking` | 채널 랭킹 — 언급 뒤 수익률 기준 상·하위 (metric=excess_mean|mean|win_rate|asset_win_rate, 표본 min_n 이상만) | horizon, metric, min_n, min_assets, limit | — | 200 ChannelRanking |
+| GET | `/v1/channels/ranking` | 채널 랭킹 — 언급 뒤 수익률 기준 상·하위 (metric=excess_mean|mean|win_rate|asset_win_rate, 표본 min_n 이상만) | horizon, metric, min_n, min_assets, stance, limit | — | 200 ChannelRanking |
 | GET | `/v1/assets/{asset_id}/events` | 종목 하나의 언급별 이후 수익률 (타임라인 화면) | asset_id | — | 200 ListEvents |
 | GET | `/v1/channels/{channel_id}/events` | 채널 하나의 언급별 이후 수익률 | channel_id | — | 200 ListEvents |
 | GET | `/internal/sync-status` | 비동기 계산(background=true) 의 진행 상태 | X-Internal-Token | — | 200 SyncStatus |
