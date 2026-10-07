@@ -5,11 +5,11 @@ import { Disclaimer, ErrorBox, Seg, SkeletonRows, Term, useLoad } from "../compo
 const METRICS = [["excess_mean", "시장 대비"], ["mean", "평균 수익률"], ["win_rate", "상승 확률"], ["asset_win_rate", "종목 승률"]];
 const fmt = (m, v) => (m === "win_rate" || m === "asset_win_rate" ? pct0(v) : pct(v));
 
-function RankCard({ r, ch, i, kind, metric }) {
+function RankCard({ r, ch, i, kind, metric, go }) {
   return (
-    <div className={"rank " + kind}>
+    <div className={"rank clickable " + kind} onClick={() => go("channel", r.channel_id)} title="채널 상세">
       <div className="pos-n">{i + 1}</div>
-      <div className="who"><b>{ch?.title || r.channel_id}</b><small>{ch?.handle} · {ch?.category === "crypto" ? "코인" : "주식"} · 구독자 {compact(ch?.subscriber_count)} · 언급 {num(r.n)}건</small></div>
+      <div className="who"><b>{ch?.title || r.channel_id}</b><small>{ch?.handle} · {ch?.category === "crypto" ? "코인" : "주식"} · 구독자 {compact(ch?.subscriber_count)} · 언급 {num(r.n)}건{ch?.handle && <> · <a href={`https://www.youtube.com/${ch.handle}`} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} style={{ color: "var(--accent)" }}>YouTube ↗</a></>}</small></div>
       <div className="val"><b className={metric === "asset_win_rate" ? (r[metric] >= 0.5 ? "pos" : "neg") : sign(r[metric])}>{fmt(metric, r[metric])}</b><small>{metric === "asset_win_rate" ? `종목 ${r.assets_n}개 중 ${r.assets_up}개 상승` : `평균 ${pct(r.mean)} · 상승 ${pct0(r.win_rate)}`}</small></div>
     </div>
   );
@@ -40,7 +40,7 @@ function BarChart({ rows, metric, chs }) {
 }
 
 // 채널 — 언급 뒤 성적이 좋았던 채널과 나빴던 채널
-export default function Channels() {
+export default function Channels({ go }) {
   const [horizon, setHorizon] = useState(20);
   const [metric, setMetric] = useState("excess_mean");
   const data = useLoad(() => Promise.all([api("stats", "/v1/channels/ranking", { params: { horizon, metric, stance: "bull", min_n: 30, min_assets: 10, limit: 3 }, ttl: 5 * 60e3 }), channelMap()]), [horizon, metric]);
@@ -66,25 +66,25 @@ export default function Channels() {
       <div className="grid" style={{ marginBottom: 16 }}>
         <div className="card col-6">
           <div className="card-head"><div><h2>TOP 3</h2></div><span className="chip up">언급 뒤 성적 상위</span></div>
-          {data.loading && !rank ? <SkeletonRows n={3} /> : <div className="rank-list">{(rank?.top || []).map((r, i) => <RankCard key={r.channel_id} r={r} ch={chs[r.channel_id]} i={i} kind="top" metric={metric} />)}</div>}
+          {data.loading && !rank ? <SkeletonRows n={3} /> : <div className="rank-list">{(rank?.top || []).map((r, i) => <RankCard key={r.channel_id} r={r} ch={chs[r.channel_id]} i={i} kind="top" metric={metric} go={go} />)}</div>}
         </div>
         <div className="card col-6">
           <div className="card-head"><div><h2>BOTTOM 3</h2></div><span className="chip down">언급 뒤 성적 하위</span></div>
-          {data.loading && !rank ? <SkeletonRows n={3} /> : <div className="rank-list">{(rank?.bottom || []).map((r, i) => <RankCard key={r.channel_id} r={r} ch={chs[r.channel_id]} i={i} kind="bottom" metric={metric} />)}</div>}
+          {data.loading && !rank ? <SkeletonRows n={3} /> : <div className="rank-list">{(rank?.bottom || []).map((r, i) => <RankCard key={r.channel_id} r={r} ch={chs[r.channel_id]} i={i} kind="bottom" metric={metric} go={go} />)}</div>}
         </div>
         <div className="card col-12">
           <div className="card-head"><div><h3>채널 {all.length}개 · {METRICS.find((m) => m[0] === metric)[1]}</h3><p>{metric === "asset_win_rate" ? "50% 기준 오른쪽이 좋음" : "빨강 좋음 · 파랑 나쁨"}</p></div></div>
           {data.loading && !rank ? <div className="sk" style={{ height: 300 }} /> : <BarChart rows={all} metric={metric} chs={chs} />}
         </div>
         <div className="card col-12">
-          <div className="card-head"><div><h3>전체 표</h3></div></div>
+          <div className="card-head"><div><h3>전체 표</h3><p>행을 누르면 채널 상세</p></div></div>
           {data.loading && !rank ? <SkeletonRows n={8} /> : (
             <div className="table-wrap" style={{ maxHeight: 520, overflowY: "auto" }}><table>
               <thead><tr><th>#</th><th>채널</th><th>분류</th><th className="num">구독자</th><th className="num"><Term k="n">n</Term></th><th className="num">평균</th><th className="num">중앙값</th><th className="num"><Term k="win">상승</Term></th><th className="num"><Term k="excess">시장 대비</Term></th><th className="num"><Term k="xwin">시장 이김</Term></th><th className="num"><Term k="awin">종목 승률</Term></th><th className="num"><Term k="vol">거래량</Term></th></tr></thead>
               <tbody>{all.map((r, i) => { const c = chs[r.channel_id]; return (
-                <tr key={r.channel_id}>
+                <tr key={r.channel_id} className="clickable" onClick={() => go("channel", r.channel_id)}>
                   <td className="muted">{i + 1}</td>
-                  <td className="name"><b>{c?.title || r.channel_id}</b><small>{c?.handle}</small></td>
+                  <td className="name"><b>{c?.title || r.channel_id}</b><small>{c?.handle}{c?.handle && <> · <a href={`https://www.youtube.com/${c.handle}`} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} style={{ color: "var(--accent)" }}>YouTube ↗</a></>}</small></td>
                   <td><span className={"chip " + (c?.category === "crypto" ? "warn" : "accent")}>{c?.category === "crypto" ? "코인" : "주식"}</span></td>
                   <td className="num">{compact(c?.subscriber_count)}</td>
                   <td className="num">{num(r.n)}</td>
