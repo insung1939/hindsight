@@ -10,3 +10,5 @@ node_modules/
 dist/
 .DS_Store
 platform/k8s/base/secret.yaml
+.vercel
+.env*

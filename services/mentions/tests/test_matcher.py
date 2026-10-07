@@ -107,3 +107,9 @@ def test_auto_korean_name_needs_word_boundary():
     assert got("스피어가 간다 #스피어") == {"KRX:347700"}
     assert got("휴림로봇, 두산로보틱스 비교") == {"KRX:090710"}
     assert got("삼성전자가 산다") == {"KRX:005930"}                # 시드(curated) 는 기존 규칙 그대로
+
+
+def test_ascii_ticker_not_inside_korean_word():
+    assert ids("SOL글로벌DRAM반도체플러스 ETF 출시") == set()   # ETF 이름 속 SOL 은 솔라나가 아니다
+    assert ids("BTC가 10만 달러") == {"CRYPTO:KRW-BTC"}         # 조사는 허용
+    assert ids("NVIDIA를 샀다") == {"US:NVDA"}

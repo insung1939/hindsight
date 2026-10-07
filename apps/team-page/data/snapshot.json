@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-07T11:35",
+ "generated_at": "2026-10-07T13:15",
  "youtube": {
   "channels": 51,
   "videos": 44620,
@@ -12,10 +12,10 @@
  },
  "mentions": {
   "videos_seen": 44605,
-  "videos_matched": 29213,
-  "match_rate": 0.6549265777379217,
-  "mentions": 49186,
-  "assets": 903,
+  "videos_matched": 29206,
+  "match_rate": 0.6547696446586706,
+  "mentions": 49108,
+  "assets": 902,
   "last_video_at": "2026-10-07T01:39:48"
  },
  "market": {
@@ -49,16 +49,16 @@
   "last_disclosure_date": "2026-10-07"
  },
  "stats": {
-  "events": 49160,
+  "events": 49082,
   "events_theme": 10145,
-  "with_t0": 49087,
-  "r5_filled": 48266,
-  "r20_filled": 45281,
-  "r60_filled": 37361,
-  "vol_ratio_filled": 48197,
+  "with_t0": 49009,
+  "r5_filled": 48190,
+  "r20_filled": 45214,
+  "r60_filled": 37311,
+  "vol_ratio_filled": 48121,
   "disclosure_checked": 16466,
-  "last_computed_at": "2026-10-07T02:34:37.143611",
-  "summaries": 2850
+  "last_computed_at": "2026-10-07T04:15:21.554442",
+  "summaries": 2847
  },
  "channels": {
   "total": 51,
@@ -68,19 +68,19 @@
  "summary": {
   "overall:5": {
    "horizon": 5,
-   "n": 38321,
+   "n": 38245,
    "low_sample": false,
    "mean": -0.0052,
    "median": -0.0066,
-   "win_rate": 0.4548,
+   "win_rate": 0.4547,
    "excess_mean": -0.0083,
-   "excess_n": 38321,
-   "excess_win_rate": 0.3916,
+   "excess_n": 38245,
+   "excess_win_rate": 0.3914,
    "p10": -0.1183,
-   "p90": 0.1016,
+   "p90": 0.1015,
    "vol_ratio_median": 0.924,
-   "vol_up_rate": 0.3988,
-   "vol_n": 38221,
+   "vol_up_rate": 0.3992,
+   "vol_n": 38145,
    "disclosure_rate": 0.2427,
    "disclosure_n": 16466,
    "histogram": [
@@ -92,159 +92,159 @@
     {
      "from": -0.2,
      "to": -0.1,
-     "n": 3507
+     "n": 3503
     },
     {
      "from": -0.1,
      "to": -0.05,
-     "n": 5248
+     "n": 5238
     },
     {
      "from": -0.05,
      "to": 0,
-     "n": 10706
+     "n": 10683
     },
     {
      "from": 0,
      "to": 0.05,
-     "n": 9411
+     "n": 9392
     },
     {
      "from": 0.05,
      "to": 0.1,
-     "n": 4224
+     "n": 4213
     },
     {
      "from": 0.1,
      "to": 0.2,
-     "n": 2865
+     "n": 2858
     },
     {
      "from": 0.2,
      "to": 9,
-     "n": 1098
+     "n": 1096
     }
    ],
    "scope": "overall"
   },
   "overall:20": {
    "horizon": 20,
-   "n": 36192,
+   "n": 36125,
    "low_sample": false,
-   "mean": -0.015,
+   "mean": -0.0152,
    "median": -0.0186,
-   "win_rate": 0.447,
-   "excess_mean": -0.0203,
-   "excess_n": 36192,
-   "excess_win_rate": 0.3825,
-   "p10": -0.2547,
-   "p90": 0.192,
+   "win_rate": 0.4468,
+   "excess_mean": -0.0204,
+   "excess_n": 36125,
+   "excess_win_rate": 0.3822,
+   "p10": -0.2548,
+   "p90": 0.1915,
    "vol_ratio_median": 0.924,
-   "vol_up_rate": 0.3988,
-   "vol_n": 38221,
+   "vol_up_rate": 0.3992,
+   "vol_n": 38145,
    "disclosure_rate": 0.2427,
    "disclosure_n": 16466,
    "histogram": [
     {
      "from": -1,
      "to": -0.2,
-     "n": 5448
+     "n": 5447
     },
     {
      "from": -0.2,
      "to": -0.1,
-     "n": 4719
+     "n": 4703
     },
     {
      "from": -0.1,
      "to": -0.05,
-     "n": 4640
+     "n": 4632
     },
     {
      "from": -0.05,
      "to": 0,
-     "n": 5153
+     "n": 5146
     },
     {
      "from": 0,
      "to": 0.05,
-     "n": 4721
+     "n": 4716
     },
     {
      "from": 0.05,
      "to": 0.1,
-     "n": 4133
+     "n": 4124
     },
     {
      "from": 0.1,
      "to": 0.2,
-     "n": 4034
+     "n": 4028
     },
     {
      "from": 0.2,
      "to": 9,
-     "n": 3343
+     "n": 3328
     }
    ],
    "scope": "overall"
   },
   "overall:60": {
    "horizon": 60,
-   "n": 30077,
+   "n": 30027,
    "low_sample": false,
-   "mean": -0.0105,
-   "median": -0.0622,
-   "win_rate": 0.3934,
-   "excess_mean": -0.0365,
-   "excess_n": 30077,
-   "excess_win_rate": 0.3083,
+   "mean": -0.0106,
+   "median": -0.0625,
+   "win_rate": 0.393,
+   "excess_mean": -0.0366,
+   "excess_n": 30027,
+   "excess_win_rate": 0.3079,
    "p10": -0.342,
-   "p90": 0.3807,
+   "p90": 0.3818,
    "vol_ratio_median": 0.924,
-   "vol_up_rate": 0.3988,
-   "vol_n": 38221,
+   "vol_up_rate": 0.3992,
+   "vol_n": 38145,
    "disclosure_rate": 0.2427,
    "disclosure_n": 16466,
    "histogram": [
     {
      "from": -1,
      "to": -0.2,
-     "n": 8283
+     "n": 8281
     },
     {
      "from": -0.2,
      "to": -0.1,
-     "n": 5001
+     "n": 4996
     },
     {
      "from": -0.1,
      "to": -0.05,
-     "n": 2470
+     "n": 2462
     },
     {
      "from": -0.05,
      "to": 0,
-     "n": 2477
+     "n": 2473
     },
     {
      "from": 0,
      "to": 0.05,
-     "n": 2449
+     "n": 2444
     },
     {
      "from": 0.05,
      "to": 0.1,
-     "n": 1640
+     "n": 1635
     },
     {
      "from": 0.1,
      "to": 0.2,
-     "n": 2895
+     "n": 2882
     },
     {
      "from": 0.2,
      "to": 9,
-     "n": 4862
+     "n": 4854
     }
    ],
    "scope": "overall"
@@ -312,19 +312,19 @@
   },
   "market:US:20": {
    "horizon": 20,
-   "n": 11130,
+   "n": 11071,
    "low_sample": false,
-   "mean": 0.0053,
-   "median": -0.0088,
-   "win_rate": 0.4624,
-   "excess_mean": -0.0065,
-   "excess_n": 11130,
-   "excess_win_rate": 0.4361,
+   "mean": 0.0049,
+   "median": -0.009,
+   "win_rate": 0.4618,
+   "excess_mean": -0.0069,
+   "excess_n": 11071,
+   "excess_win_rate": 0.4352,
    "p10": -0.128,
    "p90": 0.1417,
    "vol_ratio_median": 0.962,
-   "vol_up_rate": 0.4238,
-   "vol_n": 11884,
+   "vol_up_rate": 0.4247,
+   "vol_n": 11817,
    "disclosure_rate": null,
    "disclosure_n": 0,
    "histogram": [
@@ -336,78 +336,78 @@
     {
      "from": -0.2,
      "to": -0.1,
-     "n": 1235
+     "n": 1221
     },
     {
      "from": -0.1,
      "to": -0.05,
-     "n": 1929
+     "n": 1924
     },
     {
      "from": -0.05,
      "to": 0,
-     "n": 2374
+     "n": 2368
     },
     {
      "from": 0,
      "to": 0.05,
-     "n": 1881
+     "n": 1876
     },
     {
      "from": 0.05,
      "to": 0.1,
-     "n": 1447
+     "n": 1438
     },
     {
      "from": 0.1,
      "to": 0.2,
-     "n": 1284
+     "n": 1279
     },
     {
      "from": 0.2,
      "to": 9,
-     "n": 535
+     "n": 520
     }
    ],
    "scope": "market:US"
   },
   "market:CRYPTO:20": {
    "horizon": 20,
-   "n": 10072,
+   "n": 10064,
    "low_sample": false,
    "mean": -0.0383,
-   "median": -0.0293,
-   "win_rate": 0.3995,
+   "median": -0.029,
+   "win_rate": 0.3997,
    "excess_mean": -0.0251,
-   "excess_n": 10072,
+   "excess_n": 10064,
    "excess_win_rate": 0.209,
    "p10": -0.2269,
    "p90": 0.1158,
    "vol_ratio_median": 0.873,
-   "vol_up_rate": 0.4016,
-   "vol_n": 10241,
+   "vol_up_rate": 0.4019,
+   "vol_n": 10232,
    "disclosure_rate": null,
    "disclosure_n": 0,
    "histogram": [
     {
      "from": -1,
      "to": -0.2,
-     "n": 1319
+     "n": 1318
     },
     {
      "from": -0.2,
      "to": -0.1,
-     "n": 1552
+     "n": 1550
     },
     {
      "from": -0.1,
      "to": -0.05,
-     "n": 1477
+     "n": 1474
     },
     {
      "from": -0.05,
      "to": 0,
-     "n": 1664
+     "n": 1663
     },
     {
      "from": 0,
@@ -422,7 +422,7 @@
     {
      "from": 0.1,
      "to": 0.2,
-     "n": 824
+     "n": 823
     },
     {
      "from": 0.2,
@@ -678,19 +678,19 @@
   },
   "market:US:5": {
    "horizon": 5,
-   "n": 11844,
+   "n": 11777,
    "low_sample": false,
-   "mean": 0.0013,
+   "mean": 0.0012,
    "median": -0.0011,
    "win_rate": 0.4927,
-   "excess_mean": -0.0018,
-   "excess_n": 11844,
-   "excess_win_rate": 0.4829,
+   "excess_mean": -0.0019,
+   "excess_n": 11777,
+   "excess_win_rate": 0.4828,
    "p10": -0.0688,
    "p90": 0.0755,
    "vol_ratio_median": 0.962,
-   "vol_up_rate": 0.4238,
-   "vol_n": 11884,
+   "vol_up_rate": 0.4247,
+   "vol_n": 11817,
    "disclosure_rate": null,
    "disclosure_n": 0,
    "histogram": [
@@ -702,56 +702,56 @@
     {
      "from": -0.2,
      "to": -0.1,
-     "n": 447
+     "n": 443
     },
     {
      "from": -0.1,
      "to": -0.05,
-     "n": 1609
+     "n": 1601
     },
     {
      "from": -0.05,
      "to": 0,
-     "n": 3879
+     "n": 3857
     },
     {
      "from": 0,
      "to": 0.05,
-     "n": 3723
+     "n": 3708
     },
     {
      "from": 0.05,
      "to": 0.1,
-     "n": 1384
+     "n": 1375
     },
     {
      "from": 0.1,
      "to": 0.2,
-     "n": 582
+     "n": 575
     },
     {
      "from": 0.2,
      "to": 9,
-     "n": 146
+     "n": 144
     }
    ],
    "scope": "market:US"
   },
   "market:CRYPTO:5": {
    "horizon": 5,
-   "n": 10355,
+   "n": 10346,
    "low_sample": false,
    "mean": -0.0147,
    "median": -0.0113,
-   "win_rate": 0.3986,
-   "excess_mean": -0.0109,
-   "excess_n": 10355,
-   "excess_win_rate": 0.2185,
+   "win_rate": 0.3984,
+   "excess_mean": -0.011,
+   "excess_n": 10346,
+   "excess_win_rate": 0.2183,
    "p10": -0.1092,
    "p90": 0.0661,
    "vol_ratio_median": 0.873,
-   "vol_up_rate": 0.4016,
-   "vol_n": 10241,
+   "vol_up_rate": 0.4019,
+   "vol_n": 10232,
    "disclosure_rate": null,
    "disclosure_n": 0,
    "histogram": [
@@ -768,22 +768,22 @@
     {
      "from": -0.1,
      "to": -0.05,
-     "n": 1315
+     "n": 1313
     },
     {
      "from": -0.05,
      "to": 0,
-     "n": 3708
+     "n": 3707
     },
     {
      "from": 0,
      "to": 0.05,
-     "n": 2772
+     "n": 2768
     },
     {
      "from": 0.05,
      "to": 0.1,
-     "n": 913
+     "n": 911
     },
     {
      "from": 0.1,
@@ -861,19 +861,19 @@
   },
   "market:US:60": {
    "horizon": 60,
-   "n": 9520,
+   "n": 9478,
    "low_sample": false,
-   "mean": 0.0022,
-   "median": -0.0152,
-   "win_rate": 0.4527,
-   "excess_mean": -0.0352,
-   "excess_n": 9520,
-   "excess_win_rate": 0.2998,
-   "p10": -0.2105,
+   "mean": 0.0018,
+   "median": -0.0154,
+   "win_rate": 0.4517,
+   "excess_mean": -0.0356,
+   "excess_n": 9478,
+   "excess_win_rate": 0.2986,
+   "p10": -0.2107,
    "p90": 0.1972,
    "vol_ratio_median": 0.962,
-   "vol_up_rate": 0.4238,
-   "vol_n": 11884,
+   "vol_up_rate": 0.4247,
+   "vol_n": 11817,
    "disclosure_rate": null,
    "disclosure_n": 0,
    "histogram": [
@@ -885,63 +885,63 @@
     {
      "from": -0.2,
      "to": -0.1,
-     "n": 1595
+     "n": 1590
     },
     {
      "from": -0.1,
      "to": -0.05,
-     "n": 1210
+     "n": 1204
     },
     {
      "from": -0.05,
      "to": 0,
-     "n": 1291
+     "n": 1289
     },
     {
      "from": 0,
      "to": 0.05,
-     "n": 1545
+     "n": 1540
     },
     {
      "from": 0.05,
      "to": 0.1,
-     "n": 799
+     "n": 794
     },
     {
      "from": 0.1,
      "to": 0.2,
-     "n": 1040
+     "n": 1028
     },
     {
      "from": 0.2,
      "to": 9,
-     "n": 926
+     "n": 919
     }
    ],
    "scope": "market:US"
   },
   "market:CRYPTO:60": {
    "horizon": 60,
-   "n": 9234,
+   "n": 9226,
    "low_sample": false,
-   "mean": -0.1005,
-   "median": -0.1268,
-   "win_rate": 0.3282,
+   "mean": -0.1006,
+   "median": -0.1269,
+   "win_rate": 0.3283,
    "excess_mean": -0.0629,
-   "excess_n": 9234,
-   "excess_win_rate": 0.1436,
+   "excess_n": 9226,
+   "excess_win_rate": 0.1434,
    "p10": -0.3626,
    "p90": 0.177,
    "vol_ratio_median": 0.873,
-   "vol_up_rate": 0.4016,
-   "vol_n": 10241,
+   "vol_up_rate": 0.4019,
+   "vol_n": 10232,
    "disclosure_rate": null,
    "disclosure_n": 0,
    "histogram": [
     {
      "from": -1,
      "to": -0.2,
-     "n": 3276
+     "n": 3274
     },
     {
      "from": -0.2,
@@ -951,12 +951,12 @@
     {
      "from": -0.1,
      "to": -0.05,
-     "n": 559
+     "n": 557
     },
     {
      "from": -0.05,
      "to": 0,
-     "n": 674
+     "n": 672
     },
     {
      "from": 0,
@@ -971,12 +971,12 @@
     {
      "from": 0.1,
      "to": 0.2,
-     "n": 1237
+     "n": 1236
     },
     {
      "from": 0.2,
      "to": 9,
-     "n": 622
+     "n": 621
     }
    ],
    "scope": "market:CRYPTO"
@@ -1035,11 +1035,11 @@
    "asset_id": "CRYPTO:KRW-XRP",
    "name": "리플",
    "market": "CRYPTO",
-   "n": 2001,
-   "mean": -0.0192,
+   "n": 1996,
+   "mean": -0.0191,
    "median": -0.0371,
-   "win_rate": 0.3768,
-   "excess_mean": -0.0141,
+   "win_rate": 0.3778,
+   "excess_mean": -0.014,
    "vol_ratio_median": 0.832,
    "low_sample": false
   },
@@ -1285,16 +1285,16 @@
   {
    "asset_id": "KRX:091160",
    "name": "반도체",
-   "mentions": 339,
-   "prev": 305,
+   "mentions": 337,
+   "prev": 307,
    "channels": 27
   },
   {
-   "asset_id": "KRX:069500",
-   "name": "코스피",
-   "mentions": 193,
-   "prev": 164,
-   "channels": 17
+   "asset_id": "US:AMD",
+   "name": "AMD",
+   "mentions": 45,
+   "prev": 18,
+   "channels": 10
   },
   {
    "asset_id": "US:QQQ",
@@ -1304,11 +1304,11 @@
    "channels": 14
   },
   {
-   "asset_id": "US:AMD",
-   "name": "AMD",
-   "mentions": 54,
-   "prev": 31,
-   "channels": 10
+   "asset_id": "KRX:069500",
+   "name": "코스피",
+   "mentions": 190,
+   "prev": 167,
+   "channels": 17
   },
   {
    "asset_id": "US:INTC",
@@ -1332,18 +1332,18 @@
    "channels": 5
   },
   {
-   "asset_id": "US:TSLA",
-   "name": "Tesla",
-   "mentions": 285,
-   "prev": 275,
-   "channels": 17
-  },
-  {
    "asset_id": "US:AAPL",
    "name": "Apple",
    "mentions": 56,
    "prev": 46,
    "channels": 12
+  },
+  {
+   "asset_id": "US:PLTR",
+   "name": "Palantir",
+   "mentions": 54,
+   "prev": 44,
+   "channels": 6
   }
  ],
  "unmatched_sample": [

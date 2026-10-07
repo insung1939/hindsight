@@ -8,7 +8,7 @@
 |---|---|
 | 코드 | 서비스 4개(market-data·youtube·mentions·stats) + 공통 라이브러리 + React 화면 4개 + OpenAPI 계약 4개 + CI 3개. 로컬에서 한 바퀴 돈다 |
 | 데이터(**10/7 밤 최종**, 로컬 SQLite → Supabase 복사) | 채널 51개(2025-10-07~2026-10-07) → 영상 44,620 → 언급 49,186(성공률 **65.5%**, 종목·테마 903개) → 수익률 49,160건(r5 48,266 · r20 45,281 · r60 37,361, 거래량 비율 48,197, 공시 판정 16,466). 사전 4,360(KRX 3,998+테마 20 · US 48 · 코인 292 · 지수 2), 시세 283,273행(국내는 공공데이터포털 공식 소스, 거래량 포함), DART 공시 47,950건(641종목) |
-| 배포 | Render ❌ · Supabase ❌ · GitHub Secrets ❌ (사용자 계정 작업 대기). 합본 앱 `apps/api`·`render.yaml`·`docs/deploy.md`·`scripts/migrate_sqlite_to_pg.py` 준비 완료. Vercel 에는 5주차 팀 페이지(https://hindsight-gold.vercel.app) |
+| 배포 (**10/7 완료**) | Render https://hindsight-api-edab.onrender.com (합본, /healthz 4개 ok) · Supabase 전 테이블 · Vercel 서비스 https://hindsight-web.vercel.app · 발표 https://hindsight-gold.vercel.app · GitHub Secrets API_URL·INTERNAL_TOKEN |
 | GitHub | public, 로컬 커밋 1개(체크리스트) 미푸시 |
 | 문서 | api·db·data-sources·deploy·requirements·checklist. deploy.md 는 hindsight 기준으로 정리함 |
 | 발표 페이지 | **10/7 새로 작성** `apps/team-page`(밝은 테마, 16장, 필수 6항목+주소·문서, 숫자는 `data/snapshot.json`+실시간). 팀원 제작본은 `index.legacy.html` 로 보존, 일러스트 재사용 |
@@ -27,14 +27,14 @@
 ## 3. 할 일 (우선순위 순)
 
 ### A. 배포 — 10/8~10/10. 주소 3개를 먼저 만든다
-- [ ] 커밋·푸시 (사용자 허락 후)
+- [x] 커밋·푸시 (10/7)
 - [x] (사용자) Supabase 프로젝트 → 루트 `.env` 의 `DATABASE_URL` (10/7 접속 확인, PostgreSQL 17 서울 pooler)
 - [x] 합본 앱 `apps/api`(launcher + gateway, /docs 하나) · `render.yaml` · Dockerfile — 로컬 검증 완료
-- [ ] (사용자 클릭) Render Blueprint → `hindsight-api`. 환경변수 `DATABASE_URL` · `INTERNAL_TOKEN` · `ALLOWED_ORIGINS` · `YOUTUBE_API_KEY` · `DART_KEY` · `DATA_GO_KR_KEY`
+- [x] Render Blueprint → `hindsight-api` (실주소 hindsight-api-edab, 이름 충돌로 접미사) (10/7)
 - [x] `scripts/migrate_sqlite_to_pg.py` 로 로컬 데이터 → Supabase 복사 (10/7 밤)
-- [ ] Vercel 에 `apps/web`(프로젝트 `hindsight-web`, `VITE_API_URL`) · `apps/team-page`(발표) 배포
-- [ ] GitHub Secrets `API_URL` · `INTERNAL_TOKEN` + `sync.yml` 수동 실행
-- [ ] docs/api.md · 발표 페이지 `deck.js` CONFIG 에 실제 주소 반영
+- [x] Vercel `hindsight-web`(apps/web) · `hindsight`(apps/team-page, 저장소 루트에서 배포, Root Directory 설정) (10/7)
+- [x] GitHub Secrets `API_URL` · `INTERNAL_TOKEN` 등록 (10/7) · [ ] `sync.yml` 수동 실행 결과 확인
+- [x] 발표 페이지 `deck.js` · 프론트 env · README · deploy.md 에 실제 주소 반영
 
 ### B. 데이터 — 10/9~10/15. 평가의 핵심
 - [x] 채널 선정(51개, 근거 docs/channel-selection.md)
@@ -66,7 +66,7 @@
 
 ### D. 발표 페이지 — 초안 완료(10/7), 10/19 까지 다듬기
 - [x] 16장: 표지(주소 3개) → 문제 → 시나리오 → 출처 → 채널 선정 → 파이프라인 → 아키텍처 → DB → API → 화면 → 결과 3장 → BM → 막혔던 것 → 정리(문서 링크). 숫자는 스냅샷+실시간
-- [ ] 배포 주소 확정 후 `deck.js` CONFIG 수정, 스냅샷 재생성(`scripts/snapshot_deck.py`)
+- [x] 배포 주소 반영, 스냅샷 재생성 (10/7)
 - [ ] 결과 ③ "발견" 문장을 최종 데이터로 다듬기(지금은 데이터로 자동 생성)
 - [ ] 리허설 10/20. 발표 직전 Render `/healthz` 호출해 깨우기
 
