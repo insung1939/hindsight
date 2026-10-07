@@ -5,10 +5,6 @@ from .errors import install_error_handlers
 from .request_id import RequestIdMiddleware
 from .settings import allowed_origins, env
 
-try:  # 5주차: OTEL_EXPORTER_OTLP_ENDPOINT 가 있을 때만 켠다. 패키지가 없어도 서비스는 돈다.
-    from .telemetry import setup_telemetry
-except Exception:  # pragma: no cover
-    setup_telemetry = None
 
 
 def create_app(service_name: str, title: str, version: str, description: str = "") -> FastAPI:
@@ -25,8 +21,12 @@ def create_app(service_name: str, title: str, version: str, description: str = "
     def healthz():
         return {"status": "ok", "service": service_name, "version": version}
 
-    if setup_telemetry and env("OTEL_EXPORTER_OTLP_ENDPOINT"):
-        setup_telemetry(app, service_name)
+    if env("OTEL_EXPORTER_OTLP_ENDPOINT"):  # 세미나(관측) 때만. import 자체를 늦춰 평소엔 메모리를 쓰지 않는다 (Render 무료 512MB 에 프로세스 5개)
+        try:
+            from .telemetry import setup_telemetry
+            setup_telemetry(app, service_name)
+        except Exception:  # pragma: no cover
+            pass
     _install_openapi_conventions(app, service_name)
     return app
 

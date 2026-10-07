@@ -75,4 +75,4 @@ gh workflow run sync && gh run watch   # 최초는 inputs 로 youtube_days=365, 
 | 프론트 `blocked by CORS policy` | `ALLOWED_ORIGINS` 에 Vercel 주소가 정확히(https, `/` 없이) 있는지 |
 | `no route to host` / `ENOTFOUND` | Direct 대신 Session pooler, 사용자명 `postgres.<ref>` |
 | `/internal/sync` 401 | `X-Internal-Token` 이 Render 의 `INTERNAL_TOKEN` 과 다름 |
-| 메모리 초과로 재시작 | 무료 512MB. 프로세스 5개가 보통 350MB 안쪽. 넘으면 uvicorn 워커 수(기본 1) 확인 |
+| 메모리 초과로 재시작 (502 뒤 잠깐 HTML 오류 페이지) | 무료 512MB. 프로세스 5개 기본 약 310MB. DART 상장사 목록 갱신(`dictionary=true`)이 가장 무거워 **일요일에만** 돌린다(sync.yml). 2026-10-07 OTel 지연 import·iterparse 로 최대 약 340MB 로 낮춤. 로컬 재현: `docker run -m 512m …` |

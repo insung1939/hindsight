@@ -24,7 +24,7 @@ SERVICES = {"market-data": 8001, "youtube": 8002, "mentions": 8003, "stats": 800
 HOP = {"host", "content-length", "transfer-encoding", "connection", "keep-alive", "te", "trailer", "upgrade", "proxy-authorization", "proxy-authenticate"}
 PUBLIC_URL = os.getenv("PUBLIC_URL", "")  # 예: https://hindsight-api.onrender.com (없으면 상대 경로)
 
-app = FastAPI(title="힌드사이트 API", version="1.0.0", docs_url=None, redoc_url=None, openapi_url=None,
+app = FastAPI(title="힌드사이트 API", version="1.1.0", docs_url=None, redoc_url=None, openapi_url=None,
               description="유튜버가 말한 종목, 그 뒤에 어떻게 됐나 — market-data · youtube · mentions · stats 네 서비스를 한 주소로 묶은 게이트웨이.")
 client = httpx.AsyncClient(timeout=httpx.Timeout(600.0, connect=5.0))
 
@@ -43,7 +43,7 @@ def public_base(request: Request) -> str:
 @app.get("/", include_in_schema=False)
 def index(request: Request):
     base = public_base(request)
-    return {"service": "hindsight", "docs": f"{base}/docs", "healthz": f"{base}/healthz",
+    return {"service": "hindsight", "version": app.version, "docs": f"{base}/docs", "healthz": f"{base}/healthz",
             "services": {s: f"{base}/{s}" for s in SERVICES}, "per_service_docs": {s: f"{base}/{s}/docs" for s in SERVICES},
             "github": "https://github.com/insung1939/hindsight"}
 
