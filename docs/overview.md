@@ -38,7 +38,7 @@ Render 무료 플랜은 15분 유휴 시 잠든다. 첫 요청이 30~60초 걸�
 |---|---|
 | 서비스 4개와 호출 방향, 하루 배치 순서 | [../README.md](../README.md) 구조 절, [PLAN.md](../PLAN.md) 5장 |
 | 발표용 아키텍처 그림 (외부 API → Render → Supabase, Vercel, Actions) | 발표 페이지 7장 |
-| 합본 배포가 어떻게 생겼나 (한 컨테이너에 4개 + 게이트웨이) | [../apps/api/README.md](../apps/api/README.md), `apps/api/launcher.py`, `gateway.py` |
+| 합본 배포가 어떻게 생겼나 (한 프로세스에 4개 마운트) | [../apps/api/README.md](../apps/api/README.md), `apps/api/single.py` |
 | 테이블·컬럼·키·관계 | [db.md](db.md) |
 | API 목록·요청·응답 | [api.md](api.md) (자동 생성), 계약 원본 `contracts/*.yaml` |
 
@@ -49,7 +49,7 @@ Render 무료 플랜은 15분 유휴 시 잠든다. 첫 요청이 30~60초 걸�
 | 프론트 | React 18 + Vite, 순수 SVG 차트 | 수업 기본. 평가 제외라 라이브러리 최소 |
 | 백엔드 | Python 3.12, FastAPI, Pydantic, SQLAlchemy 2, httpx | 수업 기본. 서비스별 폴더 분리 + 공통 라이브러리 `libs/hs-common` |
 | DB | PostgreSQL (Supabase), 로컬은 SQLite | `DATABASE_URL` 하나로 전환. 서비스마다 스키마 하나 |
-| 배포 | Vercel(프론트·발표) · Render(Docker 1개) · GitHub Actions(매일 배치) | 수업 플랫폼. Render 무료 콜드스타트 때문에 합본 |
+| 배포 | Vercel(프론트·발표) · Render(Docker 1개, 프로세스 1개) · GitHub Actions(매일 배치) | 수업 플랫폼. Render 무료(512MB·콜드스타트) 때문에 한 프로세스 합본 |
 | 품질 | pytest 31개, OpenAPI 계약 + Spectral + oasdiff CI, problem+json, X-Request-ID | AI 생성 코드를 규칙·테스트로 검증 |
 
 ## 5. 배포·운영 방법

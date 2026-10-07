@@ -82,7 +82,7 @@
 
 | 교수님 요구 | 산출물 | 위치 | 상태(10/7) |
 |---|---|---|---|
-| FastAPI 백엔드 → Render | 합본 1개(서비스 4개 + 게이트웨이) | `apps/api`, `render.yaml` | ✅ https://hindsight-api-edab.onrender.com |
+| FastAPI 백엔드 → Render | 합본 1개(서비스 4개를 한 프로세스에 마운트) | `apps/api`, `render.yaml` | ✅ https://hindsight-api-edab.onrender.com |
 | PostgreSQL → Supabase | 스키마 4개 | `docs/db.md` | ✅ 전 테이블 적재 |
 | GitHub | 공개 저장소 | https://github.com/insung1939/hindsight | ✅ |
 | React → Vercel (평가 제외) | 화면 4개 | `apps/web` | ✅ https://hindsight-web.vercel.app |

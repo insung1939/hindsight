@@ -1,5 +1,5 @@
 // 서비스별 주소. 화면은 stats · mentions 를 주로 부르고, market-data 는 종목 이름·시세(타임라인) 읽기, youtube 는 수집 현황만.
-// 배포는 합본 게이트웨이 하나(VITE_API_URL, 예: https://hindsight-api.onrender.com)에 접두사로 붙인다.
+// 배포는 합본 API 하나(VITE_API_URL, .env.production)에 서비스 접두사를 붙인다.
 // 서비스별 주소(VITE_STATS_URL …)를 주면 그게 우선이라 분리 실행(로컬 8001~8004, 세미나)도 그대로 된다.
 const env = import.meta.env;
 const gw = (env.VITE_API_URL || "").replace(/\/$/, "");

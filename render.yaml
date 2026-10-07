@@ -1,4 +1,4 @@
-# Render Blueprint — 수업 제출용 합본 1개 (apps/api: 서비스 4개 + 게이트웨이를 한 컨테이너에).
+# Render Blueprint — 수업 제출용 합본 1개 (apps/api/single.py: 서비스 4개를 한 프로세스에 마운트, 무료 512MB 대비).
 # dashboard.render.com → New → Blueprint → 이 저장소 선택 → sync:false 항목 입력 → Apply.
 # 세미나용 분리 배포(서비스별 컨테이너)는 platform/k8s 를 쓴다.
 services:

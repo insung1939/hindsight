@@ -214,8 +214,11 @@ paths:
         schema:
           type: integer
           maximum: 2000
-          default: 400
+          description: 이 기간의 언급만 다시 계산 (최초 백필은 400). 60거래일이 채워지려면 약 90일이면 되므로 매일은
+            130일
+          default: 130
           title: Since Days
+        description: 이 기간의 언급만 다시 계산 (최초 백필은 400). 60거래일이 채워지려면 약 90일이면 되므로 매일은 130일
       - name: X-Internal-Token
         in: header
         required: false

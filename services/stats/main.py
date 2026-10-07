@@ -126,7 +126,7 @@ def channel_events(channel_id: str, s: Session = Depends(db.session)):
 
 @app.post("/internal/sync", response_model=SyncResult, tags=["ops"], operation_id="sync_stats",
           summary="새 언급의 수익률 계산 + 미완성 값 채우기 + 요약 갱신", dependencies=[InternalOnly])
-def sync(since_days: int = Query(default=400, le=2000), s: Session = Depends(db.session)):
+def sync(since_days: int = Query(default=130, le=2000, description="이 기간의 언급만 다시 계산 (최초 백필은 400). 60거래일이 채워지려면 약 90일이면 되므로 매일은 130일"), s: Session = Depends(db.session)):
     since = datetime.utcnow() - timedelta(days=since_days)
     ments, after = [], 0
     while True:  # 2만 건도 다 받도록 id 페이징
@@ -217,21 +217,28 @@ def _load_series(ids: list[str], from_date: date) -> dict[str, list[tuple]]:
 
 
 def _rebuild_summaries(s: Session) -> int:
-    rows = s.scalars(select(EventReturn)).all()
-    # overall·market 은 종목·코인만. 테마(업종 ETF)는 kind:theme 와 asset:<id> 로만 집계해 종목 통계와 섞지 않는다.
-    groups: dict[str, list] = {"overall": [e for e in rows if e.kind != "theme"]}
-    for e in rows:
-        if e.kind == "theme":
-            groups.setdefault("kind:theme", []).append(e)
+    """요약 캐시 재계산. ORM 객체 대신 컬럼 튜플만 읽어 메모리를 아낀다(5만 건 ORM 은 Render 무료 512MB 에서 OOM)."""
+    cols = (EventReturn.market, EventReturn.kind, EventReturn.channel_id, EventReturn.asset_id,
+            EventReturn.r5, EventReturn.r20, EventReturn.r60, EventReturn.x5, EventReturn.x20, EventReturn.x60,
+            EventReturn.vol_ratio, EventReturn.near_disclosure)
+    groups: dict[str, list[tuple]] = {"overall": []}
+    for row in s.execute(select(*cols)).yield_per(5000):
+        market, kind, channel_id, asset_id = row[0], row[1], row[2], row[3]
+        payload = row[4:]
+        if kind == "theme":
+            groups.setdefault("kind:theme", []).append(payload)
         else:
-            groups.setdefault("kind:stock", []).append(e)
-            groups.setdefault(f"market:{e.market}", []).append(e)
-            groups.setdefault(f"channel:{e.channel_id}", []).append(e)
-        groups.setdefault(f"asset:{e.asset_id}", []).append(e)
+            groups["overall"].append(payload)
+            groups.setdefault("kind:stock", []).append(payload)
+            groups.setdefault(f"market:{market}", []).append(payload)
+            groups.setdefault(f"channel:{channel_id}", []).append(payload)
+        groups.setdefault(f"asset:{asset_id}", []).append(payload)
+    idx = {5: (0, 3), 20: (1, 4), 60: (2, 5)}  # (r 위치, x 위치) in payload
     n = 0
     for key, evs in groups.items():
         for h in HORIZONS:
-            val = summarize([{"r": getattr(e, f"r{h}"), "x": getattr(e, f"x{h}"), "v": e.vol_ratio, "d": e.near_disclosure} for e in evs], h)
+            ri, xi = idx[h]
+            val = summarize([{"r": e[ri], "x": e[xi], "v": e[6], "d": e[7]} for e in evs], h)
             val["scope"] = key
             k = f"{key}:{h}"
             row = s.get(Summary, k)
@@ -240,4 +247,5 @@ def _rebuild_summaries(s: Session) -> int:
             else:
                 s.add(Summary(key=k, value=val))
             n += 1
+        evs.clear()
     return n

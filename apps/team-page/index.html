@@ -161,7 +161,7 @@
         <text class="m" x="40" y="490">전부 HTTPS REST · 키는 환경변수</text>
       </g>
       <!-- Render -->
-      <rect class="box acc" x="330" y="40" width="420" height="470" rx="16"/><text class="t" x="350" y="70">Render · FastAPI 웹 서비스 1개</text><text class="m" x="350" y="88">apps/api 게이트웨이 → 서비스 4개 (한 컨테이너, /docs 하나)</text>
+      <rect class="box acc" x="330" y="40" width="420" height="470" rx="16"/><text class="t" x="350" y="70">Render · FastAPI 웹 서비스 1개</text><text class="m" x="350" y="88">apps/api/single.py — 서비스 4개를 한 프로세스에 마운트 (/docs 하나)</text>
       <g class="s">
         <rect class="box" x="350" y="110" width="180" height="78" rx="10"/><text class="t" x="362" y="132">market-data</text><text class="m" x="362" y="150">종목·테마 사전 · 시세</text><text class="m" x="362" y="166">거래량 · 공시</text>
         <rect class="box" x="550" y="110" width="180" height="78" rx="10"/><text class="t" x="562" y="132">youtube</text><text class="m" x="562" y="150">채널(익명 코드) · 영상</text><text class="m" x="562" y="166">업로드 목록 수집</text>
@@ -171,7 +171,7 @@
         <path class="ln" d="M640 210 Q640 199 530 188"/><path class="ln" d="M620 288 Q620 300 530 300 Q470 300 470 288" style="display:none"/>
         <path class="ln" d="M550 249 L530 249"/>
         <text class="m" x="350" y="318">호출 방향: mentions → youtube · market-data, stats → mentions · market-data. 순환 없음, X-Request-ID 전파, problem+json</text>
-        <rect class="box" x="350" y="340" width="380" height="60" rx="10"/><text class="t" x="362" y="362">게이트웨이 (apps/api/gateway.py)</text><text class="m" x="362" y="380">/market-data/* /youtube/* /mentions/* /stats/* 프록시 · 네 명세를 합친 /docs · /healthz</text>
+        <rect class="box" x="350" y="340" width="380" height="60" rx="10"/><text class="t" x="362" y="362">합본 앱 (apps/api/single.py)</text><text class="m" x="362" y="380">/market-data/* /youtube/* /mentions/* /stats/* 마운트 · 네 명세를 합친 /docs · /healthz</text>
         <text class="m" x="350" y="430">읽기 API: GET 조회 전용 · CORS 는 Vercel 주소만</text>
         <text class="m" x="350" y="448">쓰기: /internal/sync 만, X-Internal-Token 필요</text>
         <text class="m" x="350" y="466">코드는 서비스별 폴더(services/*)로 분리, 계약은 contracts/*.yaml</text>
@@ -200,7 +200,7 @@
       <path class="ln d" d="M830 465 L790 465 L790 370 L750 370"/><text class="m" x="760" y="462">배치</text>
       <!-- 사용자 -->
           </svg>
-    <p class="note rv d3">데이터 흐름: 외부 API → (수집) market-data·youtube → (가공) mentions → (계산) stats → Supabase → 게이트웨이 → React. 화면은 계산된 결과만 읽으므로 무료 서버에서도 빠르다.</p>
+    <p class="note rv d3">데이터 흐름: 외부 API → (수집) market-data·youtube → (가공) mentions → (계산) stats → Supabase → 합본 API → React. 화면은 계산된 결과만 읽으므로 무료 서버에서도 빠르다.</p>
   </div>
 </section>
 
@@ -357,7 +357,7 @@
       <li><div><b>매칭 성공률 26%.</b> 못 잡은 제목 1,304건을 직접 읽어 보니 종목이 아니라 업종·시황 얘기였다 → 테마 사전(업종 → 대표 ETF) 추가, 흔한 단어 스톱리스트 → <b data-bind="mentions.match_rate" data-fmt="pct0">62%</b>. 종목 통계와는 분리.</div></li>
       <li><div><b>채널 20개를 누가 고르나.</b> 사람이 고르면 근거가 없다 → 후보 547개를 API 로 측정해 임계값 표를 만들고 2단 규칙으로 51개. 5주차에 넣었던 슈카월드·소수몽키는 언급률 2~4%라 규칙상 제외.</div></li>
       <li><div><b>YouTube 쿼터.</b> 검색 API 는 호출당 100유닛이라 20채널 1년치면 하루 한도를 넘는다 → 업로드 재생목록(1유닛)으로 설계, 1년치 4만 4천 편을 약 1,500유닛에.</div></li>
-      <li><div><b>Render 무료 플랜.</b> 서비스 4개를 따로 올리면 콜드스타트 4번·Swagger 주소 4개 → 코드는 4개로 두고 한 컨테이너에서 게이트웨이로 묶어 주소 하나. 발표 전 /healthz 로 깨운다.</div></li>
+      <li><div><b>Render 무료 플랜(512MB).</b> 서비스 4개를 따로 올리면 콜드스타트 4번·주소 4개, 한 컨테이너에 프로세스 5개로 묶으니 기본 메모리 350MB 로 배치 중 OOM → 코드는 4개로 두고 <b>한 프로세스에 마운트</b>해 주소 하나·메모리 절반. 512MB 제한 컨테이너로 재현해 확인했다.</div></li>
       <li><div><b>T0 를 언제로 볼 것인가.</b> 게시일 종가로 하면 장 마감 뒤 영상이 "이미 지난 가격"을 쓴다 → 시장별 마감 시각(15:30 KST · 16:00 EST · 업비트 09:00 캔들)으로 첫 거래 가능일을 정하고 테스트로 고정.</div></li>
       <li><div><b>AI 코드 검증.</b> 매칭 규칙·사건일·거래량 비율은 pytest 로 규칙을 명시(27개), 계약(OpenAPI)과 구현의 드리프트는 CI 가 막는다. 생성된 코드는 실데이터로 한 바퀴 돌려 숫자가 말이 되는지 보고 반영했다.</div></li>
     </ol>
