@@ -31,12 +31,13 @@ class ChannelIn(BaseModel):
 class ChannelOut(BaseModel):
     channel_id: str
     anon_code: str
+    title: str  # 2026-10-07 팀 결정: 채널 실명을 보여준다 (학습용 통계이며 추천이 아님을 화면에 고정 고지)
+    handle: str
     category: str
     subscriber_count: int | None = None
     tracked: bool
     added_at: datetime
     model_config = {"from_attributes": True}
-    # handle·title 은 일부러 응답에서 뺀다 — 익명 집계 원칙(PLAN 1.7). 운영자는 DB 에서 본다.
 
 
 class VideoOut(BaseModel):
@@ -91,7 +92,7 @@ def add_channel(body: ChannelIn, s: Session = Depends(db.session)):
     return ch
 
 
-@app.get("/v1/channels", response_model=ListChannels, tags=["channels"], operation_id="list_channels", summary="채널 목록 (익명)")
+@app.get("/v1/channels", response_model=ListChannels, tags=["channels"], operation_id="list_channels", summary="채널 목록 (실명·핸들·구독자)")
 def list_channels(s: Session = Depends(db.session)):
     return {"items": s.scalars(select(Channel).order_by(Channel.anon_code)).all(), "next_cursor": None}
 

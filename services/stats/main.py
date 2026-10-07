@@ -11,7 +11,7 @@ from engine import HORIZONS, event_day, forward_returns, summarize
 from hs_common import InternalOnly, ServiceClient, create_app
 from models import EventReturn, Summary, db
 
-app = create_app("stats", "힌드사이트 stats", "0.1.0", "언급 뒤 5·20·60 거래일 수익률과 벤치마크 대비 초과수익. 채널은 익명 집계.")
+app = create_app("stats", "힌드사이트 stats", "0.1.0", "언급 뒤 5·20·60 거래일 수익률과 벤치마크 대비 초과수익. 채널별 랭킹 포함.")
 mentions = ServiceClient("mentions", timeout=60)
 market = ServiceClient("market-data", timeout=120)
 
@@ -71,6 +71,26 @@ class StatsCoverage(BaseModel):
     summaries: int
 
 
+class ChannelRank(BaseModel):
+    channel_id: str
+    n: int
+    mean: float
+    median: float
+    win_rate: float
+    excess_mean: float | None
+    excess_win_rate: float | None
+    vol_ratio_median: float | None
+
+
+class ChannelRanking(BaseModel):
+    horizon: int
+    metric: str
+    min_n: int
+    top: list[ChannelRank]
+    bottom: list[ChannelRank]
+    all: list[ChannelRank]
+
+
 class SyncResult(BaseModel):
     events_added: int
     events_updated: int
@@ -110,6 +130,22 @@ def stats_coverage(s: Session = Depends(db.session)):
             "summaries": s.scalar(select(func.count()).select_from(Summary)) or 0}
 
 
+@app.get("/v1/channels/ranking", response_model=ChannelRanking, tags=["summary"], operation_id="channel_ranking",
+         summary="채널 랭킹 — 언급 뒤 수익률 기준 상·하위 (metric=excess_mean|mean|win_rate, 표본 min_n 이상만)")
+def channel_ranking(horizon: int = Query(default=20, description="5 · 20 · 60"), metric: str = Query(default="excess_mean", pattern="^(excess_mean|mean|win_rate)$"),
+                    min_n: int = Query(default=30, ge=1), limit: int = Query(default=3, ge=1, le=20), s: Session = Depends(db.session)):
+    rows = []
+    for sm in s.scalars(select(Summary).where(Summary.key.like(f"channel:%:{horizon}"))).all():
+        v = sm.value
+        if (v.get("n") or 0) < min_n or v.get(metric) is None:
+            continue
+        rows.append({"channel_id": sm.key[len("channel:"):-(len(str(horizon)) + 1)], "n": v["n"], "mean": v["mean"], "median": v["median"],
+                     "win_rate": v["win_rate"], "excess_mean": v.get("excess_mean"), "excess_win_rate": v.get("excess_win_rate"),
+                     "vol_ratio_median": v.get("vol_ratio_median")})
+    rows.sort(key=lambda r: r[metric], reverse=True)
+    return {"horizon": horizon, "metric": metric, "min_n": min_n, "top": rows[:limit], "bottom": list(reversed(rows[-limit:])) if len(rows) > limit else [], "all": rows}
+
+
 @app.get("/v1/assets/{asset_id}/events", response_model=ListEvents, tags=["events"], operation_id="asset_events",
          summary="종목 하나의 언급별 이후 수익률 (타임라인 화면)")
 def asset_events(asset_id: str, s: Session = Depends(db.session)):
@@ -118,7 +154,7 @@ def asset_events(asset_id: str, s: Session = Depends(db.session)):
 
 
 @app.get("/v1/channels/{channel_id}/events", response_model=ListEvents, tags=["events"], operation_id="channel_events",
-         summary="채널 하나의 언급별 이후 수익률 (익명 코드로만 노출)")
+         summary="채널 하나의 언급별 이후 수익률")
 def channel_events(channel_id: str, s: Session = Depends(db.session)):
     rows = s.scalars(select(EventReturn).where(EventReturn.channel_id == channel_id).order_by(EventReturn.published_at.desc())).all()
     return {"items": rows, "next_cursor": None}

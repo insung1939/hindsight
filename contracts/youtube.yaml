@@ -32,7 +32,7 @@ paths:
     get:
       tags:
       - channels
-      summary: 채널 목록 (익명)
+      summary: 채널 목록 (실명·핸들·구독자)
       operationId: list_channels
       responses:
         '200':
@@ -307,6 +307,12 @@ components:
         anon_code:
           type: string
           title: Anon Code
+        title:
+          type: string
+          title: Title
+        handle:
+          type: string
+          title: Handle
         category:
           type: string
           title: Category
@@ -326,6 +332,8 @@ components:
       required:
       - channel_id
       - anon_code
+      - title
+      - handle
       - category
       - tracked
       - added_at

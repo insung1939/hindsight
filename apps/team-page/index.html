@@ -119,7 +119,7 @@
       <div class="card soft"><h3>왜 두 단계인가</h3><p style="margin:0">언급률 30%만 쓰면 수백만 구독자 채널이 전부 빠지고, 구독자만 쓰면 시황·예능 채널이 들어온다. 구독자 373만 채널도 제목에 종목이 2%뿐이라 제외됐다.</p></div>
       <div class="card soft"><h3>쿼터 설계</h3><p style="margin:0">YouTube 는 하루 10,000유닛. <code>search.list</code> 는 100유닛이라 후보 수집에만 썼고(1,800유닛), 백필은 <code>playlistItems</code> 1유닛으로 1년치 4만 4천 편을 약 1,500유닛에 받았다.</p></div>
     </div>
-    <p class="note rv d4">근거와 전체 표: <code>docs/channel-selection.md</code> · 스크립트 <code>scripts/discover_channels.py</code>. 서비스·통계에서는 채널을 A·B·C 익명 코드로만 다룬다.</p>
+    <p class="note rv d4">근거와 전체 표: <code>docs/channel-selection.md</code> · 스크립트 <code>scripts/discover_channels.py</code>. 서비스에서는 채널 실명과 채널별 성적(상·하위)을 보여주되 학습용 통계임을 고지한다.</p>
   </div>
 </section>
 
@@ -164,7 +164,7 @@
       <rect class="box acc" x="330" y="40" width="420" height="470" rx="16"/><text class="t" x="350" y="70">Render · FastAPI 웹 서비스 1개</text><text class="m" x="350" y="88">apps/api/single.py — 서비스 4개를 한 프로세스에 마운트 (/docs 하나)</text>
       <g class="s">
         <rect class="box" x="350" y="110" width="180" height="78" rx="10"/><text class="t" x="362" y="132">market-data</text><text class="m" x="362" y="150">종목·테마 사전 · 시세</text><text class="m" x="362" y="166">거래량 · 공시</text>
-        <rect class="box" x="550" y="110" width="180" height="78" rx="10"/><text class="t" x="562" y="132">youtube</text><text class="m" x="562" y="150">채널(익명 코드) · 영상</text><text class="m" x="562" y="166">업로드 목록 수집</text>
+        <rect class="box" x="550" y="110" width="180" height="78" rx="10"/><text class="t" x="562" y="132">youtube</text><text class="m" x="562" y="150">채널(실명·구독자) · 영상</text><text class="m" x="562" y="166">업로드 목록 수집</text>
         <rect class="box" x="350" y="210" width="180" height="78" rx="10"/><text class="t" x="362" y="232">mentions</text><text class="m" x="362" y="250">제목 → 종목 매칭</text><text class="m" x="362" y="266">못 잡은 제목 보관</text>
         <rect class="box" x="550" y="210" width="180" height="78" rx="10"/><text class="t" x="562" y="232">stats</text><text class="m" x="562" y="250">언급별 r5·r20·r60</text><text class="m" x="562" y="266">초과수익 · 거래량 비율 · 요약</text>
         <path class="ln" d="M440 210 L440 188"/><path class="ln" d="M470 210 Q470 199 550 188" /><path class="ln" d="M640 210 L470 288" style="display:none"/>
@@ -233,7 +233,7 @@
     <div class="grid g3 rv d3" style="margin-top:18px">
       <div class="card soft"><h3>관계</h3><p class="note" style="margin:0">channels 1─n videos 1─n mentions n─1 assets 1─n prices · mentions 1─1 event_returns · assets 1─n disclosures</p></div>
       <div class="card soft"><h3>서비스 간 FK 를 안 거는 이유</h3><p class="note" style="margin:0">각 서비스가 자기 스키마만 쓰고 남의 데이터는 REST 로만 읽는다. 다른 서비스 id 는 문자열로 보관. 분리 배포(k8s)로 옮겨도 DB 를 쪼갤 수 있다.</p></div>
-      <div class="card soft"><h3>익명 원칙</h3><p class="note" style="margin:0">채널 실명(title·handle)은 yt.channels 에만 있고 API 응답·화면·통계·발표 어디에도 내지 않는다.</p></div>
+      <div class="card soft"><h3>채널 실명</h3><p class="note" style="margin:0">처음엔 익명(A·B·C)으로 설계했지만, 사용자가 적은 학습 프로젝트라 실명과 채널별 성적을 보여주기로 했다. 대신 "누가 틀렸나"가 아니라 "유튜브 언급을 따라가면 어떻게 되나"를 보는 통계임을 고정 고지한다.</p></div>
     </div>
   </div>
 </section>
@@ -264,10 +264,11 @@
 <section class="slide alt" id="s-pages">
   <div class="in">
     <p class="kicker rv">주요 페이지 및 기능</p>
-    <h2 class="rv d1">네 화면, 전부 계산된 결과만 읽는다</h2>
-    <div class="grid g4 rv d2">
-      <div class="card"><span class="tag ok">구현</span><h3 style="color:var(--text);font-size:19px;margin-top:10px">이번 주 언급</h3><p class="note">최근 7·14·30일 언급 급증 종목. 옆에 그 종목의 과거 언급 뒤 20일 평균을 붙여 "전에 떴을 때 어땠나"를 같이 보여준다.</p></div>
-      <div class="card"><span class="tag ok">구현 · 수업 필수 분석</span><h3 style="color:var(--text);font-size:19px;margin-top:10px">언급 뒤에</h3><p class="note">5·20·60일 수익률 분포, 상승 확률, 벤치마크 대비 초과수익, 거래량 반응. 범위: 전체·국내·미국·코인·업종테마. 채널은 익명 코드.</p></div>
+    <h2 class="rv d1">다섯 화면, 전부 계산된 결과만 읽는다</h2>
+    <div class="grid g5 rv d2">
+      <div class="card"><span class="tag ok">구현</span><h3 style="color:var(--text);font-size:19px;margin-top:10px">홈 · 지금 뜨는 종목</h3><p class="note">서비스 설명과 수집 규모, 최근 7·14·30일 언급 급증 종목(시장·테마 필터). 옆에 과거 언급 뒤 20일 평균.</p></div>
+      <div class="card"><span class="tag ok">구현</span><h3 style="color:var(--text);font-size:19px;margin-top:10px">채널</h3><p class="note">채널별 언급 뒤 성적 TOP 3 · BOTTOM 3, 전체 50개 랭킹 막대 차트(초과수익·평균·상승확률 기준, 표본 30건 이상).</p></div>
+      <div class="card"><span class="tag ok">구현 · 수업 필수 분석</span><h3 style="color:var(--text);font-size:19px;margin-top:10px">언급 뒤에</h3><p class="note">5·20·60일 수익률 분포, 상승 확률, 벤치마크 대비 초과수익, 거래량 반응, 공시 동반. 범위: 전체·국내·미국·코인·업종테마. 용어마다 설명 툴팁.</p></div>
       <div class="card"><span class="tag ok">구현</span><h3 style="color:var(--text);font-size:19px;margin-top:10px">종목 타임라인</h3><p class="note">주가 선 위에 언급 시점을 점으로(색 = 20일 뒤 상승·하락). DART 공시는 눈금으로. 언급별 표에 거래량 비율.</p></div>
       <div class="card"><span class="tag ok">구현 · 수업 필수 데이터</span><h3 style="color:var(--text);font-size:19px;margin-top:10px">데이터</h3><p class="note">파이프라인 5단계의 실제 건수, 출처 6개와 현재 상태, 채널 선정 규칙, 매칭 규칙, 못 잡은 제목 20개.</p></div>
     </div>
@@ -342,7 +343,7 @@
       <div class="card"><h3>수익 · 운영</h3><p style="margin:0"><b>개인 구독</b>: 관심 종목 언급 급증 알림 · 채널 상세 옵션. <b>B2B 데이터 API</b>: 종목별 언급량·반응 시계열. <b>운영비</b>: 전부 무료 티어 공개 API + 하루 1회 배치라 월 수 달러 수준.</p></div>
     </div>
     <div class="grid g2 rv d3" style="margin-top:18px">
-      <div class="card soft"><h3>지켜야 할 선</h3><p class="note" style="margin:0">채널 실명 랭킹 금지(익명 집계) · 종목 추천 문구 금지 · 표본 수 항상 표시 · 공개 메타데이터만(자막·댓글 미사용) · 투자 권유 아님 고지 고정.</p></div>
+      <div class="card soft"><h3>지켜야 할 선</h3><p class="note" style="margin:0">채널 실명·성적은 학습용 고지와 함께 · 종목 추천 문구 금지 · 표본 수 항상 표시 · 공개 메타데이터만(자막·댓글 미사용) · 투자 권유 아님 고지 고정.</p></div>
       <div class="card soft"><h3>확장</h3><p class="note" style="margin:0">사건만 바꾸면 같은 틀로 돈다: 트윗("비트코인" 언급 뒤 BTC), 뉴스 헤드라인, 증권사 목표가 상향. 후속 과목에서 자막·LLM 추출로 "사라/팔아라" 방향까지.</p></div>
     </div>
   </div>

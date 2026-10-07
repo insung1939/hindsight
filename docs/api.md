@@ -35,7 +35,7 @@
 | Method | Path | 기능 | 파라미터 | 요청 본문 | 응답 |
 |---|---|---|---|---|---|
 | GET | `/healthz` | 서비스 상태 | — | — | 200 json |
-| GET | `/v1/channels` | 채널 목록 (익명) | — | — | 200 ListChannels |
+| GET | `/v1/channels` | 채널 목록 (실명·핸들·구독자) | — | — | 200 ListChannels |
 | POST | `/v1/channels` | 채널 등록 (핸들 → YouTube API 로 id 조회) | — | ChannelIn | 201 ChannelOut |
 | GET | `/v1/videos` | 영상 목록 (since 이후, 게시일 오름차순). mentions 가 매일 새 영상을 받아간다 | since, channel_id, cursor, limit | — | 200 ListVideos |
 | GET | `/v1/videos/{video_id}` | 영상 하나 | video_id | — | 200 VideoOut |
@@ -61,7 +61,7 @@
 
 ## stats
 
-언급 뒤 5·20·60 거래일 수익률과 벤치마크 대비 초과수익. 채널은 익명 집계.
+언급 뒤 5·20·60 거래일 수익률과 벤치마크 대비 초과수익. 채널별 랭킹 포함.
 
 - 소유: `team-stats` · 호출하는 서비스: mentions, market-data
 - 서버: `http://localhost:8004`, `https://hindsight-stats.onrender.com`
@@ -72,6 +72,7 @@
 | GET | `/v1/summary` | 전체 분포 (scope=overall | market:KRX | market:US | market:CRYPTO | kind:theme | asset:<id> | channel:<id>) | scope, horizon | — | 200 SummaryOut |
 | GET | `/v1/summaries` | 요약 전부 (prefix 로 필터: overall · market · channel · asset) | prefix | — | 200 ListSummaries |
 | GET | `/v1/coverage` | 계산 현황 (데이터 페이지용): 언급별 수익률이 몇 건 채워졌나 | — | — | 200 StatsCoverage |
+| GET | `/v1/channels/ranking` | 채널 랭킹 — 언급 뒤 수익률 기준 상·하위 (metric=excess_mean|mean|win_rate, 표본 min_n 이상만) | horizon, metric, min_n, limit | — | 200 ChannelRanking |
 | GET | `/v1/assets/{asset_id}/events` | 종목 하나의 언급별 이후 수익률 (타임라인 화면) | asset_id | — | 200 ListEvents |
-| GET | `/v1/channels/{channel_id}/events` | 채널 하나의 언급별 이후 수익률 (익명 코드로만 노출) | channel_id | — | 200 ListEvents |
+| GET | `/v1/channels/{channel_id}/events` | 채널 하나의 언급별 이후 수익률 | channel_id | — | 200 ListEvents |
 | POST | `/internal/sync` | 새 언급의 수익률 계산 + 미완성 값 채우기 + 요약 갱신 | since_days, X-Internal-Token | — | 200 SyncResult |

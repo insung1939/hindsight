@@ -10,7 +10,7 @@ Base = db.Base
 
 
 class Channel(Base):
-    """추적 채널. anon_code 는 화면·통계에서 쓰는 익명 코드(A, B, C …). 실명(title)은 데이터 페이지에도 내지 않는다."""
+    """추적 채널. 2026-10-07 부터 실명(title·handle)을 API 로 내보낸다. anon_code 는 짧은 식별용."""
 
     __tablename__ = "channels"
     channel_id: Mapped[str] = mapped_column(String(40), primary_key=True)  # UC…
