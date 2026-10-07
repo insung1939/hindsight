@@ -13,7 +13,7 @@ from hs_common import InternalOnly, create_app
 from models import Asset, Disclosure, Price, db
 from seed import AMBIGUOUS_NAMES, seed_assets
 
-app = create_app("market-data", "힌드사이트 market-data", "0.2.0",
+app = create_app("market-data", "하인드사이트 market-data", "0.2.0",
                  "종목 사전(국내·미국·코인·지수 + 별칭) · 일별 시세. 출처: DART corpCode, 공공데이터포털, Yahoo Finance, 업비트.")
 
 
@@ -149,6 +149,31 @@ def list_assets(market: str | None = None, tracked: bool | None = None, q: str |
         ql = q.lower()
         rows = [a for a in rows if ql in a.name.lower() or any(ql in al.lower() for al in (a.aliases or [])) or ql in a.symbol.lower()]
     return {"items": rows[:limit], "next_cursor": None}
+
+
+class AssetName(BaseModel):
+    asset_id: str
+    name: str
+    market: str
+    symbol: str
+    asset_type: str
+    benchmark_id: str | None = None
+    aliases: list[str] = []
+
+
+class ListAssetNames(BaseModel):
+    items: list[AssetName]
+    next_cursor: str | None = None
+
+
+@app.get("/v1/assets/names", response_model=ListAssetNames, tags=["assets"], operation_id="list_asset_names",
+         summary="화면용 가벼운 사전 — 언급된 적 있는(tracked) 종목·테마·지수의 이름·별칭만")
+def list_asset_names(all: bool = Query(default=False, description="true 면 사전 전체(4천여 개)"), s: Session = Depends(db.session)):
+    q = select(Asset.asset_id, Asset.name, Asset.market, Asset.symbol, Asset.asset_type, Asset.benchmark_id, Asset.aliases)
+    if not all:
+        q = q.where(Asset.tracked == True)  # noqa: E712
+    rows = s.execute(q.order_by(Asset.asset_id)).all()
+    return {"items": [{"asset_id": a, "name": n, "market": m, "symbol": sym, "asset_type": t, "benchmark_id": b, "aliases": al or []} for a, n, m, sym, t, b, al in rows], "next_cursor": None}
 
 
 @app.get("/v1/assets/{asset_id}", response_model=AssetOut, tags=["assets"], operation_id="get_asset", summary="자산 하나")

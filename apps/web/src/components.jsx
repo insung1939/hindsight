@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { onProgress } from "./api";
 
 // ── 데이터 훅: 로딩 중에도 이전 데이터를 유지해 화면이 뚝 끊기지 않게 ──
 export function useLoad(fn, deps) {
@@ -16,28 +18,48 @@ export function useLoad(fn, deps) {
 
 // ── 용어 설명: 점선 밑줄 + 떠오르는 설명 ──
 export const GLOSSARY = {
-  mention: ["언급", "유튜브 영상 제목에 종목 이름이나 별칭(삼전, 하닉, 엔비디아…)이 등장한 것. 영상 하나에 여러 종목이 있을 수 있고, '사라'인지 '조심하라'인지는 판단하지 않습니다."],
-  t0: ["사건일(T0)", "영상을 보고 처음 거래할 수 있는 날의 종가를 기준점으로 씁니다. 국내는 15:30 전 게시면 그날, 뒤면 다음 거래일. 미국은 동부 16:00, 코인은 업비트 일봉(09:00) 기준."],
-  horizon: ["5·20·60 거래일 수익률", "사건일 종가 대비 5거래일(약 1주), 20거래일(약 1개월), 60거래일(약 3개월) 뒤 종가의 변화율입니다. 주말·휴장일은 세지 않습니다."],
-  excess: ["초과수익 (시장 대비)", "같은 기간 벤치마크 수익률을 뺀 값입니다. 국내는 코스피, 미국은 S&P500, 코인은 비트코인. 종목이 올랐어도 시장이 더 올랐으면 음수입니다."],
-  win: ["상승 확률", "기간이 지난 언급 가운데 수익률이 0보다 큰 비율. 50%면 동전 던지기와 같습니다."],
-  xwin: ["시장을 이긴 비율", "초과수익이 0보다 큰 언급의 비율."],
-  vol: ["거래량 비율", "언급 뒤 5거래일 평균 거래량 ÷ 언급 전 20거래일 평균 거래량. 1보다 크면 언급 뒤에 거래가 늘었고, 1보다 작으면 언급 전에 이미 거래가 몰렸다는 뜻입니다."],
-  disc: ["주요 공시 동반", "사건일 앞뒤 3일 안에 DART 주요 공시(실적·계약·자금조달·주요사항)가 있었던 국내 종목 언급의 비율. 유튜브 언급이 공시를 따라 나온 해설인지 가늠합니다."],
-  n: ["표본 (n)", "기간이 지나 수익률이 계산된 언급 수. 30건 미만이면 참고용으로만 보세요."],
-  surge: ["급증 배수", "최근 N일 언급 수 ÷ 직전 N일 언급 수. 직전이 0이면 '신규'로 표시합니다."],
-  prev: ["직전", "선택한 기간 바로 앞 같은 길이의 기간에 있었던 언급 수. 7일을 골랐으면 8~14일 전."],
-  views: ["조회수", "최근 N일 안에 이 종목을 언급한 영상들의 조회수 합계(수집 시점 기준). 채널 수와 함께 얼마나 널리 들렸는지를 봅니다."],
-  channels: ["채널 수", "그 기간에 이 종목을 한 번이라도 언급한 채널의 수. 한 채널이 여러 번 말한 것과 여러 채널이 말한 것을 구분합니다."],
-  past: ["과거 반응", "이 종목이 이전에 언급됐을 때 20거래일 뒤 평균 수익률. '전에 떴을 때 어땠나'를 보여주며, 표본이 적으면 참고용입니다."],
-  theme: ["업종·테마", "'반도체 급등', '코스피 폭락'처럼 종목 없이 업종만 말한 제목도 사건으로 세고, 대표 ETF(KODEX 반도체 등)의 수익률로 잽니다. 종목 통계와 섞지 않습니다."],
-  match: ["매칭 성공률", "수집한 영상 제목 가운데 종목이나 테마를 하나라도 찾아낸 비율. 못 찾은 제목도 버리지 않고 남겨 사전 보강에 씁니다."],
+  mention: ["언급", "영상 제목에 종목 이름·별칭(삼전, 하닉, 엔비디아)이 나온 것. 사라는 건지 조심하라는 건지는 안 가린다."],
+  t0: ["사건일(T0)", "영상을 보고 처음 거래할 수 있는 날. 국내 15:30 전 게시면 그날, 뒤면 다음 거래일. 미국 동부 16:00, 코인은 업비트 09:00 캔들."],
+  horizon: ["5·20·60 거래일 수익률", "사건일 종가 대비 5거래일(1주)·20거래일(1개월)·60거래일(3개월) 뒤 종가 변화율. 휴장일은 안 센다."],
+  excess: ["시장 대비", "같은 기간 벤치마크(코스피·S&P500·비트코인) 수익률을 뺀 값. 시장이 더 올랐으면 음수."],
+  win: ["상승 확률", "수익률이 0보다 큰 언급의 비율. 50%면 동전 던지기."],
+  xwin: ["시장 이김", "시장 대비 수익률이 0보다 큰 비율."],
+  vol: ["거래량 비율", "언급 뒤 5일 평균 거래량 ÷ 언급 전 20일 평균. 1 미만이면 거래는 언급 전에 이미 몰렸다."],
+  disc: ["공시 동반", "사건일 ±3일에 DART 주요 공시(실적·계약·자금조달·주요사항)가 있던 국내 언급의 비율."],
+  n: ["표본", "기간이 지나 수익률이 계산된 언급 수. 30건 미만은 참고용."],
+  surge: ["급증", "최근 N일 언급 ÷ 직전 N일 언급. 직전이 0이면 신규."],
+  prev: ["직전", "바로 앞 같은 길이 기간의 언급 수. 7일이면 8~14일 전."],
+  views: ["조회수", "그 기간에 이 종목을 언급한 영상들의 조회수 합(수집 시점)."],
+  channels: ["채널 수", "그 기간에 이 종목을 언급한 채널 수."],
+  past: ["과거 반응", "이 종목이 전에 언급됐을 때 20거래일 뒤 평균 수익률."],
+  theme: ["업종·테마", "'반도체 급등'처럼 종목 없이 업종만 말한 제목. 대표 ETF 수익률로 재고 종목과 섞지 않는다."],
+  match: ["매칭 성공률", "제목에서 종목이나 테마를 하나라도 찾은 비율. 못 찾은 제목도 남겨 둔다."],
 };
 export function Term({ k, children }) {
   const [label, text] = GLOSSARY[k] || [k, ""];
+  const ref = useRef(null);
+  const [pos, setPos] = useState(null);
+  const show = () => {
+    const r = ref.current?.getBoundingClientRect(); if (!r) return;
+    const w = Math.min(320, window.innerWidth - 24);
+    setPos({ left: Math.max(12, Math.min(r.left, window.innerWidth - w - 12)), top: r.bottom + 8, w, above: r.bottom + 140 > window.innerHeight ? r.top : null });
+  };
   return (
-    <span className="term" tabIndex={0}>{children || label}<span className="tip" role="tooltip"><b>{label}</b> — {text}</span></span>
+    <span ref={ref} className="term" tabIndex={0} onMouseEnter={show} onMouseLeave={() => setPos(null)} onFocus={show} onBlur={() => setPos(null)}>
+      {children || label}
+      {pos && createPortal(
+        <span className="tip" role="tooltip" style={{ left: pos.left, width: pos.w, ...(pos.above != null ? { bottom: window.innerHeight - pos.above + 8 } : { top: pos.top }) }}>
+          <b>{label}</b><br />{text}
+        </span>, document.body)}
+    </span>
   );
+}
+
+// 상단 로딩 바 — 요청이 하나라도 진행 중이면 흐른다
+export function LoadingBar() {
+  const [n, setN] = useState(0);
+  useEffect(() => onProgress(setN), []);
+  return <div className={"loadbar " + (n > 0 ? "on" : "")} aria-hidden />;
 }
 
 export function Stat({ k, label, value, sub, cls, loading }) {
@@ -82,5 +104,5 @@ export function Histogram({ hist, loading }) {
 }
 
 export function Disclaimer() {
-  return <p className="disclaimer">이 통계는 학습용이며 투자 권유가 아닙니다. 영상 제목만 보고 '언급'을 셌을 뿐, 영상이 사라고 했는지 조심하라고 했는지는 구분하지 않습니다.</p>;
+  return <p className="disclaimer">학습용 통계. 투자 권유 아님. 제목만 보고 언급을 셌고 영상의 방향(매수·매도)은 가리지 않았다.</p>;
 }

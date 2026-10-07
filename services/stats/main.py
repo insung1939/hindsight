@@ -11,7 +11,7 @@ from engine import HORIZONS, event_day, forward_returns, summarize
 from hs_common import InternalOnly, ServiceClient, create_app
 from models import EventReturn, Summary, db
 
-app = create_app("stats", "힌드사이트 stats", "0.1.0", "언급 뒤 5·20·60 거래일 수익률과 벤치마크 대비 초과수익. 채널별 랭킹 포함.")
+app = create_app("stats", "하인드사이트 stats", "0.1.0", "언급 뒤 5·20·60 거래일 수익률과 벤치마크 대비 초과수익. 채널별 랭킹 포함.")
 mentions = ServiceClient("mentions", timeout=60)
 market = ServiceClient("market-data", timeout=120)
 
@@ -113,11 +113,18 @@ def get_summary(scope: str = "overall", horizon: int = Query(default=20, descrip
 
 @app.get("/v1/summaries", response_model=ListSummaries, tags=["summary"], operation_id="list_summaries",
          summary="요약 전부 (prefix 로 필터: overall · market · channel · asset)")
-def list_summaries(prefix: str | None = None, s: Session = Depends(db.session)):
+def list_summaries(prefix: str | None = None, horizon: int | None = Query(default=None, description="5 · 20 · 60 중 하나만"),
+                   slim: bool = Query(default=False, description="true 면 histogram 을 빼고 준다 (목록 화면용, 응답 1/5)"),
+                   s: Session = Depends(db.session)):
     q = select(Summary)
     if prefix:
         q = q.where(Summary.key.like(f"{prefix}%"))
-    return {"items": s.scalars(q.order_by(Summary.key)).all(), "next_cursor": None}
+    if horizon:
+        q = q.where(Summary.key.like(f"%:{horizon}"))
+    rows = s.scalars(q.order_by(Summary.key)).all()
+    if slim:
+        rows = [{"key": r.key, "updated_at": r.updated_at, "value": {k: v for k, v in r.value.items() if k != "histogram"}} for r in rows]
+    return {"items": rows, "next_cursor": None}
 
 
 @app.get("/v1/coverage", response_model=StatsCoverage, tags=["ops"], operation_id="get_stats_coverage",

@@ -41,12 +41,12 @@ export default function DataPage() {
       <div className="page-head">
         <div className="eyebrow">데이터</div>
         <h1>어떤 데이터를, 어디서, 어떻게 가공했나</h1>
-        <p>외부 공개 API 6개에서 받아 매일 한 번 다섯 단계로 가공합니다. 아래 숫자는 지금 데이터베이스에 쌓인 실제 건수입니다. API 문서는 <a href={API_BASE + "/docs"} target="_blank" rel="noreferrer" style={{ color: "var(--accent)" }}>Swagger</a>, 코드와 테이블 설명은 <a href="https://github.com/insung1939/hindsight" target="_blank" rel="noreferrer" style={{ color: "var(--accent)" }}>GitHub</a>에 있습니다.</p>
+        <p>공개 API 6개 → 매일 한 번 5단계 가공. 숫자는 지금 DB의 실제 건수. <a href={API_BASE + "/docs"} target="_blank" rel="noreferrer" style={{ color: "var(--accent)" }}>Swagger</a> · <a href="https://github.com/insung1939/hindsight" target="_blank" rel="noreferrer" style={{ color: "var(--accent)" }}>GitHub</a></p>
       </div>
       <ErrorBox error={d.error} />
 
       <div className="card" style={{ marginBottom: 16 }}>
-        <div className="card-head"><div><h2>파이프라인 — 매일 07:10, GitHub Actions</h2><p>외부 API에서 받아(①②) → 종목·테마로 바꾸고(③) → 시세·거래량·공시를 붙여(④) → 언급 뒤 수익률을 계산한다(⑤). 화면은 계산된 결과만 읽습니다.</p></div></div>
+        <div className="card-head"><div><h2>파이프라인</h2><p>매일 07:10 GitHub Actions. 화면은 계산된 결과만 읽는다.</p></div></div>
         <div className="pipe">
           <Step n="① 영상 수집" loading={loading} big={yt && num(yt.videos)} unit="편" sub={yt && `채널 ${yt.channels}개 · ${dateOnly(yt.first_published)} ~ ${dateOnly(yt.last_published)}`} />
           <Step n="② 종목·테마 사전" loading={loading} big={totalAssets && num(totalAssets)} unit="개" sub={mk && Object.entries(mk.assets_by_market).map(([k, v]) => `${k} ${num(v.total)}`).join(" · ")} />
@@ -58,7 +58,7 @@ export default function DataPage() {
 
       <div className="grid">
         <div className="card col-12">
-          <div className="card-head"><div><h2>데이터 출처 6개</h2><p>전부 공개 API. 인증키는 서버 환경변수에만 두고 저장소·화면에는 없습니다. 자막·댓글은 수집하지 않습니다.</p></div></div>
+          <div className="card-head"><div><h2>데이터 출처 6개</h2><p>전부 공개 API · 키는 서버 환경변수에만 · 자막·댓글은 안 모은다</p></div></div>
           <div className="table-wrap"><table>
             <thead><tr><th>명칭 · 기관</th><th>가져오는 것</th><th>어떻게 쓰나</th><th>지금</th></tr></thead>
             <tbody>{SOURCES.map((s) => (
@@ -73,7 +73,7 @@ export default function DataPage() {
         </div>
 
         <div className="card col-6">
-          <div className="card-head"><div><h3>채널 {chList.length}개 — 사람이 고르지 않았다</h3><p>YouTube 검색으로 후보 547개를 모아 구독자·업로드 빈도·제목의 종목 언급률·쇼츠 비율을 재고 두 단계 규칙으로 걸렀습니다.</p></div></div>
+          <div className="card-head"><div><h3>채널 {chList.length}개 · 사람이 고르지 않았다</h3><p>후보 547개를 API로 재서 두 단계 규칙으로 걸렀다</p></div></div>
           <div className="table-wrap" style={{ marginBottom: 12 }}><table>
             <thead><tr><th>단</th><th>구독자</th><th>언급률</th><th>뜻</th></tr></thead>
             <tbody>
@@ -81,10 +81,10 @@ export default function DataPage() {
               <tr><td><span className="chip">B</span></td><td>주식 5만 · 코인 10만 이상</td><td>30% 이상</td><td className="muted" style={{ fontSize: 13 }}>규모는 작아도 제목에 종목을 콕 집는다</td></tr>
             </tbody>
           </table></div>
-          <p className="muted" style={{ fontSize: 13, margin: 0 }}>공통: 45일 내 활동 · 쇼츠 50% 이하 · 방송사·증권사·거래소 공식 채널 제외. 구독자 373만 채널도 제목에 종목이 2%뿐이면 제외됐습니다.</p>
+          <p className="muted" style={{ fontSize: 13, margin: 0 }}>공통: 45일 내 활동 · 쇼츠 50% 이하 · 방송사·증권사·거래소 제외. 구독자 373만이어도 제목에 종목이 2%면 탈락.</p>
         </div>
         <div className="card col-6">
-          <div className="card-head"><div><h3>매칭 규칙 (mentions/matcher.py)</h3><p>규칙마다 테스트가 있어 AI가 쓴 코드를 검증합니다.</p></div></div>
+          <div className="card-head"><div><h3>매칭 규칙</h3><p>규칙마다 테스트가 있다</p></div></div>
           <ul className="muted" style={{ paddingLeft: 18, margin: 0, fontSize: 13.5, lineHeight: 1.75 }}>
             <li>사전(이름·별칭)을 <b style={{ color: "var(--text)" }}>긴 표현부터</b> 정확 매칭. "삼성전자우"가 "삼성전자"보다 먼저, 잡힌 구간은 지워 중복 방지</li>
             <li>흔한 단어(삼성·현대·KT·은행…)는 단독 매칭 금지. "한국은행", "스트레스" 같은 표현은 먼저 지움</li>
@@ -95,7 +95,7 @@ export default function DataPage() {
         </div>
 
         <div className="card col-6">
-          <div className="card-head"><div><h3>채널 목록</h3><p>구독자 순. 채널 페이지에서 언급 뒤 성적을 비교할 수 있습니다.</p></div></div>
+          <div className="card-head"><div><h3>채널 목록</h3><p>구독자 순</p></div></div>
           {loading ? <SkeletonRows n={8} /> : (
             <div className="table-wrap" style={{ maxHeight: 400, overflowY: "auto" }}><table>
               <thead><tr><th>채널</th><th>분류</th><th className="num">구독자</th></tr></thead>
@@ -104,7 +104,7 @@ export default function DataPage() {
           )}
         </div>
         <div className="card col-6">
-          <div className="card-head"><div><h3>종목을 못 잡은 제목 (최근 20개)</h3><p><Term k="match">매칭 성공률</Term>의 반대편. 대부분 종목이 아니라 시황·거시 이야기이고, 종목이 있는데 놓친 것은 별칭 사전에 추가합니다.</p></div></div>
+          <div className="card-head"><div><h3>못 잡은 제목 · 최근 20개</h3><p><Term k="match">매칭 성공률</Term>의 반대편. 대부분 시황·거시 얘기. 놓친 종목은 사전에 추가</p></div></div>
           {loading ? <SkeletonRows n={8} /> : (
             <ul style={{ paddingLeft: 18, margin: 0, fontSize: 13.5, lineHeight: 1.7, maxHeight: 400, overflowY: "auto" }}>
               {(un?.items || []).map((u) => <li key={u.video_id}>{u.title} <span className="muted">{dateOnly(u.published_at)}</span></li>)}
@@ -113,11 +113,7 @@ export default function DataPage() {
         </div>
         <div className="card col-12 flat">
           <div className="card-head"><div><h3>지키는 것</h3></div></div>
-          <ul className="muted" style={{ paddingLeft: 18, margin: 0, fontSize: 13.5, lineHeight: 1.75 }}>
-            <li>공개 메타데이터만 쓴다(제목·게시일·조회수). 자막·댓글은 수집하지 않는다.</li>
-            <li>특정 종목을 추천하지 않는다. 통계와 <Term k="n">표본 수</Term>만 보여주고 30건 미만은 참고용으로 표시한다.</li>
-            <li>채널 이름은 보여주되 "누가 틀렸나"가 아니라 "유튜브 언급을 따라가면 어떻게 되나"를 보는 학습용 통계임을 고지한다.</li>
-          </ul>
+          <div className="controls"><span className="chip">공개 메타데이터만</span><span className="chip">종목 추천 없음</span><span className="chip">표본 수 항상 표시</span><span className="chip">학습용 고지</span></div>
           <Disclaimer />
         </div>
       </div>

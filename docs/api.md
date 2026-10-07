@@ -16,6 +16,7 @@
 | GET | `/healthz` | 서비스 상태 | — | — | 200 json |
 | GET | `/v1/dictionary` | 종목 사전 전체 (이름·별칭 → asset_id). mentions 서비스가 매칭에 쓴다 | market | — | 200 ListDictionary |
 | GET | `/v1/assets` | 자산 목록 | market, tracked, q, limit | — | 200 ListAssets |
+| GET | `/v1/assets/names` | 화면용 가벼운 사전 — 언급된 적 있는(tracked) 종목·테마·지수의 이름·별칭만 | all | — | 200 ListAssetNames |
 | GET | `/v1/assets/{asset_id}` | 자산 하나 | asset_id | — | 200 AssetOut |
 | POST | `/v1/assets/{asset_id}/track` | 시세 수집 대상으로 켠다 (mentions 가 새 종목을 발견했을 때 호출) | asset_id | — | 200 AssetOut |
 | GET | `/v1/assets/{asset_id}/prices` | 일별 종가 이력 | asset_id, from, to, limit | — | 200 ListPrices |
@@ -70,7 +71,7 @@
 |---|---|---|---|---|---|
 | GET | `/healthz` | 서비스 상태 | — | — | 200 json |
 | GET | `/v1/summary` | 전체 분포 (scope=overall | market:KRX | market:US | market:CRYPTO | kind:theme | asset:<id> | channel:<id>) | scope, horizon | — | 200 SummaryOut |
-| GET | `/v1/summaries` | 요약 전부 (prefix 로 필터: overall · market · channel · asset) | prefix | — | 200 ListSummaries |
+| GET | `/v1/summaries` | 요약 전부 (prefix 로 필터: overall · market · channel · asset) | prefix, horizon, slim | — | 200 ListSummaries |
 | GET | `/v1/coverage` | 계산 현황 (데이터 페이지용): 언급별 수익률이 몇 건 채워졌나 | — | — | 200 StatsCoverage |
 | GET | `/v1/channels/ranking` | 채널 랭킹 — 언급 뒤 수익률 기준 상·하위 (metric=excess_mean|mean|win_rate, 표본 min_n 이상만) | horizon, metric, min_n, limit | — | 200 ChannelRanking |
 | GET | `/v1/assets/{asset_id}/events` | 종목 하나의 언급별 이후 수익률 (타임라인 화면) | asset_id | — | 200 ListEvents |

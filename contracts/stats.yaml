@@ -1,6 +1,6 @@
 openapi: 3.1.0
 info:
-  title: 힌드사이트 stats
+  title: 하인드사이트 stats
   description: 언급 뒤 5·20·60 거래일 수익률과 벤치마크 대비 초과수익. 채널별 랭킹 포함.
   contact:
     name: stats owner
@@ -89,6 +89,25 @@ paths:
           - type: string
           - type: 'null'
           title: Prefix
+      - name: horizon
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          description: 5 · 20 · 60 중 하나만
+          title: Horizon
+        description: 5 · 20 · 60 중 하나만
+      - name: slim
+        in: query
+        required: false
+        schema:
+          type: boolean
+          description: true 면 histogram 을 빼고 준다 (목록 화면용, 응답 1/5)
+          default: false
+          title: Slim
+        description: true 면 histogram 을 빼고 준다 (목록 화면용, 응답 1/5)
       - name: X-Request-ID
         in: header
         required: false

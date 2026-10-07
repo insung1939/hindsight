@@ -23,6 +23,11 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const listeners = new Set();
 export const onWaking = (fn) => { listeners.add(fn); return () => listeners.delete(fn); };
 const notify = (state) => listeners.forEach((fn) => fn(state));
+// 진행 중 요청 수 — 상단 로딩 바가 본다
+let pending = 0;
+const progressListeners = new Set();
+export const onProgress = (fn) => { progressListeners.add(fn); return () => progressListeners.delete(fn); };
+const bump = (d) => { pending = Math.max(0, pending + d); progressListeners.forEach((fn) => fn(pending)); };
 const cache = new Map(); // 같은 세션 안에서 같은 GET 은 한 번만 (사전·채널·요약처럼 큰 응답)
 
 export async function api(service, path, { method = "GET", body, params, ttl = 0 } = {}) {
@@ -32,6 +37,8 @@ export async function api(service, path, { method = "GET", body, params, ttl = 0
   if (key && cache.has(key) && cache.get(key).exp > Date.now()) return cache.get(key).data;
   const init = { method, headers: body ? { "Content-Type": "application/json" } : {}, body: body ? JSON.stringify(body) : undefined };
   let lastErr = null;
+  bump(1);
+  try {
   for (let attempt = 0; attempt < 5; attempt++) {
     if (attempt) { notify({ waking: true, attempt }); await sleep(attempt * 5000); }
     let res;
@@ -49,6 +56,7 @@ export async function api(service, path, { method = "GET", body, params, ttl = 0
   }
   notify({ waking: false, failed: true });
   throw lastErr;
+  } finally { bump(-1); }
 }
 
 export const pct = (x, d = 1) => (x == null ? "—" : ((x > 0 ? "+" : "") + (x * 100).toFixed(d) + "%"));
@@ -59,9 +67,15 @@ export const compact = (n) => (n == null ? "—" : n >= 1e8 ? (n / 1e8).toFixed(
 export const sign = (x) => (x > 0 ? "pos" : x < 0 ? "neg" : "");
 
 // 종목 이름 캐시 — market-data 사전을 한 번 받아 asset_id → 자산
-export async function assetNames() {
-  const d = await api("marketData", "/v1/assets", { params: { limit: 5000 }, ttl: 10 * 60e3 });
+export async function assetNames(all = false) {
+  const d = await api("marketData", "/v1/assets/names", { params: all ? { all: true } : undefined, ttl: 10 * 60e3 });
   return Object.fromEntries(d.items.map((a) => [a.asset_id, a]));
+}
+// 종목별 요약(한 기간, 히스토그램 없이) — asset_id → value
+export async function assetSummaries(horizon) {
+  const s = await api("stats", "/v1/summaries", { params: { prefix: "asset:", horizon, slim: true }, ttl: 5 * 60e3 });
+  const suf = `:${horizon}`;
+  return Object.fromEntries(s.items.map((i) => [i.key.slice(6, -suf.length), i.value]));
 }
 // 채널 캐시 — channel_id → {title, handle, anon_code, category, subscriber_count}
 export async function channelMap() {

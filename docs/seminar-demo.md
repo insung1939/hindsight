@@ -1,6 +1,6 @@
 # 세미나 데모 런북 — "MSA 환경에서 REST API를 효율적으로 관리하는 방법"
 
-힌드사이트 저장소 하나로 Before/After 를 보여준다. 순서: **OpenAPI → Spectral → oasdiff → (Pact) → APISIX → OpenTelemetry/Grafana → Backstage → Kubernetes**.
+하인드사이트 저장소 하나로 Before/After 를 보여준다. 순서: **OpenAPI → Spectral → oasdiff → (Pact) → APISIX → OpenTelemetry/Grafana → Backstage → Kubernetes**.
 각 단계는 "문제 → 도구 → 화면에서 보이는 것" 으로 말한다. 준비: `make compose-all` (서비스 4개 + 게이트웨이 + 관측 스택), `make up` 없이도 됨.
 
 ## 0. 무대 — 서비스 4개, 호출 관계

@@ -1,6 +1,6 @@
 openapi: 3.1.0
 info:
-  title: 힌드사이트 market-data
+  title: 하인드사이트 market-data
   description: '종목 사전(국내·미국·코인·지수 + 별칭) · 일별 시세. 출처: DART corpCode, 공공데이터포털, Yahoo
     Finance, 업비트.'
   contact:
@@ -120,6 +120,41 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListAssets'
+        '422':
+          description: Validation Error
+          content: *id001
+        '500':
+          description: 서버 내부 오류
+          content: *id001
+  /v1/assets/names:
+    get:
+      tags:
+      - assets
+      summary: 화면용 가벼운 사전 — 언급된 적 있는(tracked) 종목·테마·지수의 이름·별칭만
+      operationId: list_asset_names
+      parameters:
+      - name: all
+        in: query
+        required: false
+        schema:
+          type: boolean
+          description: true 면 사전 전체(4천여 개)
+          default: false
+          title: All
+        description: true 면 사전 전체(4천여 개)
+      - name: X-Request-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListAssetNames'
         '422':
           description: Validation Error
           content: *id001
@@ -489,6 +524,42 @@ paths:
           content: *id001
 components:
   schemas:
+    AssetName:
+      properties:
+        asset_id:
+          type: string
+          title: Asset Id
+        name:
+          type: string
+          title: Name
+        market:
+          type: string
+          title: Market
+        symbol:
+          type: string
+          title: Symbol
+        asset_type:
+          type: string
+          title: Asset Type
+        benchmark_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Benchmark Id
+        aliases:
+          items:
+            type: string
+          type: array
+          title: Aliases
+          default: []
+      type: object
+      required:
+      - asset_id
+      - name
+      - market
+      - symbol
+      - asset_type
+      title: AssetName
     AssetOut:
       properties:
         asset_id:
@@ -630,6 +701,22 @@ components:
       - report_nm
       - kind
       title: DisclosureOut
+    ListAssetNames:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/AssetName'
+          type: array
+          title: Items
+        next_cursor:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Next Cursor
+      type: object
+      required:
+      - items
+      title: ListAssetNames
     ListAssets:
       properties:
         items:

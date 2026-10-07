@@ -13,7 +13,7 @@ import collectors
 from hs_common import InternalOnly, create_app
 from models import Channel, Video, db
 
-app = create_app("youtube", "힌드사이트 youtube", "0.1.0",
+app = create_app("youtube", "하인드사이트 youtube", "0.1.0",
                  "추적 채널과 영상 메타데이터(제목·설명·게시일·조회수). 출처: YouTube Data API v3.")
 
 
