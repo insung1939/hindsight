@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { api, assetNames, assetSummaries, num, pct, pct0, sign, HORIZON_LABEL, STANCES } from "../api";
+import { api, assetNames, assetSummaries, num, pct, pct0, sign, HORIZON_LABEL } from "../api";
 import { Disclaimer, ErrorBox, GLOSSARY, Histogram, Seg, SkeletonRows, Stat, Term, useLoad } from "../components";
 
 const SCOPES = [["overall", "종목·코인 전체"], ["market:KRX", "국내"], ["market:US", "미국"], ["market:CRYPTO", "코인"], ["kind:theme", "업종·테마"]];
@@ -8,10 +8,9 @@ const H = (h) => HORIZON_LABEL[h].split(" ")[0];
 export default function Analysis({ go }) {
   const [horizon, setHorizon] = useState(20);
   const [scope, setScope] = useState("overall");
-  const [stance, setStance] = useState("bull");
+  const stance = "bull";  // 서비스는 "오른다"고 한 언급만 센다
   const sum = useLoad(() => api("stats", "/v1/summary", { params: { scope, horizon, stance }, ttl: 5 * 60e3 }).then((r) => r.value), [scope, horizon, stance]);
   const markets = useLoad(() => Promise.all(SCOPES.map(([k]) => api("stats", "/v1/summary", { params: { scope: k, horizon, stance }, ttl: 5 * 60e3 }).then((r) => [k, r.value]).catch(() => [k, null]))), [horizon, stance]);
-  const compare = useLoad(() => Promise.all(["bull", "bear", "neutral"].map((st) => api("stats", "/v1/summary", { params: { scope, horizon, stance: st }, ttl: 5 * 60e3 }).then((r) => [st, r.value]).catch(() => [st, null]))), [scope, horizon]);
   const assets = useLoad(async () => {
     const [s, names] = await Promise.all([assetSummaries(horizon, stance), assetNames()]);
     return Object.entries(s).map(([id, v]) => ({ id, asset: names[id], ...v })).filter((a) => a.n > 0);
@@ -23,12 +22,11 @@ export default function Analysis({ go }) {
     <div className="page container">
       <div className="page-head">
         <div className="eyebrow">언급 뒤에</div>
-        <h1>{stance === "bull" ? "오른다고 한 뒤" : stance === "bear" ? "내린다고 한 뒤" : "언급 뒤"} {H(horizon)}, 주가는 어땠나</h1>
-        <p>{stance === "bull" ? "제목이 낙관적인 언급(오른다·급등·매수·기회…)만 센다. 유튜브가 좋다고 한 종목이 실제로 올랐나." : stance === "bear" ? "제목이 비관적인 언급(하락·폭락·매도·조심…)만 센다." : "논조와 상관없이 1년치 언급 전체."}</p>
+        <h1>오른다고 한 뒤 {H(horizon)}, 주가는 어땠나</h1>
+        <p>제목이 낙관적인 언급(오른다·급등·매수·기회…)만 센다. 유튜브가 좋다고 한 종목이 실제로 올랐나.</p>
       </div>
       <div className="card" style={{ marginBottom: 16 }}>
         <div className="controls">
-          <Seg value={stance} onChange={setStance} options={STANCES} />
           <Seg value={horizon} onChange={setHorizon} options={[[5, "5거래일 · 1주"], [20, "20거래일 · 1개월"], [60, "60거래일 · 3개월"]]} />
           <Seg value={scope} onChange={setScope} options={SCOPES} />
         </div>
@@ -50,21 +48,6 @@ export default function Analysis({ go }) {
         </div>
       </div>
       <div className="grid">
-        <div className="card col-12">
-          <div className="card-head"><div><h3>낙관 · 비관 · 중립 언급 뒤 ({H(horizon)} · {SCOPES.find((x) => x[0] === scope)[1]})</h3><p>유튜브가 좋다고 한 종목과 나쁘다고 한 종목, 그 뒤가 달랐나</p></div></div>
-          {compare.loading && !compare.data ? <SkeletonRows n={3} /> : (
-            <div className="table-wrap"><table>
-              <thead><tr><th><Term k="stance">논조</Term></th><th className="num"><Term k="n">표본</Term></th><th className="num">평균</th><th className="num">중앙값</th><th className="num"><Term k="win">상승</Term></th><th className="num"><Term k="excess">시장 대비</Term></th><th className="num"><Term k="vol">거래량</Term></th></tr></thead>
-              <tbody>{(compare.data || []).map(([st, m]) => (
-                <tr key={st} className={"clickable " + (st === stance ? "hl" : "")} onClick={() => setStance(st)}>
-                  <td><span className={"chip " + (st === "bull" ? "up" : st === "bear" ? "down" : "")}>{st === "bull" ? "낙관" : st === "bear" ? "비관" : "중립"}</span></td>
-                  <td className="num">{m?.n ? num(m.n) : "—"}</td><td className={"num " + sign(m?.mean)}>{pct(m?.mean)}</td><td className={"num " + sign(m?.median)}>{pct(m?.median)}</td>
-                  <td className="num">{pct0(m?.win_rate)}</td><td className={"num " + sign(m?.excess_mean)}>{pct(m?.excess_mean)}</td><td className="num">{m?.vol_ratio_median ? m.vol_ratio_median + "배" : "—"}</td>
-                </tr>
-              ))}</tbody>
-            </table></div>
-          )}
-        </div>
         <div className="card col-6">
           <div className="card-head"><div><h3>범위별 ({H(horizon)})</h3></div></div>
           {markets.loading && !markets.data ? <SkeletonRows n={5} /> : (

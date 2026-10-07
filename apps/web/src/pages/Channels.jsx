@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { api, channelMap, compact, num, pct, pct0, sign, HORIZON_LABEL, STANCES } from "../api";
+import { api, channelMap, compact, num, pct, pct0, sign, HORIZON_LABEL } from "../api";
 import { Disclaimer, ErrorBox, Seg, SkeletonRows, Term, useLoad } from "../components";
 
 const METRICS = [["excess_mean", "시장 대비"], ["mean", "평균 수익률"], ["win_rate", "상승 확률"], ["asset_win_rate", "종목 승률"]];
@@ -43,8 +43,7 @@ function BarChart({ rows, metric, chs }) {
 export default function Channels() {
   const [horizon, setHorizon] = useState(20);
   const [metric, setMetric] = useState("excess_mean");
-  const [stance, setStance] = useState("bull");
-  const data = useLoad(() => Promise.all([api("stats", "/v1/channels/ranking", { params: { horizon, metric, stance, min_n: 30, min_assets: 10, limit: 3 }, ttl: 5 * 60e3 }), channelMap()]), [horizon, metric, stance]);
+  const data = useLoad(() => Promise.all([api("stats", "/v1/channels/ranking", { params: { horizon, metric, stance: "bull", min_n: 30, min_assets: 10, limit: 3 }, ttl: 5 * 60e3 }), channelMap()]), [horizon, metric]);
   const [rank, chs] = data.data || [null, {}];
   const all = rank?.all || [];
 
@@ -52,13 +51,12 @@ export default function Channels() {
     <div className="page container">
       <div className="page-head">
         <div className="eyebrow">채널</div>
-        <h1>어느 채널이 {stance === "bull" ? "오른다고 한" : stance === "bear" ? "내린다고 한" : "말한"} 종목이 그 뒤에 잘 갔나</h1>
-        <p>채널이 {stance === "bull" ? "낙관적으로 " : stance === "bear" ? "비관적으로 " : ""}말한 종목들의 {HORIZON_LABEL[horizon].split(" ")[0]} 뒤 성적</p>
+        <h1>어느 채널이 오른다고 한 종목이 그 뒤에 잘 갔나</h1>
+        <p>채널이 오른다고 한 종목들의 {HORIZON_LABEL[horizon].split(" ")[0]} 뒤 성적</p>
         <div className="controls" style={{ marginTop: 8 }}><span className="chip">표본 30건 이상</span><span className="chip">실력보다 스타일 차이로 읽기</span><span className="chip">학습용</span></div>
       </div>
       <div className="card" style={{ marginBottom: 16 }}>
         <div className="controls">
-          <Seg value={stance} onChange={setStance} options={STANCES} />
           <Seg value={horizon} onChange={setHorizon} options={[[5, "5거래일"], [20, "20거래일"], [60, "60거래일"]]} />
           <Seg value={metric} onChange={setMetric} options={METRICS} />
         </div>

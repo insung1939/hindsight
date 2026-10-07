@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { api, assetNames, channelMap, dateOnly, num, pct, pct0, sign, MARKET_LABEL, STANCES, STANCE_LABEL } from "../api";
+import { api, assetNames, channelMap, dateOnly, num, pct, pct0, sign, MARKET_LABEL } from "../api";
 import { Disclaimer, ErrorBox, SkeletonRows, Stat, Term, useLoad } from "../components";
 
 function Chart({ prices, events, disclosures = [], news = [], onHover, hover }) {
@@ -40,7 +40,6 @@ export default function Ticker({ assetId, go }) {
   const [q, setQ] = useState("");
   const [hover, setHover] = useState(null);
   const [limit, setLimit] = useState(200);
-  const [stance, setStance] = useState("bull");
   const names = useLoad(() => assetNames(true), []);
   const chs = useLoad(channelMap, []);
   const data = useLoad(async () => {
@@ -50,19 +49,19 @@ export default function Ticker({ assetId, go }) {
       api("marketData", `/v1/assets/${assetId}/prices`, { params: { from, limit: 5000 } }),
       api("stats", `/v1/assets/${assetId}/events`),
       api("marketData", "/v1/disclosures", { params: { asset_ids: assetId, from, limit: 5000 } }).then((r) => ({ items: r.items.filter((x) => ["실적", "계약", "자금조달", "주요사항"].includes(x.kind)) })).catch(() => ({ items: [] })),
-      api("stats", "/v1/summary", { params: { scope: `asset:${assetId}`, horizon: 20, stance } }).then((r) => r.value).catch(() => null),
+      api("stats", "/v1/summary", { params: { scope: `asset:${assetId}`, horizon: 20, stance: "bull" } }).then((r) => r.value).catch(() => null),
       api("marketData", "/v1/news-daily", { params: { asset_ids: assetId, from }, ttl: 5 * 60e3 }).catch(() => ({ items: [] })),
     ]);
     setHover(null);
     return { prices: p.items, events: e.items, disc: d.items, sum: s, news: n.items };
-  }, [assetId, stance]);
+  }, [assetId]);
   const all = names.data || {};
   const candidates = useMemo(() => {
     const s = q.trim().toLowerCase(); if (!s) return [];
     return Object.values(all).filter((a) => a.asset_type !== "index" && (a.name.toLowerCase().includes(s) || a.symbol.toLowerCase().includes(s) || (a.aliases || []).some((x) => x.toLowerCase().includes(s)))).slice(0, 8);
   }, [q, all]);
   const a = all[assetId]; const d = data.data; const sum = d?.sum;
-  const shown = (d?.events || []).filter((e) => stance === "all" || e.stance === stance);
+  const shown = (d?.events || []).filter((e) => e.stance === "bull");  // 오른다고 한 언급만
   const popular = ["KRX:005930", "KRX:000660", "US:NVDA", "US:TSLA", "CRYPTO:KRW-BTC", "KRX:091160"];
 
   return (
@@ -70,7 +69,7 @@ export default function Ticker({ assetId, go }) {
       <div className="page-head">
         <div className="eyebrow">종목</div>
         <h1>{a ? a.name : "종목 하나를 골라 보세요"}</h1>
-        <p>{a ? `${a.asset_type === "theme" ? "업종·테마 (대표 ETF)" : MARKET_LABEL[a.market]} · ${a.symbol} · 벤치마크 ${a.benchmark_id?.split(":")[1] || "—"}` : "주가 위에 언급 시점을 점으로. 빨강은 20거래일 뒤 올랐고 파랑은 내렸다."}</p>
+        <p>{a ? `${a.asset_type === "theme" ? "업종·테마 (대표 ETF)" : MARKET_LABEL[a.market]} · ${a.symbol} · 벤치마크 ${a.benchmark_id?.split(":")[1] || "—"}` : "오른다고 한 영상의 시점을 주가 위에 점으로. 빨강은 20거래일 뒤 올랐고 파랑은 내렸다."}</p>
       </div>
       <div className="card" style={{ marginBottom: 16 }}>
         <input type="search" placeholder="종목 검색 — 삼성전자, 하닉, 엔비디아, 비트코인, 반도체… (Enter 로 첫 결과)" value={q} onChange={(e) => setQ(e.target.value)}
@@ -85,8 +84,7 @@ export default function Ticker({ assetId, go }) {
       <ErrorBox error={data.error} />
       {assetId && (
         <div className="grid">
-          <div className="card col-12" style={{ padding: "12px 20px" }}><div className="controls"><Seg value={stance} onChange={setStance} options={STANCES} /><span className="muted" style={{ fontSize: 13 }}>{stance === "bull" ? "오른다고 한 언급만" : stance === "bear" ? "내린다고 한 언급만" : "논조 무관 전체"}</span></div></div>
-          <div className="col-3"><Stat k="mention" label={`${STANCE_LABEL[stance] === "전체" ? "" : STANCE_LABEL[stance] + " "}언급`} loading={data.loading && !d} value={d ? `${num(shown.length)}건` : "—"} sub={d ? `전체 ${num(d.events.length)}건 · 최근 1년` : "최근 1년"} /></div>
+          <div className="col-3"><Stat k="stance" label="오른다고 한 언급" loading={data.loading && !d} value={d ? `${num(shown.length)}건` : "—"} sub={d ? `제목에 종목이 나온 영상 ${num(d.events.length)}건 중 · 최근 1년` : "최근 1년"} /></div>
           <div className="col-3"><Stat k="past" label="언급 뒤 20거래일 수익률 평균" loading={data.loading && !d} value={pct(sum?.mean)} cls={sign(sum?.mean)} sub={sum?.n ? `n=${sum.n}${sum.low_sample ? " · 참고용" : ""}` : "계산 전"} /></div>
           <div className="col-3"><Stat k="win" label="20거래일 뒤 오른 비율" loading={data.loading && !d} value={pct0(sum?.win_rate)} sub={sum ? `시장 대비 ${pct(sum.excess_mean)}` : ""} /></div>
           <div className="col-3"><Stat k="vol" label="거래량 비율" loading={data.loading && !d} value={sum?.vol_ratio_median ? `${sum.vol_ratio_median}배` : "—"} sub="언급 뒤 5일 ÷ 언급 전 20일" /></div>
@@ -99,12 +97,12 @@ export default function Ticker({ assetId, go }) {
             <div className="card-head"><div><h3>언급별 기록</h3><p>최근 순 · 행에 올리면 차트의 점이 커진다</p></div></div>
             {data.loading && !d ? <SkeletonRows n={8} /> : (
               <div className="table-wrap" style={{ maxHeight: 520, overflowY: "auto" }}><table>
-                <thead><tr><th>언급일</th><th>채널</th><th><Term k="stance">논조</Term></th><th><Term k="t0">T0</Term></th><th className="num">T0 종가</th><th className="num">5일</th><th className="num">20일</th><th className="num">60일</th><th className="num"><Term k="excess">20일 초과</Term></th><th className="num"><Term k="vol">거래량</Term></th><th><Term k="disc">공시</Term></th></tr></thead>
+                <thead><tr><th>언급일</th><th>채널</th><th>근거 단어</th><th><Term k="t0">T0</Term></th><th className="num">T0 종가</th><th className="num">5일</th><th className="num">20일</th><th className="num">60일</th><th className="num"><Term k="excess">20일 초과</Term></th><th className="num"><Term k="vol">거래량</Term></th><th><Term k="disc">공시</Term></th></tr></thead>
                 <tbody>{[...shown].reverse().slice(0, limit).map((e) => (
                   <tr key={e.mention_id} className={hover?.mention_id === e.mention_id ? "hl" : ""} onMouseEnter={() => setHover(e)}>
                     <td>{dateOnly(e.published_at)}</td>
                     <td className="name"><b style={{ fontWeight: 600 }}>{chs.data?.[e.channel_id]?.title || e.channel_id.slice(0, 8)}</b></td>
-                    <td><span className={"chip " + (e.stance === "bull" ? "up" : e.stance === "bear" ? "down" : "")}>{STANCE_LABEL[e.stance] || "중립"}</span></td>
+                    <td className="muted" style={{ fontSize: 12 }}>{e.stance_words || "—"}</td>
                     <td className="muted">{e.t0_date || "—"}</td>
                     <td className="num">{e.t0_close?.toLocaleString() ?? "—"}</td>
                     <td className={"num " + sign(e.r5)}>{pct(e.r5)}</td>

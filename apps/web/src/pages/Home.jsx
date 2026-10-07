@@ -1,17 +1,15 @@
 import { useState } from "react";
-import { api, assetNames, assetSummaries, compact, dateOnly, num, pct, pct0, sign, MARKET_LABEL, STANCES } from "../api";
+import { api, assetNames, assetSummaries, compact, dateOnly, num, pct, pct0, sign, MARKET_LABEL } from "../api";
 import { Disclaimer, ErrorBox, Seg, SkeletonRows, Term, useLoad } from "../components";
 
 export default function Home({ go }) {
   const [days, setDays] = useState(7);
   const [market, setMarket] = useState("ALL");
-  const [stance, setStance] = useState("bull");
   const head = useLoad(() => Promise.all([api("youtube", "/v1/coverage", { ttl: 60e3 }), api("mentions", "/v1/coverage", { ttl: 60e3 }), api("stats", "/v1/coverage", { ttl: 60e3 })]), []);
   const trend = useLoad(async () => {
-    const st = stance === "all" ? undefined : stance;
-    const [t, names, sum] = await Promise.all([api("mentions", "/v1/mentions/trending", { params: { days, limit: 60, stance: st }, ttl: 60e3 }), assetNames(), assetSummaries(20, stance)]);
+    const [t, names, sum] = await Promise.all([api("mentions", "/v1/mentions/trending", { params: { days, limit: 60, stance: "bull" }, ttl: 60e3 }), assetNames(), assetSummaries(20, "bull")]);
     return t.items.map((r) => ({ ...r, asset: names[r.asset_id], summary: sum[r.asset_id] }));
-  }, [days, stance]);
+  }, [days]);
   const [yt, me, st] = head.data || [];
   const rows = (trend.data || []).filter((r) => market === "ALL" ? true : market === "THEME" ? r.asset?.asset_type === "theme" : (r.asset?.market === market && r.asset?.asset_type !== "theme")).slice(0, 25);
 
@@ -34,9 +32,8 @@ export default function Home({ go }) {
 
       <div className="card">
         <div className="card-head">
-          <div><h2>지금 유튜브가 {stance === "bull" ? "오른다고 하는" : stance === "bear" ? "내린다고 하는" : "말하는"} 종목</h2><p>최근 {days}일 <Term k="stance">{stance === "bull" ? "낙관" : stance === "bear" ? "비관" : "전체"}</Term> <Term k="mention">언급</Term>이 직전 {days}일보다 늘어난 순. 종목을 누르면 주가 위 언급 시점을 본다.</p></div>
+          <div><h2>지금 유튜브가 오른다고 하는 종목</h2><p>최근 {days}일 <Term k="stance">낙관</Term> <Term k="mention">언급</Term>이 직전 {days}일보다 늘어난 순. 종목을 누르면 주가 위 언급 시점을 본다.</p></div>
           <div className="controls">
-            <Seg value={stance} onChange={setStance} options={STANCES} />
             <Seg value={days} onChange={setDays} options={[[7, "7일"], [14, "14일"], [30, "30일"]]} />
             <Seg value={market} onChange={setMarket} options={[["ALL", "전체"], ["KRX", "국내"], ["US", "미국"], ["CRYPTO", "코인"], ["THEME", "업종·테마"]]} />
           </div>
@@ -47,7 +44,7 @@ export default function Home({ go }) {
             <table>
               <thead><tr>
                 <th>종목</th><th className="num"><Term k="mention">언급</Term></th><th className="num"><Term k="prev">직전</Term></th><th className="num"><Term k="surge">급증</Term></th>
-                <th className="num"><Term k="channels">채널 수</Term></th><th className="num"><Term k="views">조회수</Term></th><th>마지막 언급</th><th className="num"><Term k="past">과거 {stance === "bull" ? "낙관 " : stance === "bear" ? "비관 " : ""}언급 뒤 20일 평균</Term></th>
+                <th className="num"><Term k="channels">채널 수</Term></th><th className="num"><Term k="views">조회수</Term></th><th>마지막 언급</th><th className="num"><Term k="past">과거 낙관 언급 뒤 20일 평균</Term></th>
               </tr></thead>
               <tbody>
                 {rows.map((r) => {

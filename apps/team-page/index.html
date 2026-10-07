@@ -65,7 +65,7 @@
       <div class="f"><b>시세</b><span>종가 · 거래량 · 공시</span></div><i>→</i>
       <div class="f acc"><b>5 · 20 · 60일</b><span>수익률 · 시장 대비</span></div>
     </div>
-    <p class="note rv d3">제목의 단어로 논조를 가른다 — 낙관(오른다·급등·매수·기회) <b data-bind="stance_counts.bull" data-fmt="n"></b> · 비관(하락·폭락·매도·조심) <b data-bind="stance_counts.bear" data-fmt="n"></b> · 중립 <b data-bind="stance_counts.neutral" data-fmt="n"></b>. 기본 통계는 낙관만</p>
+    <p class="note rv d3">제목에 오른다·급등·매수·기회 같은 말이 있는 언급만 센다 — 전체 <b data-bind="mentions.mentions" data-fmt="n"></b>건 중 <b data-bind="stance_counts.bull" data-fmt="n"></b>건. 하락·조심 같은 말이 더 많은 제목은 뺀다</p>
   </div>
 </section>
 
@@ -196,9 +196,9 @@
 <section class="slide" id="s-result2">
   <div class="in">
     <p class="kicker rv">데이터 분석 결과 ②</p>
-    <h2 class="rv d1">낙관 vs 비관 · 시장별 · 채널</h2>
+    <h2 class="rv d1">시장별 · 채널</h2>
     <div class="two rv d2">
-      <table id="tbl-market"><thead><tr><th>20일 뒤</th><th class="r">표본</th><th class="r">평균</th><th class="r">상승</th><th class="r">시장 대비</th><th class="r">거래량</th></tr></thead><tbody></tbody></table>
+      <table id="tbl-market"><thead><tr><th>오른다고 한 뒤 20일</th><th class="r">표본</th><th class="r">평균</th><th class="r">상승</th><th class="r">시장 대비</th><th class="r">거래량</th></tr></thead><tbody></tbody></table>
       <div>
         <h3 class="sub">낙관 언급 기준 채널 TOP 3 · BOTTOM 3 (시장 대비, 20일)</h3>
         <div id="rank-top" class="ranks"></div>
