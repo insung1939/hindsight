@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { onWaking } from "./api";
 import Trending from "./pages/Trending";
 import Afterwards from "./pages/Afterwards";
 import Timeline from "./pages/Timeline";
@@ -17,6 +18,8 @@ export default function App() {
   const [asset, setAsset] = useState(null); // 타임라인으로 넘길 종목
   const [dark, setDark] = useState(() => window.matchMedia?.("(prefers-color-scheme: dark)").matches);
 
+  const [waking, setWaking] = useState(null);
+  useEffect(() => onWaking(setWaking), []);
   const openTimeline = (assetId) => { setAsset(assetId); setTab("timeline"); };
 
   return (
@@ -34,6 +37,8 @@ export default function App() {
           <button key={k} className={tab === k ? "on" : ""} onClick={() => setTab(k)}>{label}</button>
         ))}
       </nav>
+      {waking?.waking && <div className="wake">서버를 깨우는 중입니다 (무료 서버는 15분 쉬면 잠듭니다). 자동으로 다시 시도합니다… {waking.attempt}/4</div>}
+      {waking?.failed && <div className="problem">서버에 연결하지 못했습니다. 잠시 뒤 새로고침해 주세요.</div>}
       <main>
         {tab === "trending" && <Trending onPick={openTimeline} />}
         {tab === "after" && <Afterwards onPick={openTimeline} />}

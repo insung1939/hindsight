@@ -34,8 +34,10 @@ def upstream(svc: str) -> str:
 
 
 def public_base(request: Request) -> str:
-    """배포 주소. PUBLIC_URL 이 있으면 그것, 없으면 요청 헤더(X-Forwarded-Proto/Host)로 만든다 — Render 가 서비스 이름 뒤에 접미사를 붙여도 맞는다."""
-    return PUBLIC_URL or f"{request.url.scheme}://{request.headers.get('host', request.url.netloc)}"
+    """배포 주소. 요청 헤더(X-Forwarded-Proto/Host)로 만들고, 호스트를 알 수 없을 때만 PUBLIC_URL 을 쓴다.
+    Render 가 서비스 이름 뒤에 접미사를 붙이거나 환경변수에 옛 주소가 남아 있어도 Swagger Try-it-out 이 실제 주소로 간다."""
+    host = request.headers.get("host") or request.url.netloc
+    return f"{request.url.scheme}://{host}" if host else PUBLIC_URL
 
 
 @app.get("/", include_in_schema=False)

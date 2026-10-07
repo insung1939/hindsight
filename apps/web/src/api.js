@@ -19,19 +19,33 @@ export class ApiError extends Error {
 }
 
 // RFC 9457 problem+json 을 그대로 오류 객체로 올린다. X-Request-ID 는 응답 헤더에서 읽어 디버깅에 쓴다.
+// Render 무료 플랜은 15분 쉬면 잠들고, 재배포 중엔 잠깐 502 가 난다. 네트워크 오류·502·503·504 는 최대 4번(약 40초) 다시 시도한다.
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const listeners = new Set();
+export const onWaking = (fn) => { listeners.add(fn); return () => listeners.delete(fn); };
+const notify = (state) => listeners.forEach((fn) => fn(state));
+
 export async function api(service, path, { method = "GET", body, params } = {}) {
   const url = new URL(URLS[service] + path);
   if (params) Object.entries(params).forEach(([k, v]) => v != null && url.searchParams.set(k, v));
-  const res = await fetch(url, {
-    method,
-    headers: body ? { "Content-Type": "application/json" } : {},
-    body: body ? JSON.stringify(body) : undefined,
-  });
-  const requestId = res.headers.get("X-Request-ID");
-  if (res.status === 204) return null;
-  const data = await res.json().catch(() => null);
-  if (!res.ok) throw Object.assign(new ApiError(data, res.status), { requestId });
-  return data;
+  const init = { method, headers: body ? { "Content-Type": "application/json" } : {}, body: body ? JSON.stringify(body) : undefined };
+  let lastErr = null;
+  for (let attempt = 0; attempt < 5; attempt++) {
+    if (attempt) { notify({ waking: true, attempt }); await sleep(attempt * 5000); }
+    let res;
+    try {
+      res = await fetch(url, init);
+    } catch (e) { lastErr = Object.assign(new ApiError({ detail: "서버에 연결하지 못했습니다. 잠든 서버를 깨우는 중일 수 있습니다." }, 0), { cause: e }); continue; }
+    if ([502, 503, 504].includes(res.status)) { lastErr = new ApiError({ detail: `서버가 깨어나는 중입니다 (HTTP ${res.status})` }, res.status); continue; }
+    notify({ waking: false });
+    const requestId = res.headers.get("X-Request-ID");
+    if (res.status === 204) return null;
+    const data = await res.json().catch(() => null);
+    if (!res.ok) throw Object.assign(new ApiError(data, res.status), { requestId });
+    return data;
+  }
+  notify({ waking: false, failed: true });
+  throw lastErr;
 }
 
 export const pct = (x, d = 1) => (x == null ? "—" : ((x > 0 ? "+" : "") + (x * 100).toFixed(d) + "%"));
