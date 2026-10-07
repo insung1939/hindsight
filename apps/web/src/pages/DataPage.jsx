@@ -74,6 +74,9 @@ export default function DataPage() {
           </table></div>
         </div>
 
+        <div className="card col-12 flat">
+          <details className="help"><summary>더 보기 — 채널 선정 규칙 · 매칭 규칙 · 채널 목록 · 못 잡은 제목</summary>
+          <div className="grid" style={{ marginTop: 12 }}>
         <div className="card col-6">
           <div className="card-head"><div><h3>채널 {chList.length}개 · 사람이 고르지 않았다</h3><p>후보 547개를 API로 재서 두 단계 규칙으로 걸렀다</p></div></div>
           <div className="table-wrap" style={{ marginBottom: 12 }}><table>
@@ -113,6 +116,8 @@ export default function DataPage() {
               {(un?.items || []).map((u) => <li key={u.video_id}>{u.title} <span className="muted">{dateOnly(u.published_at)}</span></li>)}
             </ul>
           )}
+        </div>
+          </div></details>
         </div>
         <div className="card col-12 flat">
           <div className="card-head"><div><h3>지키는 것</h3></div></div>

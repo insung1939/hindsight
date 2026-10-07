@@ -1,4 +1,4 @@
-# Hindsight(하인드사이트) — 유튜버가 말한 종목, 그 뒤에 어떻게 됐나
+# HINDSIGHT — 유튜버가 오른다고 한 종목, 정말 올랐을까?
 
 **배포 주소 (2026-10-07)** · 서비스 https://hindsight-web.vercel.app · Swagger https://hindsight-api-edab.onrender.com/docs · 발표 페이지 https://hindsight-gold.vercel.app · 저장소 https://github.com/insung1939/hindsight
 

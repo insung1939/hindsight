@@ -26,14 +26,22 @@ BEAR_WORDS = ("하락", "급락", "폭락", "매도", "팔아", "파세요", "�
               "손실", "물렸", "비상", "폭망", "망한다", "망했", "위기", "공포", "탈출", "도망", "하지 마", "사지 마", "사면 안", "끝났다", "꺾", "급락장", "조정", "리스크", "주의")
 
 
+# 지난 일을 설명하는 단서("반도체주 급등하며 마감", "오른 이유") — 전망이 아니라 해설이면 낙관으로 치지 않는다
+PAST_WORDS = ("이유", "마감", "했다", "했던", "올랐", "급등한", "상승한", "폭등한", "급등했", "상승했", "오른 ", "왜 ")
+FORWARD_WORDS = ("전망", "간다", "갈 ", "될 ", "올 ", "임박", "기회", "매수", "사라", "사야", "담", "목표", "온다", "갑니다", "오릅니다", "상승할", "급등할", "폭등할", "오를", "갈까", "될까", "신호", "준비", "모아", "놓치면", "지금")
+
+
 def classify_stance(text: str) -> tuple[str, str]:
-    """제목 → ('bull'|'bear'|'neutral', 잡힌 단어들). 낙관·비관 단어 수를 비교하고, 같으면 중립."""
+    """제목 → ('bull'|'bear'|'neutral', 잡힌 단어들). 낙관·비관 단어 수를 비교하고, 같으면 중립.
+    낙관이라도 '지난 일 설명' 단서만 있고 전망 단서가 없으면 중립(사후 해설)으로 내린다."""
     if not text:
         return "neutral", ""
     low = text.lower()
     bull = [w for w in BULL_WORDS if w in low]
     bear = [w for w in BEAR_WORDS if w in low]
     if len(bull) > len(bear):
+        if any(w in low for w in PAST_WORDS) and not any(w in low for w in FORWARD_WORDS):
+            return "neutral", "해설:" + ",".join(bull)[:90]
         return "bull", ",".join(bull)[:100]
     if len(bear) > len(bull):
         return "bear", ",".join(bear)[:100]

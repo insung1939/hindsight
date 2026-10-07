@@ -120,3 +120,9 @@ def test_stance_classification():
     assert classify_stance("비트코인 폭락 경고, 지금 팔아야")[0] == "bear"
     assert classify_stance("삼성전자 실적 발표 정리")[0] == "neutral"
     assert classify_stance("급등 뒤 급락? 조정 가능성")[0] == "bear"   # 비관 2 > 낙관 1
+
+
+def test_recap_titles_are_not_bullish():
+    assert classify_stance("반도체주 급등하며 뉴욕증시 상승 마감")[0] == "neutral"   # 지난 일 설명
+    assert classify_stance("삼성전자 급등한 이유")[0] == "neutral"
+    assert classify_stance("삼성전자 급등 전망, 지금이 기회")[0] == "bull"           # 전망 단서가 있으면 낙관

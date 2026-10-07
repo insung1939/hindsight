@@ -60,6 +60,10 @@ export default function Ticker({ assetId, go }) {
     const s = q.trim().toLowerCase(); if (!s) return [];
     return Object.values(all).filter((a) => a.asset_type !== "index" && (a.name.toLowerCase().includes(s) || a.symbol.toLowerCase().includes(s) || (a.aliases || []).some((x) => x.toLowerCase().includes(s)))).slice(0, 8);
   }, [q, all]);
+  const chCandidates = useMemo(() => {
+    const s = q.trim().toLowerCase(); if (!s || !chs.data) return [];
+    return Object.values(chs.data).filter((c) => c.title.toLowerCase().includes(s) || (c.handle || "").toLowerCase().includes(s)).slice(0, 5);
+  }, [q, chs.data]);
   const a = all[assetId]; const d = data.data; const sum = d?.sum;
   const shown = (d?.events || []).filter((e) => e.stance === "bull");  // 오른다고 한 언급만
   const popular = ["KRX:005930", "KRX:000660", "US:NVDA", "US:TSLA", "CRYPTO:KRW-BTC", "KRX:091160"];
@@ -72,13 +76,14 @@ export default function Ticker({ assetId, go }) {
         <p>{a ? `${a.asset_type === "theme" ? "업종·테마 (대표 ETF)" : MARKET_LABEL[a.market]} · ${a.symbol} · 벤치마크 ${a.benchmark_id?.split(":")[1] || "—"}` : "오른다고 한 영상의 시점을 주가 위에 점으로. 빨강은 20거래일 뒤 올랐고 파랑은 내렸다."}</p>
       </div>
       <div className="card" style={{ marginBottom: 16 }}>
-        <input type="search" placeholder="종목 검색 — 삼성전자, 하닉, 엔비디아, 비트코인, 반도체… (Enter 로 첫 결과)" value={q} onChange={(e) => setQ(e.target.value)}
-          onKeyDown={(e) => { if (e.key === "Enter" && candidates[0]) { go("ticker", candidates[0].asset_id); setQ(""); } if (e.key === "Escape") setQ(""); }} autoFocus={!assetId} />
+        <input type="search" placeholder="종목 또는 채널 검색 — 삼성전자, 하닉, 엔비디아, 비트코인, 반도체, 삼프로… (Enter 로 첫 결과)" value={q} onChange={(e) => setQ(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Enter") { if (candidates[0]) { go("ticker", candidates[0].asset_id); setQ(""); } else if (chCandidates[0]) { go("channel", chCandidates[0].channel_id); setQ(""); } } if (e.key === "Escape") setQ(""); }} autoFocus={!assetId} />
         <div className="controls" style={{ marginTop: 10 }}>
           {(q ? candidates : popular.map((id) => all[id]).filter(Boolean)).map((c) => (
             <button key={c.asset_id} className={"btn " + (c.asset_id === assetId ? "primary" : "")} onClick={() => { go("ticker", c.asset_id); setQ(""); }}>{c.name} <span className="muted" style={{ fontSize: 12 }}>{c.symbol}</span></button>
           ))}
-          {q && candidates.length === 0 && <span className="muted">사전에 없는 이름</span>}
+          {q && chCandidates.map((c) => <button key={c.channel_id} className="btn" onClick={() => { go("channel", c.channel_id); setQ(""); }}>📺 {c.title}</button>)}
+          {q && candidates.length === 0 && chCandidates.length === 0 && <span className="muted">사전에 없는 이름</span>}
         </div>
       </div>
       <ErrorBox error={data.error} />

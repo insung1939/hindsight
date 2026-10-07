@@ -18,8 +18,8 @@ export default function Home({ go }) {
       <section className="hero">
         <div>
           <div className="eyebrow" style={{ color: "#9db4ff" }}>HINDSIGHT · 유튜브 언급의 사후 성적표</div>
-          <h1>유튜버가 말한 종목,<br />그 뒤에 어떻게 됐나</h1>
-          <p>주식·코인 채널 {yt ? yt.channels : 51}개의 1년치 영상 제목에서 "오른다"고 한 종목을 찾아, 그 뒤 5·20·60거래일 주가를 셌다.</p>
+          <h1>유튜버가 오른다고 한 종목,<br />정말 올랐을까?</h1>
+          <p>주식·코인 채널 {yt ? yt.channels : 51}개의 1년치 영상 제목에서 "오른다"고 한 종목을 찾아, 그 뒤 5·20·60거래일 주가를 셌다. 개별 영상이 아니라 1년치 전체의 평균이다.</p>
           <div className="flow"><span>YouTube 제목</span><i>→</i><span>종목·테마 매칭</span><i>→</i><span>시세·거래량·공시</span><i>→</i><span>언급 뒤 수익률</span></div>
         </div>
         <div className="kpis">
