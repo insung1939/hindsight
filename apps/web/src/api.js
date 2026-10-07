@@ -72,8 +72,7 @@ export async function assetNames(all = false) {
   return Object.fromEntries(d.items.map((a) => [a.asset_id, a]));
 }
 // 종목별 요약(한 기간, 히스토그램 없이) — asset_id → value
-export const STANCES = [["bull", "낙관 언급"], ["all", "전체"], ["bear", "비관 언급"]];
-export const STANCE_LABEL = { bull: "낙관", bear: "비관", neutral: "중립", all: "전체" };
+// 서비스는 "오른다"고 한(낙관) 언급만 센다. 전체·비관은 API 에 남아 있지만 화면에서는 쓰지 않는다.
 export async function assetSummaries(horizon, stance = "bull") {
   const s = await api("stats", "/v1/summaries", { params: { prefix: "asset:", horizon, slim: true, stance }, ttl: 5 * 60e3 });
   const suf = `:${horizon}`;
