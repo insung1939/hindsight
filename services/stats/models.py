@@ -21,6 +21,7 @@ class EventReturn(Base):
     channel_id: Mapped[str] = mapped_column(String(40), index=True)
     market: Mapped[str] = mapped_column(String(10), index=True)
     kind: Mapped[str] = mapped_column(String(10), default="stock", index=True)  # stock(종목·코인) · theme(업종·테마 ETF)
+    stance: Mapped[str] = mapped_column(String(8), default="neutral", index=True)  # 제목 논조 bull · bear · neutral (mentions 에서 복사)
     benchmark_id: Mapped[str | None] = mapped_column(String(40), nullable=True)
     published_at: Mapped[datetime] = mapped_column(DateTime, index=True)
     t0_date: Mapped[date | None] = mapped_column(Date, nullable=True)
@@ -37,7 +38,7 @@ class EventReturn(Base):
 
 
 class Summary(Base):
-    """집계 캐시. key 예: overall:20(종목·코인, 테마 제외), market:KRX:20, kind:theme:20, channel:UC…:20, asset:KRX:005930:20"""
+    """집계 캐시. key 예: overall:20(전체 논조), bull:overall:20(낙관 언급만), bear:market:KRX:20, kind:theme:20, channel:UC…:20, asset:KRX:005930:20"""
 
     __tablename__ = "summaries"
     key: Mapped[str] = mapped_column(String(80), primary_key=True)

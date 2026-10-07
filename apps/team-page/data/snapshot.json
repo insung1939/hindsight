@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-07T16:09",
+ "generated_at": "2026-10-07T21:06",
  "youtube": {
   "channels": 51,
   "videos": 44620,
@@ -16,6 +16,11 @@
   "match_rate": 0.6547696446586706,
   "mentions": 49108,
   "assets": 902,
+  "by_stance": {
+   "bear": 7292,
+   "bull": 19925,
+   "neutral": 21891
+  },
   "last_video_at": "2026-10-07T01:39:48"
  },
  "market": {
@@ -46,7 +51,10 @@
   "last_trade_date": "2026-10-07",
   "disclosures": 47950,
   "disclosure_assets": 641,
-  "last_disclosure_date": "2026-10-07"
+  "last_disclosure_date": "2026-10-07",
+  "news_rows": 0,
+  "news_assets": 0,
+  "last_news_date": null
  },
  "stats": {
   "events": 49082,
@@ -57,8 +65,8 @@
   "r60_filled": 37311,
   "vol_ratio_filled": 48121,
   "disclosure_checked": 16466,
-  "last_computed_at": "2026-10-07T05:59:50.431798",
-  "summaries": 2847
+  "last_computed_at": "2026-10-07T11:59:30.291360",
+  "summaries": 8658
  },
  "channels": {
   "total": 51,
@@ -79,9 +87,9 @@
    "p10": -0.1183,
    "p90": 0.1015,
    "vol_ratio_median": 0.924,
-   "vol_up_rate": 0.399,
+   "vol_up_rate": 0.3992,
    "vol_n": 38145,
-   "disclosure_rate": 0.2448,
+   "disclosure_rate": 0.2427,
    "disclosure_n": 16466,
    "histogram": [
     {
@@ -140,9 +148,9 @@
    "p10": -0.2548,
    "p90": 0.1915,
    "vol_ratio_median": 0.924,
-   "vol_up_rate": 0.399,
+   "vol_up_rate": 0.3992,
    "vol_n": 38145,
-   "disclosure_rate": 0.2448,
+   "disclosure_rate": 0.2427,
    "disclosure_n": 16466,
    "histogram": [
     {
@@ -201,9 +209,9 @@
    "p10": -0.342,
    "p90": 0.3818,
    "vol_ratio_median": 0.924,
-   "vol_up_rate": 0.399,
+   "vol_up_rate": 0.3992,
    "vol_n": 38145,
-   "disclosure_rate": 0.2448,
+   "disclosure_rate": 0.2427,
    "disclosure_n": 16466,
    "histogram": [
     {
@@ -262,9 +270,9 @@
    "p10": -0.3206,
    "p90": 0.2826,
    "vol_ratio_median": 0.905,
-   "vol_up_rate": 0.3782,
+   "vol_up_rate": 0.3787,
    "vol_n": 16096,
-   "disclosure_rate": 0.2448,
+   "disclosure_rate": 0.2427,
    "disclosure_n": 16466,
    "histogram": [
     {
@@ -493,494 +501,682 @@
    ],
    "scope": "kind:theme"
   },
-  "kind:theme:5": {
+  "bull:overall:5": {
    "horizon": 5,
-   "n": 9945,
+   "n": 15091,
    "low_sample": false,
-   "mean": 0.0096,
-   "median": 0.0051,
-   "win_rate": 0.5296,
-   "excess_mean": -0.0058,
-   "excess_n": 9945,
-   "excess_win_rate": 0.4753,
-   "p10": -0.0899,
-   "p90": 0.1128,
-   "vol_ratio_median": 0.964,
-   "vol_up_rate": 0.4589,
-   "vol_n": 9976,
-   "disclosure_rate": null,
-   "disclosure_n": 0,
-   "histogram": [
-    {
-     "from": -1,
-     "to": -0.2,
-     "n": 104
-    },
-    {
-     "from": -0.2,
-     "to": -0.1,
-     "n": 707
-    },
-    {
-     "from": -0.1,
-     "to": -0.05,
-     "n": 1240
-    },
-    {
-     "from": -0.05,
-     "to": 0,
-     "n": 2620
-    },
-    {
-     "from": 0,
-     "to": 0.05,
-     "n": 2260
-    },
-    {
-     "from": 0.05,
-     "to": 0.1,
-     "n": 1717
-    },
-    {
-     "from": 0.1,
-     "to": 0.2,
-     "n": 1145
-    },
-    {
-     "from": 0.2,
-     "to": 9,
-     "n": 152
-    }
-   ],
-   "scope": "kind:theme"
-  },
-  "kind:theme:60": {
-   "horizon": 60,
-   "n": 7284,
-   "low_sample": false,
-   "mean": 0.087,
-   "median": 0.0236,
-   "win_rate": 0.538,
-   "excess_mean": -0.0841,
-   "excess_n": 7284,
-   "excess_win_rate": 0.3859,
-   "p10": -0.2576,
-   "p90": 0.5549,
-   "vol_ratio_median": 0.964,
-   "vol_up_rate": 0.4589,
-   "vol_n": 9976,
-   "disclosure_rate": null,
-   "disclosure_n": 0,
-   "histogram": [
-    {
-     "from": -1,
-     "to": -0.2,
-     "n": 1461
-    },
-    {
-     "from": -0.2,
-     "to": -0.1,
-     "n": 1126
-    },
-    {
-     "from": -0.1,
-     "to": -0.05,
-     "n": 295
-    },
-    {
-     "from": -0.05,
-     "to": 0,
-     "n": 474
-    },
-    {
-     "from": 0,
-     "to": 0.05,
-     "n": 570
-    },
-    {
-     "from": 0.05,
-     "to": 0.1,
-     "n": 407
-    },
-    {
-     "from": 0.1,
-     "to": 0.2,
-     "n": 519
-    },
-    {
-     "from": 0.2,
-     "to": 9,
-     "n": 2432
-    }
-   ],
-   "scope": "kind:theme"
-  },
-  "market:KRX:5": {
-   "horizon": 5,
-   "n": 16122,
-   "low_sample": false,
-   "mean": -0.0038,
-   "median": -0.0079,
-   "win_rate": 0.4631,
-   "excess_mean": -0.0113,
-   "excess_n": 16122,
-   "excess_win_rate": 0.4356,
-   "p10": -0.1558,
-   "p90": 0.1474,
-   "vol_ratio_median": 0.905,
-   "vol_up_rate": 0.3782,
-   "vol_n": 16096,
-   "disclosure_rate": 0.2448,
-   "disclosure_n": 16466,
-   "histogram": [
-    {
-     "from": -1,
-     "to": -0.2,
-     "n": 839
-    },
-    {
-     "from": -0.2,
-     "to": -0.1,
-     "n": 2261
-    },
-    {
-     "from": -0.1,
-     "to": -0.05,
-     "n": 2324
-    },
-    {
-     "from": -0.05,
-     "to": 0,
-     "n": 3119
-    },
-    {
-     "from": 0,
-     "to": 0.05,
-     "n": 2916
-    },
-    {
-     "from": 0.05,
-     "to": 0.1,
-     "n": 1927
-    },
-    {
-     "from": 0.1,
-     "to": 0.2,
-     "n": 1964
-    },
-    {
-     "from": 0.2,
-     "to": 9,
-     "n": 772
-    }
-   ],
-   "scope": "market:KRX"
-  },
-  "market:US:5": {
-   "horizon": 5,
-   "n": 11777,
-   "low_sample": false,
-   "mean": 0.0012,
-   "median": -0.0011,
-   "win_rate": 0.4927,
-   "excess_mean": -0.0019,
-   "excess_n": 11777,
-   "excess_win_rate": 0.4828,
-   "p10": -0.0688,
-   "p90": 0.0755,
-   "vol_ratio_median": 0.962,
-   "vol_up_rate": 0.4247,
-   "vol_n": 11817,
-   "disclosure_rate": null,
-   "disclosure_n": 0,
-   "histogram": [
-    {
-     "from": -1,
-     "to": -0.2,
-     "n": 74
-    },
-    {
-     "from": -0.2,
-     "to": -0.1,
-     "n": 443
-    },
-    {
-     "from": -0.1,
-     "to": -0.05,
-     "n": 1601
-    },
-    {
-     "from": -0.05,
-     "to": 0,
-     "n": 3857
-    },
-    {
-     "from": 0,
-     "to": 0.05,
-     "n": 3708
-    },
-    {
-     "from": 0.05,
-     "to": 0.1,
-     "n": 1375
-    },
-    {
-     "from": 0.1,
-     "to": 0.2,
-     "n": 575
-    },
-    {
-     "from": 0.2,
-     "to": 9,
-     "n": 144
-    }
-   ],
-   "scope": "market:US"
-  },
-  "market:CRYPTO:5": {
-   "horizon": 5,
-   "n": 10346,
-   "low_sample": false,
-   "mean": -0.0147,
-   "median": -0.0113,
-   "win_rate": 0.3984,
+   "mean": -0.0083,
+   "median": -0.0104,
+   "win_rate": 0.4389,
    "excess_mean": -0.011,
-   "excess_n": 10346,
-   "excess_win_rate": 0.2183,
-   "p10": -0.1092,
-   "p90": 0.0661,
-   "vol_ratio_median": 0.873,
-   "vol_up_rate": 0.4019,
-   "vol_n": 10232,
-   "disclosure_rate": null,
-   "disclosure_n": 0,
+   "excess_n": 15091,
+   "excess_win_rate": 0.3947,
+   "p10": -0.1347,
+   "p90": 0.1044,
+   "vol_ratio_median": 0.924,
+   "vol_up_rate": 0.4,
+   "vol_n": 15031,
+   "disclosure_rate": 0.2521,
+   "disclosure_n": 7311,
    "histogram": [
     {
      "from": -1,
      "to": -0.2,
-     "n": 349
+     "n": 588
     },
     {
      "from": -0.2,
      "to": -0.1,
-     "n": 799
+     "n": 1608
     },
     {
      "from": -0.1,
      "to": -0.05,
-     "n": 1313
+     "n": 2196
     },
     {
      "from": -0.05,
      "to": 0,
-     "n": 3707
+     "n": 4009
     },
     {
      "from": 0,
      "to": 0.05,
-     "n": 2768
+     "n": 3442
     },
     {
      "from": 0.05,
      "to": 0.1,
-     "n": 911
+     "n": 1639
     },
     {
      "from": 0.1,
      "to": 0.2,
-     "n": 319
+     "n": 1118
     },
     {
      "from": 0.2,
      "to": 9,
-     "n": 180
+     "n": 491
     }
    ],
-   "scope": "market:CRYPTO"
+   "scope": "bull:overall"
   },
-  "market:KRX:60": {
-   "horizon": 60,
-   "n": 11323,
+  "bull:overall:20": {
+   "horizon": 20,
+   "n": 14209,
    "low_sample": false,
-   "mean": 0.0523,
-   "median": -0.0991,
-   "win_rate": 0.3966,
-   "excess_mean": -0.016,
-   "excess_n": 11323,
-   "excess_win_rate": 0.4498,
-   "p10": -0.3974,
-   "p90": 0.6864,
-   "vol_ratio_median": 0.905,
-   "vol_up_rate": 0.3782,
-   "vol_n": 16096,
-   "disclosure_rate": 0.2448,
-   "disclosure_n": 16466,
+   "mean": -0.0227,
+   "median": -0.0276,
+   "win_rate": 0.4251,
+   "excess_mean": -0.027,
+   "excess_n": 14209,
+   "excess_win_rate": 0.3803,
+   "p10": -0.2753,
+   "p90": 0.1957,
+   "vol_ratio_median": 0.924,
+   "vol_up_rate": 0.4,
+   "vol_n": 15031,
+   "disclosure_rate": 0.2521,
+   "disclosure_n": 7311,
    "histogram": [
     {
      "from": -1,
      "to": -0.2,
-     "n": 3893
+     "n": 2427
     },
     {
      "from": -0.2,
      "to": -0.1,
-     "n": 1716
+     "n": 2016
     },
     {
      "from": -0.1,
      "to": -0.05,
-     "n": 701
+     "n": 1808
     },
     {
      "from": -0.05,
      "to": 0,
-     "n": 512
+     "n": 1895
     },
     {
      "from": 0,
      "to": 0.05,
-     "n": 325
+     "n": 1655
     },
     {
      "from": 0.05,
      "to": 0.1,
-     "n": 244
+     "n": 1488
     },
     {
      "from": 0.1,
      "to": 0.2,
-     "n": 618
+     "n": 1588
     },
     {
      "from": 0.2,
      "to": 9,
-     "n": 3314
+     "n": 1331
     }
    ],
-   "scope": "market:KRX"
+   "scope": "bull:overall"
   },
-  "market:US:60": {
+  "bull:overall:60": {
    "horizon": 60,
-   "n": 9478,
+   "n": 11835,
    "low_sample": false,
-   "mean": 0.0018,
-   "median": -0.0154,
-   "win_rate": 0.4517,
-   "excess_mean": -0.0356,
-   "excess_n": 9478,
-   "excess_win_rate": 0.2986,
-   "p10": -0.2107,
-   "p90": 0.1972,
-   "vol_ratio_median": 0.962,
-   "vol_up_rate": 0.4247,
-   "vol_n": 11817,
-   "disclosure_rate": null,
-   "disclosure_n": 0,
+   "mean": -0.025,
+   "median": -0.0792,
+   "win_rate": 0.3725,
+   "excess_mean": -0.0471,
+   "excess_n": 11835,
+   "excess_win_rate": 0.3112,
+   "p10": -0.3757,
+   "p90": 0.3992,
+   "vol_ratio_median": 0.924,
+   "vol_up_rate": 0.4,
+   "vol_n": 15031,
+   "disclosure_rate": 0.2521,
+   "disclosure_n": 7311,
    "histogram": [
     {
      "from": -1,
      "to": -0.2,
-     "n": 1114
+     "n": 3606
     },
     {
      "from": -0.2,
      "to": -0.1,
-     "n": 1590
+     "n": 1905
     },
     {
      "from": -0.1,
      "to": -0.05,
-     "n": 1204
+     "n": 939
     },
     {
      "from": -0.05,
      "to": 0,
-     "n": 1289
+     "n": 970
     },
     {
      "from": 0,
      "to": 0.05,
-     "n": 1540
+     "n": 968
     },
     {
      "from": 0.05,
      "to": 0.1,
-     "n": 794
-    },
-    {
-     "from": 0.1,
-     "to": 0.2,
-     "n": 1028
-    },
-    {
-     "from": 0.2,
-     "to": 9,
-     "n": 919
-    }
-   ],
-   "scope": "market:US"
-  },
-  "market:CRYPTO:60": {
-   "horizon": 60,
-   "n": 9226,
-   "low_sample": false,
-   "mean": -0.1006,
-   "median": -0.1269,
-   "win_rate": 0.3283,
-   "excess_mean": -0.0629,
-   "excess_n": 9226,
-   "excess_win_rate": 0.1434,
-   "p10": -0.3626,
-   "p90": 0.177,
-   "vol_ratio_median": 0.873,
-   "vol_up_rate": 0.4019,
-   "vol_n": 10232,
-   "disclosure_rate": null,
-   "disclosure_n": 0,
-   "histogram": [
-    {
-     "from": -1,
-     "to": -0.2,
-     "n": 3274
-    },
-    {
-     "from": -0.2,
-     "to": -0.1,
-     "n": 1690
-    },
-    {
-     "from": -0.1,
-     "to": -0.05,
      "n": 557
     },
     {
-     "from": -0.05,
-     "to": 0,
-     "n": 672
-    },
-    {
-     "from": 0,
-     "to": 0.05,
-     "n": 579
-    },
-    {
-     "from": 0.05,
-     "to": 0.1,
-     "n": 597
-    },
-    {
      "from": 0.1,
      "to": 0.2,
-     "n": 1236
+     "n": 978
     },
     {
      "from": 0.2,
      "to": 9,
-     "n": 621
+     "n": 1912
     }
    ],
-   "scope": "market:CRYPTO"
+   "scope": "bull:overall"
+  },
+  "bull:market:KRX:20": {
+   "horizon": 20,
+   "n": 6737,
+   "low_sample": false,
+   "mean": -0.0257,
+   "median": -0.0423,
+   "win_rate": 0.4373,
+   "excess_mean": -0.0366,
+   "excess_n": 6737,
+   "excess_win_rate": 0.4306,
+   "p10": -0.3342,
+   "p90": 0.282,
+   "vol_ratio_median": 0.904,
+   "vol_up_rate": 0.387,
+   "vol_n": 7175,
+   "disclosure_rate": 0.2521,
+   "disclosure_n": 7311,
+   "histogram": [
+    {
+     "from": -1,
+     "to": -0.2,
+     "n": 1785
+    },
+    {
+     "from": -0.2,
+     "to": -0.1,
+     "n": 956
+    },
+    {
+     "from": -0.1,
+     "to": -0.05,
+     "n": 536
+    },
+    {
+     "from": -0.05,
+     "to": 0,
+     "n": 505
+    },
+    {
+     "from": 0,
+     "to": 0.05,
+     "n": 475
+    },
+    {
+     "from": 0.05,
+     "to": 0.1,
+     "n": 620
+    },
+    {
+     "from": 0.1,
+     "to": 0.2,
+     "n": 828
+    },
+    {
+     "from": 0.2,
+     "to": 9,
+     "n": 1031
+    }
+   ],
+   "scope": "bull:market:KRX"
+  },
+  "bull:market:US:20": {
+   "horizon": 20,
+   "n": 4100,
+   "low_sample": false,
+   "mean": 0.0008,
+   "median": -0.0113,
+   "win_rate": 0.452,
+   "excess_mean": -0.0101,
+   "excess_n": 4100,
+   "excess_win_rate": 0.4246,
+   "p10": -0.1293,
+   "p90": 0.136,
+   "vol_ratio_median": 0.952,
+   "vol_up_rate": 0.3962,
+   "vol_n": 4399,
+   "disclosure_rate": null,
+   "disclosure_n": 0,
+   "histogram": [
+    {
+     "from": -1,
+     "to": -0.2,
+     "n": 171
+    },
+    {
+     "from": -0.2,
+     "to": -0.1,
+     "n": 476
+    },
+    {
+     "from": -0.1,
+     "to": -0.05,
+     "n": 729
+    },
+    {
+     "from": -0.05,
+     "to": 0,
+     "n": 871
+    },
+    {
+     "from": 0,
+     "to": 0.05,
+     "n": 696
+    },
+    {
+     "from": 0.05,
+     "to": 0.1,
+     "n": 509
+    },
+    {
+     "from": 0.1,
+     "to": 0.2,
+     "n": 485
+    },
+    {
+     "from": 0.2,
+     "to": 9,
+     "n": 163
+    }
+   ],
+   "scope": "bull:market:US"
+  },
+  "bull:market:CRYPTO:20": {
+   "horizon": 20,
+   "n": 3372,
+   "low_sample": false,
+   "mean": -0.0452,
+   "median": -0.0404,
+   "win_rate": 0.368,
+   "excess_mean": -0.0285,
+   "excess_n": 3372,
+   "excess_win_rate": 0.226,
+   "p10": -0.2342,
+   "p90": 0.1184,
+   "vol_ratio_median": 0.898,
+   "vol_up_rate": 0.4319,
+   "vol_n": 3457,
+   "disclosure_rate": null,
+   "disclosure_n": 0,
+   "histogram": [
+    {
+     "from": -1,
+     "to": -0.2,
+     "n": 471
+    },
+    {
+     "from": -0.2,
+     "to": -0.1,
+     "n": 584
+    },
+    {
+     "from": -0.1,
+     "to": -0.05,
+     "n": 543
+    },
+    {
+     "from": -0.05,
+     "to": 0,
+     "n": 519
+    },
+    {
+     "from": 0,
+     "to": 0.05,
+     "n": 484
+    },
+    {
+     "from": 0.05,
+     "to": 0.1,
+     "n": 359
+    },
+    {
+     "from": 0.1,
+     "to": 0.2,
+     "n": 275
+    },
+    {
+     "from": 0.2,
+     "to": 9,
+     "n": 137
+    }
+   ],
+   "scope": "bull:market:CRYPTO"
+  },
+  "bull:kind:theme:20": {
+   "horizon": 20,
+   "n": 4147,
+   "low_sample": false,
+   "mean": 0.0188,
+   "median": 0.0081,
+   "win_rate": 0.5279,
+   "excess_mean": -0.0303,
+   "excess_n": 4147,
+   "excess_win_rate": 0.4483,
+   "p10": -0.2231,
+   "p90": 0.2568,
+   "vol_ratio_median": 0.969,
+   "vol_up_rate": 0.4714,
+   "vol_n": 4448,
+   "disclosure_rate": null,
+   "disclosure_n": 0,
+   "histogram": [
+    {
+     "from": -1,
+     "to": -0.2,
+     "n": 499
+    },
+    {
+     "from": -0.2,
+     "to": -0.1,
+     "n": 440
+    },
+    {
+     "from": -0.1,
+     "to": -0.05,
+     "n": 409
+    },
+    {
+     "from": -0.05,
+     "to": 0,
+     "n": 610
+    },
+    {
+     "from": 0,
+     "to": 0.05,
+     "n": 466
+    },
+    {
+     "from": 0.05,
+     "to": 0.1,
+     "n": 463
+    },
+    {
+     "from": 0.1,
+     "to": 0.2,
+     "n": 634
+    },
+    {
+     "from": 0.2,
+     "to": 9,
+     "n": 626
+    }
+   ],
+   "scope": "bull:kind:theme"
+  },
+  "bear:overall:20": {
+   "horizon": 20,
+   "n": 5507,
+   "low_sample": false,
+   "mean": -0.0132,
+   "median": -0.0123,
+   "win_rate": 0.4618,
+   "excess_mean": -0.0136,
+   "excess_n": 5507,
+   "excess_win_rate": 0.3973,
+   "p10": -0.2464,
+   "p90": 0.1909,
+   "vol_ratio_median": 0.931,
+   "vol_up_rate": 0.4091,
+   "vol_n": 5698,
+   "disclosure_rate": 0.2412,
+   "disclosure_n": 2384,
+   "histogram": [
+    {
+     "from": -1,
+     "to": -0.2,
+     "n": 801
+    },
+    {
+     "from": -0.2,
+     "to": -0.1,
+     "n": 669
+    },
+    {
+     "from": -0.1,
+     "to": -0.05,
+     "n": 694
+    },
+    {
+     "from": -0.05,
+     "to": 0,
+     "n": 793
+    },
+    {
+     "from": 0,
+     "to": 0.05,
+     "n": 795
+    },
+    {
+     "from": 0.05,
+     "to": 0.1,
+     "n": 628
+    },
+    {
+     "from": 0.1,
+     "to": 0.2,
+     "n": 617
+    },
+    {
+     "from": 0.2,
+     "to": 9,
+     "n": 510
+    }
+   ],
+   "scope": "bear:overall"
+  },
+  "neutral:overall:20": {
+   "horizon": 20,
+   "n": 16409,
+   "low_sample": false,
+   "mean": -0.0093,
+   "median": -0.013,
+   "win_rate": 0.4607,
+   "excess_mean": -0.0171,
+   "excess_n": 16409,
+   "excess_win_rate": 0.3788,
+   "p10": -0.2418,
+   "p90": 0.1894,
+   "vol_ratio_median": 0.923,
+   "vol_up_rate": 0.3952,
+   "vol_n": 17416,
+   "disclosure_rate": 0.2332,
+   "disclosure_n": 6771,
+   "histogram": [
+    {
+     "from": -1,
+     "to": -0.2,
+     "n": 2219
+    },
+    {
+     "from": -0.2,
+     "to": -0.1,
+     "n": 2018
+    },
+    {
+     "from": -0.1,
+     "to": -0.05,
+     "n": 2130
+    },
+    {
+     "from": -0.05,
+     "to": 0,
+     "n": 2458
+    },
+    {
+     "from": 0,
+     "to": 0.05,
+     "n": 2266
+    },
+    {
+     "from": 0.05,
+     "to": 0.1,
+     "n": 2008
+    },
+    {
+     "from": 0.1,
+     "to": 0.2,
+     "n": 1823
+    },
+    {
+     "from": 0.2,
+     "to": 9,
+     "n": 1487
+    }
+   ],
+   "scope": "neutral:overall"
+  },
+  "bear:overall:5": {
+   "horizon": 5,
+   "n": 5706,
+   "low_sample": false,
+   "mean": -0.0048,
+   "median": -0.0055,
+   "win_rate": 0.4634,
+   "excess_mean": -0.0069,
+   "excess_n": 5706,
+   "excess_win_rate": 0.3913,
+   "p10": -0.1169,
+   "p90": 0.1008,
+   "vol_ratio_median": 0.931,
+   "vol_up_rate": 0.4091,
+   "vol_n": 5698,
+   "disclosure_rate": 0.2412,
+   "disclosure_n": 2384,
+   "histogram": [
+    {
+     "from": -1,
+     "to": -0.2,
+     "n": 184
+    },
+    {
+     "from": -0.2,
+     "to": -0.1,
+     "n": 510
+    },
+    {
+     "from": -0.1,
+     "to": -0.05,
+     "n": 757
+    },
+    {
+     "from": -0.05,
+     "to": 0,
+     "n": 1584
+    },
+    {
+     "from": 0,
+     "to": 0.05,
+     "n": 1429
+    },
+    {
+     "from": 0.05,
+     "to": 0.1,
+     "n": 655
+    },
+    {
+     "from": 0.1,
+     "to": 0.2,
+     "n": 462
+    },
+    {
+     "from": 0.2,
+     "to": 9,
+     "n": 125
+    }
+   ],
+   "scope": "bear:overall"
+  },
+  "bear:overall:60": {
+   "horizon": 60,
+   "n": 4560,
+   "low_sample": false,
+   "mean": 0.0056,
+   "median": -0.0535,
+   "win_rate": 0.4068,
+   "excess_mean": -0.0208,
+   "excess_n": 4560,
+   "excess_win_rate": 0.3228,
+   "p10": -0.321,
+   "p90": 0.3834,
+   "vol_ratio_median": 0.931,
+   "vol_up_rate": 0.4091,
+   "vol_n": 5698,
+   "disclosure_rate": 0.2412,
+   "disclosure_n": 2384,
+   "histogram": [
+    {
+     "from": -1,
+     "to": -0.2,
+     "n": 1148
+    },
+    {
+     "from": -0.2,
+     "to": -0.1,
+     "n": 773
+    },
+    {
+     "from": -0.1,
+     "to": -0.05,
+     "n": 401
+    },
+    {
+     "from": -0.05,
+     "to": 0,
+     "n": 382
+    },
+    {
+     "from": 0,
+     "to": 0.05,
+     "n": 383
+    },
+    {
+     "from": 0.05,
+     "to": 0.1,
+     "n": 271
+    },
+    {
+     "from": 0.1,
+     "to": 0.2,
+     "n": 464
+    },
+    {
+     "from": 0.2,
+     "to": 9,
+     "n": 738
+    }
+   ],
+   "scope": "bear:overall"
   }
+ },
+ "stance_counts": {
+  "bear": 7292,
+  "bull": 19925,
+  "neutral": 21891
  },
  "top_assets_20": [
   {
@@ -1278,16 +1474,9 @@
   {
    "asset_id": "KRX:261220",
    "name": "원유",
-   "mentions": 113,
-   "prev": 48,
-   "channels": 17
-  },
-  {
-   "asset_id": "KRX:091160",
-   "name": "반도체",
-   "mentions": 335,
-   "prev": 308,
-   "channels": 27
+   "mentions": 110,
+   "prev": 51,
+   "channels": 16
   },
   {
    "asset_id": "US:AMD",
@@ -1311,25 +1500,11 @@
    "channels": 11
   },
   {
-   "asset_id": "KRX:434730",
-   "name": "원전",
-   "mentions": 43,
-   "prev": 29,
-   "channels": 10
-  },
-  {
-   "asset_id": "KRX:069500",
-   "name": "코스피",
-   "mentions": 185,
-   "prev": 172,
-   "channels": 17
-  },
-  {
-   "asset_id": "US:AAPL",
-   "name": "Apple",
-   "mentions": 56,
-   "prev": 45,
-   "channels": 12
+   "asset_id": "KRX:091160",
+   "name": "반도체",
+   "mentions": 330,
+   "prev": 313,
+   "channels": 27
   },
   {
    "asset_id": "US:IONQ",
@@ -1339,11 +1514,32 @@
    "channels": 5
   },
   {
+   "asset_id": "KRX:434730",
+   "name": "원전",
+   "mentions": 41,
+   "prev": 31,
+   "channels": 10
+  },
+  {
+   "asset_id": "US:AAPL",
+   "name": "Apple",
+   "mentions": 55,
+   "prev": 46,
+   "channels": 11
+  },
+  {
    "asset_id": "US:ORCL",
    "name": "Oracle",
    "mentions": 15,
    "prev": 6,
    "channels": 8
+  },
+  {
+   "asset_id": "US:AMZN",
+   "name": "Amazon",
+   "mentions": 48,
+   "prev": 40,
+   "channels": 4
   }
  ],
  "unmatched_sample": [
@@ -1359,48 +1555,48 @@
  "channel_ranking": {
   "top": [
    {
+    "title": "미국주식의 모든것 - 미주모",
+    "n": 104,
+    "mean": 0.0532,
+    "excess_mean": 0.0524,
+    "win_rate": 0.4808
+   },
+   {
     "title": "안정모의 주식투자",
-    "n": 331,
-    "mean": 0.1083,
-    "excess_mean": 0.0552,
-    "win_rate": 0.6888
+    "n": 199,
+    "mean": 0.1032,
+    "excess_mean": 0.0514,
+    "win_rate": 0.6985
    },
    {
-    "title": "킴스 미국주식",
-    "n": 552,
-    "mean": 0.0475,
-    "excess_mean": 0.0368,
-    "win_rate": 0.4837
-   },
-   {
-    "title": "실전투자대회1위 전태룡 주식내비",
-    "n": 197,
-    "mean": 0.0803,
-    "excess_mean": 0.0337,
-    "win_rate": 0.6041
+    "title": "김작가 TV",
+    "n": 115,
+    "mean": 0.0935,
+    "excess_mean": 0.0245,
+    "win_rate": 0.6957
    }
   ],
   "bottom": [
    {
-    "title": "주식전망TV",
-    "n": 2834,
-    "mean": -0.1761,
-    "excess_mean": -0.0988,
-    "win_rate": 0.1718
-   },
-   {
     "title": "민박사 ㅣ 주식 끝까지 간다!",
-    "n": 128,
-    "mean": -0.0655,
-    "excess_mean": -0.08,
-    "win_rate": 0.3828
+    "n": 60,
+    "mean": -0.1062,
+    "excess_mean": -0.1797,
+    "win_rate": 0.2833
    },
    {
-    "title": "mediaAUTO 미디어오토",
-    "n": 77,
-    "mean": -0.015,
-    "excess_mean": -0.0576,
-    "win_rate": 0.4026
+    "title": "주식전망TV",
+    "n": 1471,
+    "mean": -0.1658,
+    "excess_mean": -0.1006,
+    "win_rate": 0.1856
+   },
+   {
+    "title": "주식홀인원",
+    "n": 1089,
+    "mean": -0.0139,
+    "excess_mean": -0.0592,
+    "win_rate": 0.4408
    }
   ]
  }

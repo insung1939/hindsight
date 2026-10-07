@@ -55,3 +55,16 @@ class Disclosure(Base):
     report_nm: Mapped[str] = mapped_column(String(200))
     kind: Mapped[str] = mapped_column(String(10), index=True)  # 실적 · 계약 · 자금조달 · 주요사항 · 지분 · 기타
     collected_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class NewsDaily(Base):
+    """종목별 일별 뉴스 기사 수 — 네이버 금융 종목 뉴스 페이지 크롤링(BeautifulSoup). '유튜브 언급이 뉴스보다 앞서나' 를 본다."""
+
+    __tablename__ = "news_daily"
+    __table_args__ = (UniqueConstraint("asset_id", "news_date", name="uq_news_asset_date"),)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    asset_id: Mapped[str] = mapped_column(String(40), index=True)
+    news_date: Mapped[date] = mapped_column(Date, index=True)
+    count: Mapped[int] = mapped_column(Integer)
+    source: Mapped[str] = mapped_column(String(20), default="naver_finance")
+    collected_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)

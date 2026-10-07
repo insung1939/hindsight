@@ -9,6 +9,7 @@
 | 국내 일별 시세 | 금융위원회_주식시세정보(V2) · 공공데이터포털 | https://www.data.go.kr/data/15094808/openapi.do (엔드포인트 `GetStockSecuritiesInfoService_V2/getStockPriceInfo_V2`) | Open API (키) | 기준일, 종목명, 종가, 거래량 | 일 1회 | market-data |
 | 미국 시세 · 지수 · 국내 대체 시세 · **업종 ETF** | Yahoo Finance chart API | https://finance.yahoo.com | HTTP JSON (키 불필요) | 일자, 종가, 거래량 (`^KS11` 코스피, `^GSPC` S&P500, `005930.KS`, 테마 대표 ETF `091160.KS` 등 20개) | 일 1회 | market-data |
 | 코인 마켓 목록 · 일봉 | 업비트 Open API · 두나무 | https://docs.upbit.com | Open API (키 불필요) | 마켓·한글명, 일자(KST)·종가·거래량 | 일 1회 | market-data |
+| 종목별 일별 뉴스 기사 수 | **크롤링** 네이버 증권 종목 뉴스 · 네이버 | https://m.stock.naver.com/domestic/stock/005930/news | 웹 페이지가 화면을 그릴 때 부르는 엔드포인트(`/api/news/stock/<코드>`, 20건/쪽)를 읽음. BeautifulSoup 는 HTML 표가 폐기(410)되어 쓰지 않음 | 기사 날짜 → 일별 건수 (하루 300건 상한) | 일 1회, 국내 추적 종목 100개 × 7일 | market-data |
 | 공시 목록 | DART 공시검색 `list.json` · 금융감독원 | https://opendart.fss.or.kr/guide/detail.do?apiGrpCd=DS001&apiId=2019001 | Open API (키) | 접수번호, 접수일, 공시명(→ 실적·계약·자금조달·주요사항·지분·기타 분류). 언급된 국내 종목만 | 일 1회 | market-data |
 
 메모

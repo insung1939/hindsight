@@ -29,6 +29,7 @@ class EventOut(BaseModel):
     channel_id: str
     market: str
     kind: str = "stock"
+    stance: str = "neutral"
     published_at: datetime
     t0_date: date | None
     t0_close: float | None
@@ -90,6 +91,7 @@ class ChannelRank(BaseModel):
 class ChannelRanking(BaseModel):
     horizon: int
     metric: str
+    stance: str = "all"
     min_n: int
     top: list[ChannelRank]
     bottom: list[ChannelRank]
@@ -124,24 +126,35 @@ def _summary(s: Session, key: str) -> dict:
 
 @app.get("/v1/summary", response_model=SummaryOut, tags=["summary"], operation_id="get_summary",
          summary="전체 분포 (scope=overall | market:KRX | market:US | market:CRYPTO | kind:theme | asset:<id> | channel:<id>)")
-def get_summary(scope: str = "overall", horizon: int = Query(default=20, description="5 · 20 · 60"), s: Session = Depends(db.session)):
-    return _summary(s, f"{scope}:{horizon}")
+def get_summary(scope: str = "overall", horizon: int = Query(default=20, description="5 · 20 · 60"),
+                stance: str = Query(default="all", pattern="^(all|bull|bear|neutral)$", description="제목 논조. 화면 기본은 bull(낙관 언급만)"),
+                s: Session = Depends(db.session)):
+    key = f"{scope}:{horizon}" if stance == "all" else f"{stance}:{scope}:{horizon}"
+    return _summary(s, key)
 
 
 @app.get("/v1/summaries", response_model=ListSummaries, tags=["summary"], operation_id="list_summaries",
          summary="요약 전부 (prefix 로 필터: overall · market · channel · asset)")
 def list_summaries(prefix: str | None = None, horizon: int | None = Query(default=None, description="5 · 20 · 60 중 하나만"),
+                   stance: str = Query(default="all", pattern="^(all|bull|bear|neutral)$", description="all 이면 전체 논조 키, 아니면 그 논조 키만"),
                    slim: bool = Query(default=False, description="true 면 histogram 을 빼고 준다 (목록 화면용, 응답 1/5)"),
                    s: Session = Depends(db.session)):
     q = select(Summary)
     if prefix:
-        q = q.where(Summary.key.like(f"{prefix}%"))
+        q = q.where(Summary.key.like(f"{(stance + ':') if stance != 'all' else ''}{prefix}%"))
+    elif stance != "all":
+        q = q.where(Summary.key.like(f"{stance}:%"))
+    if stance == "all":
+        q = q.where(~Summary.key.like("bull:%"), ~Summary.key.like("bear:%"), ~Summary.key.like("neutral:%"))
     if horizon:
         q = q.where(Summary.key.like(f"%:{horizon}"))
     rows = s.scalars(q.order_by(Summary.key)).all()
-    if slim:
-        rows = [{"key": r.key, "updated_at": r.updated_at, "value": {k: v for k, v in r.value.items() if k != "histogram"}} for r in rows]
-    return {"items": rows, "next_cursor": None}
+    strip = (stance + ":") if stance != "all" else None
+    out = []
+    for r in rows:
+        key = r.key[len(strip):] if strip and r.key.startswith(strip) else r.key
+        out.append({"key": key, "updated_at": r.updated_at, "value": ({k: v for k, v in r.value.items() if k != "histogram"} if slim else r.value)})
+    return {"items": out, "next_cursor": None}
 
 
 @app.get("/v1/coverage", response_model=StatsCoverage, tags=["ops"], operation_id="get_stats_coverage",
@@ -158,19 +171,21 @@ def stats_coverage(s: Session = Depends(db.session)):
          summary="채널 랭킹 — 언급 뒤 수익률 기준 상·하위 (metric=excess_mean|mean|win_rate|asset_win_rate, 표본 min_n 이상만)")
 def channel_ranking(horizon: int = Query(default=20, description="5 · 20 · 60"), metric: str = Query(default="excess_mean", pattern="^(excess_mean|mean|win_rate|asset_win_rate)$"),
                     min_n: int = Query(default=30, ge=1), min_assets: int = Query(default=10, ge=1, description="asset_win_rate 기준일 때 최소 언급 종목 수"),
+                    stance: str = Query(default="all", pattern="^(all|bull|bear|neutral)$", description="제목 논조. 화면 기본은 bull"),
                     limit: int = Query(default=3, ge=1, le=20), s: Session = Depends(db.session)):
     rows = []
-    for sm in s.scalars(select(Summary).where(Summary.key.like(f"channel:%:{horizon}"))).all():
+    pre = "" if stance == "all" else f"{stance}:"
+    for sm in s.scalars(select(Summary).where(Summary.key.like(f"{pre}channel:%:{horizon}"))).all():
         v = sm.value
         if (v.get("n") or 0) < min_n or v.get(metric) is None:
             continue
         if metric == "asset_win_rate" and (v.get("assets_n") or 0) < min_assets:
             continue
-        rows.append({"channel_id": sm.key[len("channel:"):-(len(str(horizon)) + 1)], "n": v["n"], "mean": v["mean"], "median": v["median"],
+        rows.append({"channel_id": sm.key[len(pre) + len("channel:"):-(len(str(horizon)) + 1)], "n": v["n"], "mean": v["mean"], "median": v["median"],
                      "win_rate": v["win_rate"], "excess_mean": v.get("excess_mean"), "excess_win_rate": v.get("excess_win_rate"),
                      "vol_ratio_median": v.get("vol_ratio_median"), "assets_n": v.get("assets_n"), "assets_up": v.get("assets_up"), "asset_win_rate": v.get("asset_win_rate")})
     rows.sort(key=lambda r: r[metric], reverse=True)
-    return {"horizon": horizon, "metric": metric, "min_n": min_n, "top": rows[:limit], "bottom": list(reversed(rows[-limit:])) if len(rows) > limit else [], "all": rows}
+    return {"horizon": horizon, "metric": metric, "stance": stance, "min_n": min_n, "top": rows[:limit], "bottom": list(reversed(rows[-limit:])) if len(rows) > limit else [], "all": rows}
 
 
 @app.get("/v1/assets/{asset_id}/events", response_model=ListEvents, tags=["events"], operation_id="asset_events",
@@ -255,7 +270,7 @@ def _sync(s: Session, since_days: int, full: bool) -> dict:
         fr = forward_returns(ser, day)
         bench = series.get(a.get("benchmark_id") or "")
         br = forward_returns(bench, day) if bench else {f"r{h}": None for h in HORIZONS}
-        vals = {"t0_date": fr["t0_date"], "t0_close": fr["t0_close"], "vol_ratio": fr["vol_ratio"],
+        vals = {"t0_date": fr["t0_date"], "t0_close": fr["t0_close"], "vol_ratio": fr["vol_ratio"], "stance": m.get("stance", "neutral"),
                 "near_disclosure": _near(disc.get(m["asset_id"]), fr["t0_date"]) if m["asset_id"] in disc else None}
         for h in HORIZONS:
             vals[f"r{h}"] = fr[f"r{h}"]
@@ -266,7 +281,7 @@ def _sync(s: Session, since_days: int, full: bool) -> dict:
                 to_update.append({"id": ev.id, "computed_at": datetime.utcnow(), **vals}); updated += 1
         else:
             to_insert.append({"mention_id": m["id"], "asset_id": m["asset_id"], "channel_id": m["channel_id"], "market": a["market"],
-                              "kind": "theme" if a.get("asset_type") == "theme" else "stock", "benchmark_id": a.get("benchmark_id"),
+                              "kind": "theme" if a.get("asset_type") == "theme" else "stock", "stance": m.get("stance", "neutral"), "benchmark_id": a.get("benchmark_id"),
                               "published_at": pub, "computed_at": datetime.utcnow(), **vals}); added += 1
     # 한 건씩이 아니라 묶어서 — Render 0.1 CPU 에서 1만 건 UPDATE 가 20분 → 수십 초
     from sqlalchemy import insert, update
@@ -329,32 +344,34 @@ def _rebuild_summaries(s: Session) -> int:
     """요약 캐시 재계산. ORM 객체 대신 컬럼 튜플만 읽어 메모리를 아낀다(5만 건 ORM 은 Render 무료 512MB 에서 OOM)."""
     cols = (EventReturn.market, EventReturn.kind, EventReturn.channel_id, EventReturn.asset_id,
             EventReturn.r5, EventReturn.r20, EventReturn.r60, EventReturn.x5, EventReturn.x20, EventReturn.x60,
-            EventReturn.vol_ratio, EventReturn.near_disclosure)
+            EventReturn.vol_ratio, EventReturn.near_disclosure, EventReturn.stance)
     groups: dict[str, list[tuple]] = {"overall": []}
     for row in s.execute(select(*cols)).yield_per(5000):
-        market, kind, channel_id, asset_id = row[0], row[1], row[2], row[3]
-        payload = row[4:]
-        if kind == "theme":
-            groups.setdefault("kind:theme", []).append(payload)
-        else:
-            groups["overall"].append(payload)
-            groups.setdefault("kind:stock", []).append(payload)
-            groups.setdefault(f"market:{market}", []).append(payload)
-            groups.setdefault(f"channel:{channel_id}", []).append(payload)
-        groups.setdefault(f"asset:{asset_id}", []).append(payload)
+        market, kind, channel_id, asset_id, stance = row[0], row[1], row[2], row[3], row[12]
+        payload = row[4:12]
+        for pre in ("", f"{stance}:"):  # 전체 키와 논조별 키(bull:·bear:·neutral:) 둘 다
+            if kind == "theme":
+                groups.setdefault(f"{pre}kind:theme", []).append(payload)
+            else:
+                groups.setdefault(f"{pre}overall", []).append(payload)
+                groups.setdefault(f"{pre}kind:stock", []).append(payload)
+                groups.setdefault(f"{pre}market:{market}", []).append(payload)
+                groups.setdefault(f"{pre}channel:{channel_id}", []).append(payload)
+            groups.setdefault(f"{pre}asset:{asset_id}", []).append(payload)
     idx = {5: (0, 3), 20: (1, 4), 60: (2, 5)}  # (r 위치, x 위치) in payload
     # 채널별 "언급한 종목 n개 중 평균 수익률이 양(+)인 종목 비중" — 언급 건 기준 상승 확률과 다른, 종목 기준 지표
-    by_channel_asset: dict[str, dict[str, list]] = {}
-    for row in s.execute(select(EventReturn.channel_id, EventReturn.asset_id, EventReturn.r5, EventReturn.r20, EventReturn.r60).where(EventReturn.kind != "theme")).yield_per(5000):
-        by_channel_asset.setdefault(row[0], {}).setdefault(row[1], []).append(row[2:])
+    by_channel_asset: dict[str, dict[str, list]] = {}  # 키: "" 또는 "bull:" 등 접두사 + channel_id
+    for row in s.execute(select(EventReturn.channel_id, EventReturn.asset_id, EventReturn.r5, EventReturn.r20, EventReturn.r60, EventReturn.stance).where(EventReturn.kind != "theme")).yield_per(5000):
+        for pre in ("", f"{row[5]}:"):
+            by_channel_asset.setdefault(pre + row[0], {}).setdefault(row[1], []).append(row[2:5])
     n = 0
     for key, evs in groups.items():
         for h in HORIZONS:
             ri, xi = idx[h]
             val = summarize([{"r": e[ri], "x": e[xi], "v": e[6], "d": e[7]} for e in evs], h)
             val["scope"] = key
-            if key.startswith("channel:"):
-                per_asset = by_channel_asset.get(key[8:], {})
+            if "channel:" in key:
+                per_asset = by_channel_asset.get(key.replace("channel:", "", 1) if key.startswith("channel:") else key.split("channel:")[0] + key.split("channel:")[1], {})
                 means = []
                 for rows_ in per_asset.values():
                     rs = [r_[ri] for r_ in rows_ if r_[ri] is not None]

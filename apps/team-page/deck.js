@@ -46,7 +46,7 @@ function renderOverall(d) {
   const el = $("#overall-cards"); if (!el) return;
   const s = d.summary || {};
   el.innerHTML = [5, 20, 60].map((h) => {
-    const v = s[`overall:${h}`];
+    const v = s[`bull:overall:${h}`] || s[`overall:${h}`];
     if (!v || !v.n) return card(`${h}거래일 뒤`, "—", "표본 없음");
     const cls = v.mean > 0 ? "pos-v" : v.mean < 0 ? "neg-v" : "";
     return card(`${h}거래일 뒤 · n=${fmt.n(v.n)}`,
@@ -56,7 +56,7 @@ function renderOverall(d) {
 }
 function renderHist(d) {
   const el = $("#hist-overall"); if (!el) return;
-  const v = (d.summary || {})["overall:20"]; if (!v || !v.histogram) return;
+  const v = (d.summary || {})["bull:overall:20"] || (d.summary || {})["overall:20"]; if (!v || !v.histogram) return;
   const max = Math.max(1, ...v.histogram.map((b) => b.n));
   const label = (b) => (b.from <= -1 ? "< −20%" : b.to >= 9 ? "> +20%" : `${Math.round(b.from * 100)}~${Math.round(b.to * 100)}%`);
   el.innerHTML = v.histogram.map((b) => `<div class="c"><div class="n">${fmt.n(b.n)}</div><div class="b ${b.from >= 0 ? "up" : ""}" style="height:${(b.n / max) * 100}%"></div><div class="l">${label(b)}</div></div>`).join("");
@@ -65,7 +65,7 @@ function row(cells) { return `<tr>${cells.map((c, i) => `<td class="${i ? "r" : 
 function renderTables(d) {
   const s = d.summary || {};
   const tm = $("#tbl-market tbody");
-  if (tm) tm.innerHTML = [["전체", "overall:20"], ["국내", "market:KRX:20"], ["미국", "market:US:20"], ["코인", "market:CRYPTO:20"], ["업종·테마", "kind:theme:20"]]
+  if (tm) tm.innerHTML = [["낙관 언급", "bull:overall:20"], ["비관 언급", "bear:overall:20"], ["중립", "neutral:overall:20"], ["낙관 · 국내", "bull:market:KRX:20"], ["낙관 · 미국", "bull:market:US:20"], ["낙관 · 코인", "bull:market:CRYPTO:20"], ["낙관 · 업종·테마", "bull:kind:theme:20"]]
     .map(([l, k]) => { const v = s[k]; return v && v.n ? row([`<b>${l}</b>`, fmt.n(v.n), `<span class="${v.mean > 0 ? "pos-v" : "neg-v"}">${fmt.pct1(v.mean)}</span>`, fmt.pct0(v.win_rate), fmt.pct1(v.excess_mean), v.vol_ratio_median ? v.vol_ratio_median + "배" : "—"]) : row([l, "—", "—", "—", "—", "—"]); }).join("");
   const ta = $("#tbl-assets tbody");
   if (ta) ta.innerHTML = (d.top_assets_20 || []).slice(0, 10).map((a) => row([`<b>${a.name}</b> <span class="note">${a.market}</span>`, fmt.n(a.n), `<span class="${a.mean > 0 ? "pos-v" : "neg-v"}">${fmt.pct1(a.mean)}</span>`, fmt.pct0(a.win_rate), a.vol_ratio_median ? a.vol_ratio_median + "배" : "—"])).join("");
@@ -79,15 +79,16 @@ function renderTables(d) {
   if (tr) tr.innerHTML = (d.trending_30d || []).slice(0, 8).map((t) => row([`<b>${t.name}</b>`, fmt.n(t.mentions), fmt.n(t.prev), t.channels])).join("");
 }
 function renderFindings(d) {
-  const s = d.summary || {}; const o = s["overall:20"], o5 = s["overall:5"], o60 = s["overall:60"]; const th = s["kind:theme:20"];
-  const f = {};
-  if (o && o.n) f[1] = `언급 뒤 20거래일 평균 <b>${fmt.pct1(o.mean)}</b>, 상승 확률 <b>${fmt.pct0(o.win_rate)}</b> (n=${fmt.n(o.n)}). ${o.win_rate >= 0.45 && o.win_rate <= 0.55 ? "동전 던지기와 같다. 언급은 방향 정보가 아니다." : o.win_rate > 0.55 ? "오른 쪽이 많았다. 시장 효과는 다음 줄에서." : "내린 쪽이 많았다. 언급이 몰릴 땐 이미 오른 뒤였다."}`;
+  const s = d.summary || {}; const o = s["bull:overall:20"] || s["overall:20"], o5 = s["bull:overall:5"] || s["overall:5"], o60 = s["bull:overall:60"] || s["overall:60"]; const th = s["bull:kind:theme:20"] || s["kind:theme:20"];
+  const bear = s["bear:overall:20"]; const f = {};
+  if (o && o.n) f[1] = `"오른다"고 한 언급 뒤 20거래일 평균 <b>${fmt.pct1(o.mean)}</b>, 상승 확률 <b>${fmt.pct0(o.win_rate)}</b> (n=${fmt.n(o.n)}). ${o.win_rate >= 0.45 && o.win_rate <= 0.55 ? "동전 던지기와 같다. 언급은 방향 정보가 아니다." : o.win_rate > 0.55 ? "오른 쪽이 많았다. 시장 효과는 다음 줄에서." : "내린 쪽이 많았다. 언급이 몰릴 땐 이미 오른 뒤였다."}`;
   if (o && o.excess_mean != null) f[2] = `시장을 빼면 <b>${fmt.pct1(o.excess_mean)}</b>, 시장을 이긴 비율 <b>${fmt.pct0(o.excess_win_rate)}</b>. ${Math.abs(o.excess_mean) < 0.01 ? "오른 건 시장 덕이었다." : o.excess_mean > 0 ? "시장보다 조금 더 올랐다." : "언급 뒤에 사면 시장을 못 따라갔다."}`;
   if (o && o.vol_ratio_median) f[3] = o.vol_ratio_median < 1
     ? `거래량은 언급 <b>앞</b>이 더 많았다 (언급 뒤 5일 ÷ 앞 20일 = <b>${o.vol_ratio_median}배</b>, 늘어난 언급 <b>${fmt.pct0(o.vol_up_rate)}</b>). 관심이 먼저, 유튜브는 뒤따른다.`
     : `언급 뒤 거래량이 <b>${o.vol_ratio_median}배</b>로 늘었다 (늘어난 언급 <b>${fmt.pct0(o.vol_up_rate)}</b>). 가격과 별개로 관심은 움직였다.`;
   if (o5 && o60 && o5.n && o60.n) f[4] = `5일 ${fmt.pct1(o5.mean)} → 20일 ${fmt.pct1(o.mean)} → 60일 ${fmt.pct1(o60.mean)}${th && th.n ? `. 종목 없이 업종만 말한 언급(${fmt.n(th.n)}건)은 20일 ${fmt.pct1(th.mean)}, 상승 ${fmt.pct0(th.win_rate)} — 종목 언급보다 ${th.win_rate > o.win_rate + 0.03 ? "자주 올랐다" : th.win_rate < o.win_rate - 0.03 ? "덜 올랐다" : "비슷했다"}` : ""}.`;
-  const kr = s["market:KRX:20"];
+  if (bear && bear.n && o) f[4] = `"내린다"고 한 언급 뒤는 평균 <b>${fmt.pct1(bear.mean)}</b>, 상승 <b>${fmt.pct0(bear.win_rate)}</b> — 낙관(${fmt.pct1(o.mean)}, ${fmt.pct0(o.win_rate)})보다 ${bear.mean > o.mean ? "오히려 나았다. 제목의 방향은 뒤의 주가를 예측하지 못했다." : "나빴다. 제목의 방향이 어느 정도 맞았다."}`;
+  const kr = s["bull:market:KRX:20"] || s["market:KRX:20"];
   if (kr && kr.disclosure_n) f[5] = `국내 언급 ${fmt.n(kr.disclosure_n)}건 중 <b>${fmt.pct0(kr.disclosure_rate)}</b>는 사건일 ±3일에 DART 주요 공시가 있었다. ${kr.disclosure_rate >= 0.3 ? "언급의 상당수는 공시를 뒤따른 해설이다." : "대부분은 공시와 무관했다. 수급·테마가 언급을 만든다."}`;
   Object.entries(f).forEach(([k, v]) => { const el = $(`[data-finding="${k}"]`); if (el) el.innerHTML = v; });
 }
