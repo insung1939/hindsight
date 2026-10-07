@@ -89,15 +89,17 @@ def dart_listed_companies() -> list[dict]:
         return []
     r = httpx.get("https://opendart.fss.or.kr/api/corpCode.xml", params={"crtfc_key": key}, headers=UA, timeout=60)
     r.raise_for_status()
-    with zipfile.ZipFile(io.BytesIO(r.content)) as z:
-        xml = z.read(z.namelist()[0])
     out = []
-    for el in ElementTree.fromstring(xml).iter("list"):
-        code = (el.findtext("stock_code") or "").strip()
-        if not code:
-            continue
-        out.append({"stock_code": code, "corp_name": (el.findtext("corp_name") or "").strip(),
-                    "corp_code": (el.findtext("corp_code") or "").strip()})
+    # 10만 개 회사 XML 을 통째로 파싱하면 메모리가 수백 MB 튄다(Render 무료 512MB 에서 OOM). iterparse 로 흘려 읽고 바로 버린다.
+    with zipfile.ZipFile(io.BytesIO(r.content)) as z, z.open(z.namelist()[0]) as f:
+        for _, el in ElementTree.iterparse(f, events=("end",)):
+            if el.tag != "list":
+                continue
+            code = (el.findtext("stock_code") or "").strip()
+            if code:
+                out.append({"stock_code": code, "corp_name": (el.findtext("corp_name") or "").strip(),
+                            "corp_code": (el.findtext("corp_code") or "").strip()})
+            el.clear()
     return out
 
 

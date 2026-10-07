@@ -41,10 +41,11 @@ jobs:
       - name: Render 깨우기 (무료 플랜 콜드 스타트)
         if: env.API_URL != ''
         run: curl -sS --max-time 120 --retry 5 --retry-delay 20 --retry-all-errors "$API_URL/healthz" || true
-      - name: market-data (사전 + 시세·거래량)
+      - name: market-data (시세·거래량 — 사전 갱신은 일요일만)
         if: env.MARKET_DATA_URL != ''
         run: |
-          curl -sS --fail --max-time 1500 --retry 3 --retry-delay 30 -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "$MARKET_DATA_URL/internal/sync?days=$PRICE_DAYS"
+          DICT=false; [ "$(date -u +%u)" = "7" ] && DICT=true   # 일요일: DART 상장사·업비트 마켓 목록 갱신 (메모리 많이 써서 주 1회)
+          curl -sS --fail --max-time 1500 --retry 3 --retry-delay 60 -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "$MARKET_DATA_URL/internal/sync?days=$PRICE_DAYS&dictionary=$DICT"
       - name: youtube (새 영상)
         if: env.YOUTUBE_URL != ''
         run: |

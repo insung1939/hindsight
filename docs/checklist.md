@@ -33,7 +33,7 @@
 - [x] Render Blueprint → `hindsight-api` (실주소 hindsight-api-edab, 이름 충돌로 접미사) (10/7)
 - [x] `scripts/migrate_sqlite_to_pg.py` 로 로컬 데이터 → Supabase 복사 (10/7 밤)
 - [x] Vercel `hindsight-web`(apps/web) · `hindsight`(apps/team-page, 저장소 루트에서 배포, Root Directory 설정) (10/7)
-- [x] GitHub Secrets `API_URL` · `INTERNAL_TOKEN` 등록 (10/7) · [ ] `sync.yml` 수동 실행 결과 확인
+- [x] GitHub Secrets `API_URL` · `INTERNAL_TOKEN` 등록 (10/7) · [ ] `sync.yml` 수동 실행 성공 확인 (1차: 토큰 불일치 401 → 재등록, 2차: 사전 갱신 OOM 502 → 메모리 수정·일요일만 갱신)
 - [x] 발표 페이지 `deck.js` · 프론트 env · README · deploy.md 에 실제 주소 반영
 
 ### B. 데이터 — 10/9~10/15. 평가의 핵심
