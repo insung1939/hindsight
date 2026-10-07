@@ -2,7 +2,9 @@
 계산은 /internal/sync 배치에서 끝내 두고, 조회 API 는 저장된 결과와 요약 캐시만 읽는다(Render 콜드 스타트 대비)."""
 from datetime import date, datetime, timedelta
 
-from fastapi import Depends, HTTPException, Query
+import threading
+
+from fastapi import BackgroundTasks, Depends, HTTPException, Query
 from pydantic import BaseModel
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
@@ -94,6 +96,18 @@ class ChannelRanking(BaseModel):
     all: list[ChannelRank]
 
 
+class SyncStatus(BaseModel):
+    state: str  # idle · running · done · failed
+    started_at: datetime | None = None
+    finished_at: datetime | None = None
+    result: dict | None = None
+    error: str | None = None
+
+
+_job = {"state": "idle", "started_at": None, "finished_at": None, "result": None, "error": None}
+_job_lock = threading.Lock()
+
+
 class SyncResult(BaseModel):
     events_added: int
     events_updated: int
@@ -173,10 +187,40 @@ def channel_events(channel_id: str, s: Session = Depends(db.session)):
     return {"items": rows, "next_cursor": None}
 
 
+@app.get("/internal/sync-status", response_model=SyncStatus, tags=["ops"], operation_id="stats_sync_status",
+         summary="비동기 계산(background=true) 의 진행 상태", dependencies=[InternalOnly])
+def sync_status():
+    return _job
+
+
 @app.post("/internal/sync", response_model=SyncResult, tags=["ops"], operation_id="sync_stats",
-          summary="새 언급의 수익률 계산 + 미완성 값 채우기 + 요약 갱신", dependencies=[InternalOnly])
-def sync(since_days: int = Query(default=130, le=2000, description="이 기간의 언급만 다시 계산 (최초 백필은 400). 60거래일이 채워지려면 약 90일이면 되므로 매일은 130일"),
-         full: bool = Query(default=False, description="true 면 이미 60일까지 채워진 언급도 다시 계산(규칙이 바뀌었을 때)"), s: Session = Depends(db.session)):
+          summary="새 언급의 수익률 계산 + 미완성 값 채우기 + 요약 갱신. background=true 면 202 로 바로 돌아오고 /internal/sync-status 로 확인 (Render 는 긴 요청을 끊는다)",
+          dependencies=[InternalOnly], status_code=200)
+def sync(background_tasks: BackgroundTasks,
+         since_days: int = Query(default=130, le=2000, description="이 기간의 언급만 다시 계산 (최초 백필은 400). 60거래일이 채워지려면 약 90일이면 되므로 매일은 130일"),
+         full: bool = Query(default=False, description="true 면 이미 60일까지 채워진 언급도 다시 계산(규칙이 바뀌었을 때)"),
+         background: bool = Query(default=False, description="true 면 백그라운드 실행 (응답 즉시, 결과는 sync-status)")):
+    if background:
+        with _job_lock:
+            if _job["state"] == "running":
+                return {"events_added": 0, "events_updated": 0, "summaries": 0, "skipped": ["이미 실행 중 — /internal/sync-status 확인"]}
+            _job.update({"state": "running", "started_at": datetime.utcnow(), "finished_at": None, "result": None, "error": None})
+        background_tasks.add_task(_run_job, since_days, full)
+        return {"events_added": 0, "events_updated": 0, "summaries": 0, "skipped": ["백그라운드 시작 — /internal/sync-status 확인"]}
+    with db.SessionLocal() as s:
+        return _sync(s, since_days, full)
+
+
+def _run_job(since_days: int, full: bool):
+    try:
+        with db.SessionLocal() as s:
+            res = _sync(s, since_days, full)
+        _job.update({"state": "done", "finished_at": datetime.utcnow(), "result": res})
+    except Exception as e:  # noqa: BLE001
+        _job.update({"state": "failed", "finished_at": datetime.utcnow(), "error": str(e)[:300]})
+
+
+def _sync(s: Session, since_days: int, full: bool) -> dict:
     since = datetime.utcnow() - timedelta(days=since_days)
     ments, after = [], 0
     while True:  # 2만 건도 다 받도록 id 페이징
@@ -194,6 +238,7 @@ def sync(since_days: int = Query(default=130, le=2000, description="이 기간�
     series = _load_series(asset_ids + bench_ids, since.date() - timedelta(days=10))
     disc = _load_disclosures([a for a in asset_ids if a.startswith("KRX:") and assets.get(a, {}).get("asset_type") != "theme"], since.date() - timedelta(days=10))
     added, updated, skipped = 0, 0, []
+    to_insert, to_update = [], []
     complete = 0
     for m in ments:
         ev0 = existing.get(m["id"])
@@ -217,19 +262,29 @@ def sync(since_days: int = Query(default=130, le=2000, description="이 기간�
             vals[f"x{h}"] = (fr[f"r{h}"] - br[f"r{h}"]) if fr[f"r{h}"] is not None and br.get(f"r{h}") is not None else None
         ev = existing.get(m["id"])
         if ev:
-            changed = any(getattr(ev, k) != v for k, v in vals.items())
-            if changed:
-                for k, v in vals.items():
-                    setattr(ev, k, v)
-                ev.computed_at = datetime.utcnow(); updated += 1
+            if any(_differs(getattr(ev, k), v) for k, v in vals.items()):
+                to_update.append({"id": ev.id, "computed_at": datetime.utcnow(), **vals}); updated += 1
         else:
-            s.add(EventReturn(mention_id=m["id"], asset_id=m["asset_id"], channel_id=m["channel_id"], market=a["market"],
-                              kind="theme" if a.get("asset_type") == "theme" else "stock",
-                              benchmark_id=a.get("benchmark_id"), published_at=pub, **vals)); added += 1
+            to_insert.append({"mention_id": m["id"], "asset_id": m["asset_id"], "channel_id": m["channel_id"], "market": a["market"],
+                              "kind": "theme" if a.get("asset_type") == "theme" else "stock", "benchmark_id": a.get("benchmark_id"),
+                              "published_at": pub, "computed_at": datetime.utcnow(), **vals}); added += 1
+    # 한 건씩이 아니라 묶어서 — Render 0.1 CPU 에서 1만 건 UPDATE 가 20분 → 수십 초
+    from sqlalchemy import insert, update
+    for i in range(0, len(to_insert), 2000):
+        s.execute(insert(EventReturn), to_insert[i:i + 2000])
+    for i in range(0, len(to_update), 2000):
+        s.execute(update(EventReturn), to_update[i:i + 2000])
     s.flush()
     n = _rebuild_summaries(s)
     s.commit()
     return {"events_added": added, "events_updated": updated, "summaries": n, "skipped": ([f"이미 완료된 언급 {complete}건 건너뜀"] if complete else []) + skipped[:50]}
+
+
+def _differs(a, b) -> bool:
+    """float 은 반올림 차이로 매일 '바뀜' 이 되지 않게 소수 6자리에서 비교."""
+    if isinstance(a, float) or isinstance(b, float):
+        return a is None or b is None or abs(a - b) > 1e-6
+    return a != b
 
 
 MATERIAL_KINDS = {"실적", "계약", "자금조달", "주요사항"}  # 가격에 영향이 있는 공시만 (지분 보고·기타 제외)

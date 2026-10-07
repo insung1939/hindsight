@@ -76,4 +76,5 @@
 | GET | `/v1/channels/ranking` | 채널 랭킹 — 언급 뒤 수익률 기준 상·하위 (metric=excess_mean|mean|win_rate|asset_win_rate, 표본 min_n 이상만) | horizon, metric, min_n, min_assets, limit | — | 200 ChannelRanking |
 | GET | `/v1/assets/{asset_id}/events` | 종목 하나의 언급별 이후 수익률 (타임라인 화면) | asset_id | — | 200 ListEvents |
 | GET | `/v1/channels/{channel_id}/events` | 채널 하나의 언급별 이후 수익률 | channel_id | — | 200 ListEvents |
-| POST | `/internal/sync` | 새 언급의 수익률 계산 + 미완성 값 채우기 + 요약 갱신 | since_days, full, X-Internal-Token | — | 200 SyncResult |
+| GET | `/internal/sync-status` | 비동기 계산(background=true) 의 진행 상태 | X-Internal-Token | — | 200 SyncStatus |
+| POST | `/internal/sync` | 새 언급의 수익률 계산 + 미완성 값 채우기 + 요약 갱신. background=true 면 202 로 바로 돌아오고 /internal/sync-status 로 확인 (Render 는 긴 요청을 끊는다) | since_days, full, background, X-Internal-Token | — | 200 SyncResult |
