@@ -2,5 +2,6 @@
 from .app import InternalOnly, create_app, internal_only
 from .db import Database
 from .http import ServiceClient
+from .memo import memo_ttl
 
-__all__ = ["create_app", "internal_only", "InternalOnly", "Database", "ServiceClient"]
+__all__ = ["create_app", "internal_only", "InternalOnly", "Database", "ServiceClient", "memo_ttl"]

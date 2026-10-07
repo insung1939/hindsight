@@ -10,7 +10,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 import collectors
-from hs_common import InternalOnly, create_app
+from hs_common import InternalOnly, create_app, memo_ttl
 from models import Channel, Video, db
 
 app = create_app("youtube", "하인드사이트 youtube", "0.1.0",
@@ -125,12 +125,18 @@ def get_video(video_id: str, s: Session = Depends(db.session)):
 
 @app.get("/v1/coverage", response_model=Coverage, tags=["videos"], operation_id="get_coverage", summary="수집 현황 (데이터 페이지용)")
 def get_coverage(s: Session = Depends(db.session)):
-    by = dict(s.execute(select(Channel.category, func.count(Video.video_id)).join(Video, Video.channel_id == Channel.channel_id)
-                        .group_by(Channel.category)).all())
-    return {"channels": s.scalar(select(func.count()).select_from(Channel)) or 0,
-            "videos": s.scalar(select(func.count()).select_from(Video)) or 0,
-            "first_published": s.scalar(select(func.min(Video.published_at))),
-            "last_published": s.scalar(select(func.max(Video.published_at))), "by_category": by}
+    return _get_coverage_cached()
+
+
+@memo_ttl(300)
+def _get_coverage_cached():
+    with db.SessionLocal() as s:
+        by = dict(s.execute(select(Channel.category, func.count(Video.video_id)).join(Video, Video.channel_id == Channel.channel_id)
+                            .group_by(Channel.category)).all())
+        return {"channels": s.scalar(select(func.count()).select_from(Channel)) or 0,
+                "videos": s.scalar(select(func.count()).select_from(Video)) or 0,
+                "first_published": s.scalar(select(func.min(Video.published_at))),
+                "last_published": s.scalar(select(func.max(Video.published_at))), "by_category": by}
 
 
 # ── 수집 ────────────────────────────────────────────────
@@ -154,6 +160,7 @@ def sync(days: int = Query(default=7, le=730), s: Session = Depends(db.session))
         except Exception as e:
             skipped.append(f"{ch.anon_code}: {e}")
     s.commit()
+    memo_ttl.clear()
     return {"videos_added": added, "channels_synced": synced, "skipped": skipped}
 
 
@@ -172,4 +179,5 @@ def load_fixture(s: Session = Depends(db.session)):
             v = {**v, "published_at": datetime.fromisoformat(v["published_at"])}
             s.add(Video(**v)); added += 1
     s.commit()
+    memo_ttl.clear()
     return {"videos_added": added, "channels_synced": len(data["channels"]), "skipped": ["샘플 데이터 — 실제 채널·영상 아님"]}

@@ -11,7 +11,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 import collectors
-from hs_common import InternalOnly, create_app
+from hs_common import InternalOnly, create_app, memo_ttl
 from models import Asset, Disclosure, NewsDaily, Price, db
 from seed import AMBIGUOUS_NAMES, seed_assets
 
@@ -284,24 +284,30 @@ def list_disclosures(asset_ids: str, from_date: date | None = Query(default=None
 @app.get("/v1/coverage", response_model=MarketCoverage, tags=["ops"], operation_id="get_market_coverage",
          summary="수집 현황 (데이터 페이지용): 사전·시세·거래량·공시·뉴스 건수")
 def market_coverage(s: Session = Depends(db.session)):
-    by: dict[str, dict[str, int]] = {}
-    for market, asset_type, tracked, n in s.execute(select(Asset.market, Asset.asset_type, Asset.tracked, func.count()).group_by(Asset.market, Asset.asset_type, Asset.tracked)).all():
-        d_ = by.setdefault(market, {"total": 0, "tracked": 0, "theme": 0})
-        d_["total"] += n
-        if tracked:
-            d_["tracked"] += n
-        if asset_type == "theme":
-            d_["theme"] += n
-    return {"assets_by_market": by,
-            "prices": s.scalar(select(func.count()).select_from(Price)) or 0,
-            "prices_with_volume": s.scalar(select(func.count()).select_from(Price).where(Price.volume.is_not(None))) or 0,
-            "last_trade_date": s.scalar(select(func.max(Price.trade_date))),
-            "disclosures": s.scalar(select(func.count()).select_from(Disclosure)) or 0,
-            "disclosure_assets": s.scalar(select(func.count(func.distinct(Disclosure.asset_id)))) or 0,
-            "last_disclosure_date": s.scalar(select(func.max(Disclosure.rcept_dt))),
-            "news_rows": s.scalar(select(func.count()).select_from(NewsDaily)) or 0,
-            "news_assets": s.scalar(select(func.count(func.distinct(NewsDaily.asset_id)))) or 0,
-            "last_news_date": s.scalar(select(func.max(NewsDaily.news_date)))}
+    return _market_coverage_cached()
+
+
+@memo_ttl(300)
+def _market_coverage_cached():
+    with db.SessionLocal() as s:
+        by: dict[str, dict[str, int]] = {}
+        for market, asset_type, tracked, n in s.execute(select(Asset.market, Asset.asset_type, Asset.tracked, func.count()).group_by(Asset.market, Asset.asset_type, Asset.tracked)).all():
+            d_ = by.setdefault(market, {"total": 0, "tracked": 0, "theme": 0})
+            d_["total"] += n
+            if tracked:
+                d_["tracked"] += n
+            if asset_type == "theme":
+                d_["theme"] += n
+        return {"assets_by_market": by,
+                "prices": s.scalar(select(func.count()).select_from(Price)) or 0,
+                "prices_with_volume": s.scalar(select(func.count()).select_from(Price).where(Price.volume.is_not(None))) or 0,
+                "last_trade_date": s.scalar(select(func.max(Price.trade_date))),
+                "disclosures": s.scalar(select(func.count()).select_from(Disclosure)) or 0,
+                "disclosure_assets": s.scalar(select(func.count(func.distinct(Disclosure.asset_id)))) or 0,
+                "last_disclosure_date": s.scalar(select(func.max(Disclosure.rcept_dt))),
+                "news_rows": s.scalar(select(func.count()).select_from(NewsDaily)) or 0,
+                "news_assets": s.scalar(select(func.count(func.distinct(NewsDaily.asset_id)))) or 0,
+                "last_news_date": s.scalar(select(func.max(NewsDaily.news_date)))}
 
 
 @app.get("/v1/news-daily", response_model=ListNewsDaily, tags=["attention"], operation_id="list_news_daily",
@@ -415,6 +421,7 @@ def sync(days: int = Query(default=400, le=5000), dictionary: bool = True, s: Se
             continue
         upserted += _upsert_prices(s, asset, rows)
     s.commit()
+    memo_ttl.clear()
     return {"assets_added": added, "prices_upserted": upserted, "skipped": skipped[:50]}
 
 
