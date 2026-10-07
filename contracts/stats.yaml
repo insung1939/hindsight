@@ -280,6 +280,15 @@ paths:
           default: 130
           title: Since Days
         description: 이 기간의 언급만 다시 계산 (최초 백필은 400). 60거래일이 채워지려면 약 90일이면 되므로 매일은 130일
+      - name: full
+        in: query
+        required: false
+        schema:
+          type: boolean
+          description: true 면 이미 60일까지 채워진 언급도 다시 계산(규칙이 바뀌었을 때)
+          default: false
+          title: Full
+        description: true 면 이미 60일까지 채워진 언급도 다시 계산(규칙이 바뀌었을 때)
       - name: X-Internal-Token
         in: header
         required: false

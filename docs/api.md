@@ -75,4 +75,4 @@
 | GET | `/v1/channels/ranking` | 채널 랭킹 — 언급 뒤 수익률 기준 상·하위 (metric=excess_mean|mean|win_rate, 표본 min_n 이상만) | horizon, metric, min_n, limit | — | 200 ChannelRanking |
 | GET | `/v1/assets/{asset_id}/events` | 종목 하나의 언급별 이후 수익률 (타임라인 화면) | asset_id | — | 200 ListEvents |
 | GET | `/v1/channels/{channel_id}/events` | 채널 하나의 언급별 이후 수익률 | channel_id | — | 200 ListEvents |
-| POST | `/internal/sync` | 새 언급의 수익률 계산 + 미완성 값 채우기 + 요약 갱신 | since_days, X-Internal-Token | — | 200 SyncResult |
+| POST | `/internal/sync` | 새 언급의 수익률 계산 + 미완성 값 채우기 + 요약 갱신 | since_days, full, X-Internal-Token | — | 200 SyncResult |

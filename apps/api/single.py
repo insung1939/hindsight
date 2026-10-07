@@ -55,7 +55,7 @@ for svc in SERVICES:
 for m in LOCAL_MODULES:  # 마지막 서비스의 짧은 이름이 남지 않게
     sys.modules.pop(m, None)
 
-app = FastAPI(title="힌드사이트 API", version="1.2.0", docs_url=None, redoc_url=None, openapi_url=None,
+app = FastAPI(title="힌드사이트 API", version="1.3.0", docs_url=None, redoc_url=None, openapi_url=None,
               description="유튜버가 말한 종목, 그 뒤에 어떻게 됐나 — market-data · youtube · mentions · stats 네 서비스를 한 프로세스·한 주소로.")
 _origins = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "http://localhost:5173").split(",") if o.strip()]
 app.add_middleware(CORSMiddleware, allow_origins=_origins, allow_methods=["GET"], allow_headers=["*"])
