@@ -33,9 +33,14 @@ def upstream(svc: str) -> str:
     return f"http://127.0.0.1:{SERVICES[svc]}"
 
 
+def public_base(request: Request) -> str:
+    """배포 주소. PUBLIC_URL 이 있으면 그것, 없으면 요청 헤더(X-Forwarded-Proto/Host)로 만든다 — Render 가 서비스 이름 뒤에 접미사를 붙여도 맞는다."""
+    return PUBLIC_URL or f"{request.url.scheme}://{request.headers.get('host', request.url.netloc)}"
+
+
 @app.get("/", include_in_schema=False)
-def index():
-    base = PUBLIC_URL
+def index(request: Request):
+    base = public_base(request)
     return {"service": "hindsight", "docs": f"{base}/docs", "healthz": f"{base}/healthz",
             "services": {s: f"{base}/{s}" for s in SERVICES}, "per_service_docs": {s: f"{base}/{s}/docs" for s in SERVICES},
             "github": "https://github.com/insung1939/hindsight"}
@@ -72,14 +77,14 @@ def _prefix_refs(obj, svc: str):
             _prefix_refs(v, svc)
 
 
-async def merged_openapi() -> dict:
+async def merged_openapi(base: str = "") -> dict:
     global _merged
     if _merged:
-        return _merged
+        return {**_merged, "servers": [{"url": base or "/"}]}
     out = {"openapi": "3.1.0",
            "info": {"title": "힌드사이트 API (합본)", "version": "1.0.0",
                     "description": "네 서비스의 명세를 경로 접두사로 합쳤다. 원본 명세는 contracts/<service>.yaml, 서비스별 Swagger 는 /<service>/docs."},
-           "servers": [{"url": PUBLIC_URL or "/"}], "paths": {}, "components": {"schemas": {}}, "tags": []}
+           "servers": [{"url": base or "/"}], "paths": {}, "components": {"schemas": {}}, "tags": []}
     for svc in SERVICES:
         try:
             r = await client.get(f"{upstream(svc)}/openapi.json", timeout=10)
@@ -105,8 +110,8 @@ async def merged_openapi() -> dict:
 
 
 @app.get("/openapi.json", include_in_schema=False)
-async def openapi_json():
-    return await merged_openapi()
+async def openapi_json(request: Request):
+    return await merged_openapi(public_base(request))
 
 
 @app.get("/docs", include_in_schema=False)
@@ -134,7 +139,7 @@ async def proxy(svc: str, path: str, request: Request):
     content = r.content
     if path == "openapi.json" and r.status_code == 200:  # 서비스 자체 Swagger 의 "Try it out" 이 접두사를 타게
         spec = r.json()
-        spec["servers"] = [{"url": f"{PUBLIC_URL}/{svc}"}]
+        spec["servers"] = [{"url": f"{public_base(request)}/{svc}"}]
         return JSONResponse(spec, headers={k: v for k, v in resp_headers.items() if k.lower() != "content-type"})
     if path == "docs" and r.status_code == 200:  # 서비스 Swagger 페이지의 /openapi.json 상대 경로 보정
         html = content.decode("utf-8")

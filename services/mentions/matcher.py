@@ -46,7 +46,8 @@ def build_terms(dictionary: list[dict], ambiguous: set[str]) -> list[Term]:
                 continue  # 자동 수집(DART) 2글자 회사명("대상", "동양", "하나" …)은 일상어와 겹쳐 단독 매칭하지 않는다
             if is_ascii:
                 flags = 0 if (t.isupper() and len(t) <= 5) else re.IGNORECASE  # 5자 이하 대문자 = 티커
-                pattern = re.compile(r"(?<![A-Za-z0-9])" + re.escape(t) + r"(?![A-Za-z0-9])", flags)
+                # 영문 앞뒤에 한글이 바로 붙으면 다른 단어다("SOL글로벌DRAM" 의 SOL 은 솔라나가 아니다). 조사("BTC가", "NVDA를")는 허용.
+                pattern = re.compile(r"(?<![A-Za-z0-9가-힣])" + re.escape(t) + r"(?:(?![A-Za-z0-9가-힣])|(?=" + _PARTICLES + r"(?![가-힣])))", flags)
             elif e.get("curated", True):
                 pattern = re.compile(re.escape(t))
             else:

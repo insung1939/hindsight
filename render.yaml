@@ -24,7 +24,5 @@ services:
         sync: false
       - key: DATA_GO_KR_KEY        # 없으면 비움 (Yahoo 대체)
         sync: false
-      - key: PUBLIC_URL
-        value: https://hindsight-api.onrender.com
       - key: PYTHONUNBUFFERED
         value: "1"

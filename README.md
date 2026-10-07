@@ -1,8 +1,10 @@
 # 힌드사이트 — 유튜버가 말한 종목, 그 뒤에 어떻게 됐나
 
+**배포 주소 (2026-10-07)** · 서비스 https://hindsight-web.vercel.app · Swagger https://hindsight-api-edab.onrender.com/docs · 발표 페이지 https://hindsight-gold.vercel.app · 저장소 https://github.com/insung1939/hindsight
+
 KAIST 디지털금융MBA 〈클라우드컴퓨팅실습〉 팀 프로젝트. 주식·코인 유튜브 채널이 영상 제목에서 언급한 종목을 모아, **언급 뒤 5·20·60 거래일 동안 주가가 실제로 어떻게 움직였는지** 통계로 보여준다. 채널은 익명(A·B·C) 집계, 종목 추천 문구 없음.
 
-**교수님 요구사항·중간 피드백·디자인 원칙(흰 바탕·검은 글씨)은 [docs/requirements.md](docs/requirements.md)**, 현재 상태와 10/21 까지의 할 일은 [docs/checklist.md](docs/checklist.md). 기획·역할은 [PLAN.md](PLAN.md), API 설명은 [docs/api.md](docs/api.md), 테이블은 [docs/db.md](docs/db.md), 데이터 출처는 [docs/data-sources.md](docs/data-sources.md), 배포는 [docs/deploy.md](docs/deploy.md), 세미나 데모는 [docs/seminar-demo.md](docs/seminar-demo.md).
+**처음 보면 [docs/overview.md](docs/overview.md)(검토 가이드) 부터.** 교수님 요구사항·중간 피드백·디자인 원칙은 [docs/requirements.md](docs/requirements.md), 현재 상태와 10/21 까지의 할 일은 [docs/checklist.md](docs/checklist.md). 기획·역할은 [PLAN.md](PLAN.md), API 설명은 [docs/api.md](docs/api.md), 테이블은 [docs/db.md](docs/db.md), 데이터 출처는 [docs/data-sources.md](docs/data-sources.md), 배포는 [docs/deploy.md](docs/deploy.md), 세미나 데모는 [docs/seminar-demo.md](docs/seminar-demo.md).
 
 > 평가 포인트(교수 피드백): **어떤 소스에서 데이터를 가져와 어떻게 가공해 무슨 가치를 주는가.** UI 가 아니라 데이터와 API 호출이 중심. 발표의 절반은 파이프라인(소스 → 수집 → 매칭 → 계산 → 결과)에 실제 건수를 붙여 설명한다.
 

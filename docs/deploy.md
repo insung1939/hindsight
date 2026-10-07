@@ -33,8 +33,8 @@ Render 는 "프로젝트 추가"가 아니라 **GitHub 저장소를 연결한 �
 | `ALLOWED_ORIGINS` | 일단 `http://localhost:5173`, ④ 뒤에 `https://<vercel>.vercel.app,http://localhost:5173` 로 수정 |
 | `YOUTUBE_API_KEY` `DART_KEY` `DATA_GO_KR_KEY` | 있는 것만. 없으면 비움 |
 
-3. Apply. Docker 빌드 5~8분. Live 가 되면 `https://hindsight-api.onrender.com/healthz` 가 네 서비스 전부 ok 여야 한다. Swagger: `/docs`.
-4. 서비스 이름을 바꿨다면 `render.yaml` 의 `PUBLIC_URL` 도 맞춘다.
+3. Apply. Docker 빌드 5~8분. Live 가 되면 `/healthz` 가 네 서비스 전부 ok 여야 한다. Swagger: `/docs`.
+4. **주의**: `hindsight-api.onrender.com` 은 다른 사람이 쓰고 있어 Render 가 접미사를 붙인다. 실제 배포 주소는 **https://hindsight-api-edab.onrender.com** (2026-10-07). 게이트웨이는 요청 호스트로 주소를 만들므로 설정을 바꿀 필요는 없고, 프론트(`VITE_API_URL`)·발표 페이지(`deck.js`)·GitHub Secret(`API_URL`)에 이 주소를 쓴다.
 
 ## ③ 데이터 옮기기 (조인성)
 
@@ -48,7 +48,7 @@ DATABASE_URL=postgresql://… .venv/bin/python scripts/migrate_sqlite_to_pg.py  
 ```bash
 cd apps/web
 npx vercel link --yes --project hindsight-web
-npx vercel env add VITE_API_URL production      # https://hindsight-api.onrender.com
+npx vercel env add VITE_API_URL production      # https://hindsight-api-edab.onrender.com
 npx vercel --prod
 ```
 주소가 나오면 Render 의 `ALLOWED_ORIGINS` 에 넣고 재배포(환경변수 저장 시 자동).
@@ -56,7 +56,7 @@ npx vercel --prod
 ## ⑤ 매일 수집
 
 ```bash
-gh secret set API_URL --body https://hindsight-api.onrender.com
+gh secret set API_URL --body https://hindsight-api-edab.onrender.com
 gh secret set INTERNAL_TOKEN           # 프롬프트에 ②의 값
 gh workflow run sync && gh run watch   # 최초는 inputs 로 youtube_days=365, price_days=420 가능
 ```

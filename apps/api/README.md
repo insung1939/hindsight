@@ -13,4 +13,4 @@
 
 Docker: `docker build -f apps/api/Dockerfile -t hindsight/api . && docker run -p 8000:8000 --env-file .env hindsight/api`
 
-환경변수: `DATABASE_URL`(Supabase Session pooler, 네 서비스가 스키마만 달리 씀) · `INTERNAL_TOKEN` · `ALLOWED_ORIGINS` · `YOUTUBE_API_KEY` · `DART_KEY` · `DATA_GO_KR_KEY` · `PUBLIC_URL`
+환경변수: `DATABASE_URL`(Supabase Session pooler, 네 서비스가 스키마만 달리 씀) · `INTERNAL_TOKEN` · `ALLOWED_ORIGINS` · `YOUTUBE_API_KEY` · `DART_KEY` · `DATA_GO_KR_KEY` (`PUBLIC_URL` 은 선택 — 없으면 요청 호스트로 만든다)

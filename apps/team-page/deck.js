@@ -1,6 +1,6 @@
 /* 발표 페이지 — 숫자는 data/snapshot.json 을 먼저 쓰고, API 가 깨어 있으면 실시간 값으로 덮어쓴다. */
 const CONFIG = {
-  api: "https://hindsight-api.onrender.com",       // Render 합본 게이트웨이
+  api: "https://hindsight-api-edab.onrender.com",  // Render 합본 게이트웨이
   web: "https://hindsight-web.vercel.app",          // Vercel 서비스
 };
 const $ = (s, r = document) => r.querySelector(s);

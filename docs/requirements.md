@@ -82,10 +82,10 @@
 
 | 교수님 요구 | 산출물 | 위치 | 상태(10/7) |
 |---|---|---|---|
-| FastAPI 백엔드 → Render | 서비스 4개 (market-data·youtube·mentions·stats) | `services/`, `render.yaml` | 코드 완성, **미배포** |
-| PostgreSQL → Supabase | 스키마 4개 | `docs/db.md` | 로컬 SQLite만, **미연결** |
+| FastAPI 백엔드 → Render | 합본 1개(서비스 4개 + 게이트웨이) | `apps/api`, `render.yaml` | ✅ https://hindsight-api-edab.onrender.com |
+| PostgreSQL → Supabase | 스키마 4개 | `docs/db.md` | ✅ 전 테이블 적재 |
 | GitHub | 공개 저장소 | https://github.com/insung1939/hindsight | ✅ |
-| React → Vercel (평가 제외) | 화면 4개 | `apps/web` | 코드 완성, **미배포** |
+| React → Vercel (평가 제외) | 화면 4개 | `apps/web` | ✅ https://hindsight-web.vercel.app |
 | 외부 API·오픈데이터 수집 | YouTube · DART · 공공데이터포털 · Yahoo · 업비트 | `docs/data-sources.md` | 수집기 완성, 실데이터는 채널 3개·120일만 |
 | 수집 데이터 분석·정리 페이지 | "언급 뒤에" + "데이터" 페이지 | `apps/web/src/pages` | 있음, 실데이터·파이프라인 지표 보강 필요 |
 | 서비스 아키텍처 | 다이어그램 + 흐름 | `PLAN.md` 5장, README | ✅ 발표용 그림으로 정리 필요 |
@@ -94,7 +94,7 @@
 | 비즈니스 모델 | 고객·가치·수익 | `PLAN.md` 1.6 | ✅ 발표 페이지에 한 화면 필요 |
 | 주요 페이지 및 기능 | 구현/예정 구분 | 팀 페이지 F1~F10 | ✅ |
 | 데이터 분석·정리 결과 | 실수치 | "언급 뒤에" 페이지 | ❌ 실데이터 적재 후 |
-| 주소 3개 | GitHub · Vercel · Swagger | 발표 페이지 첫 장 | GitHub만 |
+| 주소 3개 | GitHub · Vercel · Swagger | 발표 페이지 첫 장 | ✅ https://github.com/insung1939/hindsight · https://hindsight-web.vercel.app · https://hindsight-api-edab.onrender.com/docs |
 | 문서 2개 | API 설명 · DB 테이블 | `docs/api.md` · `docs/db.md` | ✅ 배포 주소 반영 필요 |
 
 ## 6. 비밀값 규칙
