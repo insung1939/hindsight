@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HINDSIGHT 쇼릴 · 5조</title>
+<meta name="description" content="유튜버가 오른다고 한 종목, 정말 올랐을까? HINDSIGHT 모션그래픽 쇼릴">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+/* HINDSIGHT 쇼릴 — 1920×1080 무대를 화면에 맞춰 축소. 발표 페이지와 같은 팔레트(남색·파랑·빨강, Pretendard). */
+:root {
+  --bg: #fbfbfc; --surface: #fff; --text: #14213d; --muted: #5f6b80; --border: #e4e8ef;
+  --accent: #2f5bea; --accent-soft: rgba(47,91,234,.10); --navy: #14213d;
+  --up: #d23f31; --up-soft: rgba(210,63,49,.10); --down: #2f5bea; --ok: #0b7a4b;
+  --font: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; background: #0d1527; }
+body { font-family: var(--font); color: var(--text); overflow: hidden; -webkit-font-smoothing: antialiased; word-break: keep-all; user-select: none; cursor: default; }
+body.hide-cursor { cursor: none; }
+
+/* 무대 */
+#wrap { position: fixed; inset: 0; overflow: hidden; }
+#stage { width: 1920px; height: 1080px; background: var(--bg); position: absolute; left: calc(50% - 960px); top: calc(50% - 540px); overflow: hidden; transform-origin: center; box-shadow: 0 30px 80px rgba(0,0,0,.5); }
+#stage.paused *, #stage.paused *::before, #stage.paused *::after { animation-play-state: paused !important; }
+
+.scene { position: absolute; inset: 0; opacity: 0; visibility: hidden; padding: 120px 160px; display: flex; flex-direction: column; justify-content: center; }
+.scene.on { opacity: 1; visibility: visible; animation: fadein .6s ease both; }
+.scene.out { opacity: 0; visibility: visible; animation: fadeout .5s ease both; }
+@keyframes fadein { from { opacity: 0 } to { opacity: 1 } }
+@keyframes fadeout { from { opacity: 1 } to { opacity: 0 } }
+
+/* 공통 모션 — .on 안에서만 재생 */
+.scene .a { opacity: 0; }
+.scene.on .a { animation: up .7s cubic-bezier(.2,.8,.2,1) both; animation-delay: var(--d, 0s); }
+.scene.on .a.pop { animation-name: pop; }
+.scene.on .a.slam { animation-name: slam; animation-duration: .55s; }
+.scene.on .a.fade { animation-name: fadein; }
+@keyframes up { from { opacity: 0; transform: translateY(40px) } to { opacity: 1; transform: none } }
+@keyframes pop { from { opacity: 0; transform: scale(.85) } 70% { transform: scale(1.03) } to { opacity: 1; transform: none } }
+@keyframes slam { from { opacity: 0; transform: scale(1.6) } to { opacity: 1; transform: none } }
+.scene.on .gone { animation: fadeout .5s ease both; animation-delay: var(--g, 0s); }
+
+.kicker { color: var(--accent); font-weight: 800; font-size: 26px; letter-spacing: .14em; text-transform: uppercase; margin: 0 0 22px; }
+.h1 { font-size: 118px; line-height: 1.04; letter-spacing: -.04em; font-weight: 850; margin: 0; }
+.h2 { font-size: 84px; line-height: 1.08; letter-spacing: -.035em; font-weight: 850; margin: 0; }
+.lead { font-size: 40px; color: var(--muted); margin: 26px 0 0; font-weight: 500; }
+.num { font-variant-numeric: tabular-nums; }
+.blue { color: var(--accent); } .red { color: var(--up); } .muted { color: var(--muted); }
+.cap { position: absolute; left: 160px; bottom: 90px; font-size: 26px; color: var(--muted); font-weight: 600; }
+.cap b { color: var(--text); }
+
+/* 0. 훅 — 유튜브 제목 카드들 */
+#s0 { align-items: flex-start; }
+.ytcards { display: grid; gap: 22px; width: 1180px; }
+.ytcard { display: grid; grid-template-columns: 300px 1fr; gap: 26px; align-items: center; background: var(--surface); border: 1px solid var(--border); border-radius: 22px; padding: 18px; box-shadow: 0 10px 30px rgba(20,33,61,.07); }
+.ytcard .thumb { height: 150px; border-radius: 14px; background: linear-gradient(135deg, #1d2b4f, #2f5bea); position: relative; overflow: hidden; }
+.ytcard .thumb::after { content: ""; position: absolute; left: 50%; top: 50%; width: 0; height: 0; border: 22px solid transparent; border-left: 34px solid rgba(255,255,255,.9); transform: translate(-30%,-50%); }
+.ytcard .thumb span { position: absolute; left: 16px; bottom: 12px; color: #fff; font-weight: 850; font-size: 40px; letter-spacing: -.03em; text-shadow: 0 2px 10px rgba(0,0,0,.4); }
+.ytcard .t { font-size: 40px; font-weight: 800; letter-spacing: -.02em; line-height: 1.25; }
+.ytcard .m { font-size: 24px; color: var(--muted); margin-top: 8px; }
+.ytcard .t em { font-style: normal; color: var(--up); }
+#s0 .q { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; }
+#s0 .q .h1 { font-size: 150px; }
+
+/* 1. 로고 */
+#s1 { align-items: center; text-align: center; }
+.logo { width: 220px; height: 220px; border-radius: 48px; background: var(--navy); display: grid; place-items: center; color: #fff; font-weight: 900; font-size: 150px; letter-spacing: -.05em; margin-bottom: 48px; }
+.word { font-size: 170px; font-weight: 900; letter-spacing: .02em; line-height: 1; display: flex; }
+.word span { display: inline-block; opacity: 0; }
+.scene.on .word span { animation: up .6s cubic-bezier(.2,.8,.2,1) both; }
+.team { margin-top: 44px; font-size: 32px; color: var(--muted); font-weight: 600; }
+.team b { color: var(--accent); font-weight: 850; }
+
+/* 2. 수집 */
+.counters { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin: 60px 0 56px; }
+.counter { background: var(--surface); border: 1px solid var(--border); border-radius: 28px; padding: 44px 48px; box-shadow: 0 10px 30px rgba(20,33,61,.07); }
+.counter .v { font-size: 120px; font-weight: 900; letter-spacing: -.045em; line-height: 1; }
+.counter .v small { font-size: .36em; color: var(--muted); font-weight: 700; margin-left: 8px; letter-spacing: 0; }
+.counter .l { font-size: 30px; color: var(--muted); margin-top: 18px; font-weight: 600; }
+.marquee { overflow: hidden; white-space: nowrap; mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); }
+.marquee div { display: inline-block; padding-left: 100%; font-size: 34px; color: var(--navy); font-weight: 700; }
+.scene.on .marquee div { animation: slide 26s linear infinite; }
+@keyframes slide { to { transform: translateX(-100%) } }
+.marquee i { font-style: normal; margin: 0 28px; color: var(--border); }
+.chips { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 44px; }
+.chip { font-size: 28px; font-weight: 700; padding: 14px 26px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+.chip.k { background: #eef1f6; color: var(--muted); }
+
+/* 3. 매칭 */
+.title-box { background: var(--surface); border: 1px solid var(--border); border-radius: 28px; padding: 54px 60px; box-shadow: 0 10px 30px rgba(20,33,61,.07); font-size: 66px; font-weight: 800; letter-spacing: -.025em; line-height: 1.35; position: relative; }
+.title-box .typed { display: inline; }
+.title-box .typed::after { content: "|"; color: var(--accent); font-weight: 300; animation: blink .8s steps(1) infinite; }
+.title-box.done .typed::after { display: none; }
+@keyframes blink { 50% { opacity: 0 } }
+.mk { position: relative; display: inline-block; }
+.mk::before { content: ""; position: absolute; left: -6px; right: -6px; top: -4px; bottom: -4px; border-radius: 12px; transform: scaleX(0); transform-origin: left; }
+.mk.asset::before { background: var(--accent-soft); } .mk.bull::before { background: var(--up-soft); }
+.mk.asset { color: var(--accent); } .mk.bull { color: var(--up); }
+.scene.on .mk.lit::before { animation: wipe .5s cubic-bezier(.2,.8,.2,1) both; animation-delay: var(--d, 0s); }
+@keyframes wipe { to { transform: scaleX(1) } }
+.mk .lab { position: absolute; left: 0; top: 100%; margin-top: 10px; font-size: 24px; font-weight: 800; letter-spacing: .06em; white-space: nowrap; opacity: 0; }
+.scene.on .mk.lit .lab { animation: up .5s ease both; animation-delay: calc(var(--d, 0s) + .3s); }
+.stamp { position: absolute; right: 54px; top: -36px; font-size: 40px; font-weight: 900; letter-spacing: .1em; color: var(--up); border: 6px solid var(--up); border-radius: 16px; padding: 8px 22px; transform: rotate(-8deg); background: #fff; }
+.flow { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 28px; align-items: center; margin-top: 70px; }
+.flow .box { text-align: center; }
+.flow .v { font-size: 92px; font-weight: 900; letter-spacing: -.04em; line-height: 1; }
+.flow .l { font-size: 30px; color: var(--muted); margin-top: 14px; font-weight: 600; }
+.flow .arr { font-size: 70px; color: var(--border); font-weight: 300; }
+
+/* 4. 측정 — 차트 */
+.chart { width: 1600px; height: 640px; display: block; margin-top: 30px; overflow: visible; }
+.chart .grid { stroke: var(--border); stroke-width: 2; }
+.chart .price { fill: none; stroke: var(--navy); stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 2600; stroke-dashoffset: 2600; }
+.scene.on .chart .price { animation: draw 3.2s cubic-bezier(.4,0,.2,1) forwards; animation-delay: .4s; }
+.chart .bench { fill: none; stroke: var(--muted); stroke-width: 5; stroke-dasharray: 16 14; opacity: 0; }
+.scene.on .chart .bench { animation: fadein .6s ease forwards; animation-delay: 4.2s; }
+@keyframes draw { to { stroke-dashoffset: 0 } }
+.chart .t0 { fill: var(--up); }
+.chart .ring { fill: none; stroke: var(--up); stroke-width: 4; opacity: 0; transform-box: fill-box; transform-origin: center; }
+.scene.on .chart .ring { animation: ring 1.4s ease-out infinite; animation-delay: 1.9s; }
+@keyframes ring { 0% { transform: scale(.6); opacity: .9 } 100% { transform: scale(3); opacity: 0 } }
+.chart .hz { stroke: var(--accent); stroke-width: 3; stroke-dasharray: 10 10; opacity: 0; }
+.chart .hzl { font-size: 32px; font-weight: 800; fill: var(--accent); opacity: 0; font-family: var(--font); }
+.chart .hzv { font-size: 30px; font-weight: 800; fill: var(--up); opacity: 0; font-family: var(--font); }
+.scene.on .chart .hz, .scene.on .chart .hzl, .scene.on .chart .hzv { animation: fadein .4s ease forwards; animation-delay: var(--d); }
+.chart .lg { font-size: 30px; font-weight: 700; fill: var(--muted); font-family: var(--font); }
+.chart .legend { opacity: 0; } .scene.on .chart .legend { animation: fadein .5s ease forwards; animation-delay: 4.4s; }
+
+/* 5. 결과 */
+.result { display: grid; grid-template-columns: 1fr 1.3fr; gap: 70px; align-items: center; margin-top: 40px; }
+.tiles { display: grid; gap: 28px; }
+.tile { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 26px; padding: 34px 44px; box-shadow: 0 10px 30px rgba(20,33,61,.07); }
+.tile .l { font-size: 34px; color: var(--muted); font-weight: 650; }
+.tile .v { font-size: 100px; font-weight: 900; letter-spacing: -.045em; line-height: 1; }
+.hist { display: grid; grid-template-columns: repeat(8, 1fr); gap: 14px; align-items: end; height: 460px; padding-bottom: 60px; position: relative; }
+.hist .bar { position: relative; border-radius: 12px 12px 4px 4px; background: var(--accent); transform-origin: bottom; transform: scaleY(0); height: calc(var(--h) * 400px / 100); }
+.hist .bar.plus { background: var(--up); }
+.scene.on .hist .bar { animation: grow .8s cubic-bezier(.2,.8,.2,1) forwards; animation-delay: var(--d); }
+@keyframes grow { to { transform: scaleY(1) } }
+.hist .bar span { position: absolute; left: 50%; top: 100%; transform: translateX(-50%); margin-top: 14px; font-size: 22px; color: var(--muted); white-space: nowrap; font-weight: 600; }
+.hist .bar b { position: absolute; left: 50%; bottom: 100%; transform: translateX(-50%); margin-bottom: 10px; font-size: 26px; font-weight: 800; color: var(--text); }
+.hist .zero { position: absolute; left: 50%; top: -20px; bottom: 40px; width: 3px; background: var(--navy); opacity: .25; }
+.hist .zl { position: absolute; left: 50%; transform: translateX(-50%); top: -60px; font-size: 24px; color: var(--muted); font-weight: 700; }
+
+/* 6. 기간 */
+.hz3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 60px; margin-top: 40px; }
+.hzc { text-align: center; }
+.hzc .l { font-size: 38px; font-weight: 800; color: var(--muted); margin-bottom: 30px; }
+.hzc .well { height: 300px; position: relative; border-top: 4px solid var(--navy); }
+.hzc .bar { position: absolute; left: 50%; top: 0; width: 180px; transform: translateX(-50%) scaleY(0); transform-origin: top; border-radius: 0 0 20px 20px; background: var(--accent); height: calc(var(--h) * 56px); }
+.scene.on .hzc .bar { animation: grow .9s cubic-bezier(.2,.8,.2,1) forwards; animation-delay: var(--d); }
+.hzc .v { font-size: 96px; font-weight: 900; letter-spacing: -.045em; color: var(--accent); margin-top: 20px; line-height: 1; }
+.hzc .n { font-size: 28px; color: var(--muted); font-weight: 600; margin-top: 10px; }
+
+/* 7. 채널 */
+.rank { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; margin-top: 50px; }
+.rank h3 { font-size: 36px; margin: 0 0 30px; font-weight: 850; }
+.rrow { display: grid; grid-template-columns: 1fr 340px; gap: 40px; align-items: center; margin-bottom: 26px; }
+.rrow .nm { font-size: 36px; font-weight: 750; letter-spacing: -.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rrow .nm small { display: block; font-size: 24px; color: var(--muted); font-weight: 600; margin-top: 6px; }
+.rrow .bw { height: 54px; position: relative; }
+.rrow .b { position: absolute; top: 0; bottom: 0; border-radius: 12px; transform: scaleX(0); width: calc(var(--w) * 2px); }
+.rrow.up .b { left: 0; background: var(--up); transform-origin: left; }
+.rrow.dn .b { right: 0; background: var(--accent); transform-origin: right; }
+.scene.on .rrow .b { animation: growx .9s cubic-bezier(.2,.8,.2,1) forwards; animation-delay: var(--d); }
+@keyframes growx { to { transform: scaleX(1) } }
+.rrow .b i { position: absolute; top: 0; line-height: 54px; font-style: normal; font-size: 34px; font-weight: 900; white-space: nowrap; opacity: 0; }
+.rrow.up .b i { left: calc(100% + 14px); color: var(--up); } .rrow.dn .b i { right: calc(100% + 14px); color: var(--accent); }
+.scene.on .rrow .b i { animation: fadein .4s ease forwards; animation-delay: calc(var(--d) + .7s); }
+
+/* 8. 아키텍처 */
+.arch { display: grid; grid-template-columns: 420px 90px 1fr 90px 1fr 90px 1fr; gap: 0; align-items: center; margin-top: 60px; }
+.node { background: var(--surface); border: 2px solid var(--border); border-radius: 26px; padding: 34px 36px; box-shadow: 0 10px 30px rgba(20,33,61,.07); text-align: center; position: relative; }
+.node .t { font-size: 40px; font-weight: 850; letter-spacing: -.02em; }
+.node .s { font-size: 26px; color: var(--muted); margin-top: 10px; font-weight: 600; }
+.node .tag { position: absolute; top: -22px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #fff; font-size: 22px; font-weight: 800; padding: 6px 18px; border-radius: 999px; white-space: nowrap; letter-spacing: .04em; }
+.node.src { padding: 28px 30px; text-align: left; }
+.node.src .t { font-size: 32px; margin-bottom: 14px; }
+.node.src ul { list-style: none; margin: 0; padding: 0; font-size: 25px; color: var(--muted); display: grid; gap: 6px; font-weight: 600; }
+.node.src li { opacity: 0; }
+.scene.on .node.src li { animation: up .4s ease both; animation-delay: var(--d); }
+.link { height: 6px; background: var(--border); position: relative; overflow: hidden; }
+.link::after { content: ""; position: absolute; inset: 0; background: var(--accent); transform: scaleX(0); transform-origin: left; }
+.scene.on .link::after { animation: growx .6s ease forwards; animation-delay: var(--d); }
+.scene.on .node.lit { animation: up .6s cubic-bezier(.2,.8,.2,1) both; animation-delay: var(--d); }
+.node.lit { opacity: 0; }
+.cron { margin-top: 70px; display: flex; align-items: center; gap: 26px; font-size: 34px; color: var(--muted); font-weight: 650; }
+.cron b { color: var(--text); }
+.cron .dot { width: 22px; height: 22px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 0 rgba(11,122,75,.5); }
+.scene.on .cron .dot { animation: pulse 1.6s ease-out infinite; }
+@keyframes pulse { to { box-shadow: 0 0 0 26px rgba(11,122,75,0) } }
+
+/* 9. 아웃트로 */
+#s9 { align-items: center; text-align: center; }
+#s9 .word { font-size: 150px; }
+.urls { display: grid; gap: 14px; margin-top: 54px; font-size: 34px; font-family: var(--mono); color: var(--accent); font-weight: 600; }
+.urls span { color: var(--muted); font-family: var(--font); font-size: 26px; margin-right: 18px; font-weight: 700; }
+.members { margin-top: 54px; font-size: 32px; color: var(--muted); font-weight: 600; }
+.members b { color: var(--text); font-weight: 800; margin: 0 10px; }
+
+/* 하단 진행바·컨트롤 */
+#hud { position: fixed; left: 0; right: 0; bottom: 0; padding: 14px 20px 18px; display: flex; align-items: center; gap: 16px; color: #c8d0e0; font-size: 13px; background: linear-gradient(transparent, rgba(0,0,0,.55)); opacity: 1; transition: opacity .4s; z-index: 10; }
+body.idle #hud { opacity: 0; }
+#hud button { all: unset; cursor: pointer; padding: 6px 12px; border-radius: 8px; background: rgba(255,255,255,.12); color: #fff; font-weight: 700; font-family: var(--font); }
+#hud button:hover { background: rgba(255,255,255,.22); }
+#prog { flex: 1; height: 6px; border-radius: 3px; background: rgba(255,255,255,.18); position: relative; cursor: pointer; }
+#prog i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--accent); border-radius: 3px; }
+#prog b { position: absolute; top: -3px; width: 2px; height: 12px; background: rgba(255,255,255,.35); }
+#hud .k { color: #8f9bb3; }
+</style>
+</head>
+<body>
+<div id="wrap">
+<div id="stage">
+
+  <!-- 0. 훅 -->
+  <section class="scene" id="s0" data-t="7">
+    <div class="ytcards">
+      <div class="ytcard a" style="--d:.1s"><div class="thumb"><span>지금이 바닥</span></div><div><div class="t">삼성전자 <em>지금이 바닥</em>, 다음 주 <em>반등</em> 간다</div><div class="m">조회수 31만회 · 7개월 전</div></div></div>
+      <div class="ytcard a" style="--d:.9s"><div class="thumb"><span>10만 달러</span></div><div><div class="t">비트코인 10만 달러 <em>돌파 임박</em>, 지금 안 사면 후회</div><div class="m">조회수 48만회 · 10개월 전</div></div></div>
+      <div class="ytcard a" style="--d:1.7s"><div class="thumb"><span>전고점</span></div><div><div class="t">테슬라 <em>이제 시작</em>, 전고점 뚫고 <em>신고가</em> 갑니다</div><div class="m">조회수 22만회 · 5개월 전</div></div></div>
+    </div>
+    <div class="a fade" style="--d:3.4s; position:absolute; inset:0; background:var(--bg)"></div>
+    <div class="q"><div class="h1 a slam" style="--d:3.9s">정말 <span class="blue">올랐을까?</span></div></div>
+  </section>
+
+  <!-- 1. 로고 -->
+  <section class="scene" id="s1" data-t="6">
+    <div class="logo a pop" style="--d:.1s">H</div>
+    <div class="word" data-stagger=".55">HINDSIGHT</div>
+    <div class="lead a" style="--d:1.7s">유튜버가 오른다고 한 종목, 정말 올랐을까?</div>
+    <div class="team a" style="--d:2.4s">클라우드컴퓨팅실습 · <b>5조</b></div>
+  </section>
+
+  <!-- 2. 수집 -->
+  <section class="scene" id="s2" data-t="9">
+    <div class="kicker a" style="--d:0s">01 · 수집</div>
+    <div class="h2 a" style="--d:.1s">1년치 제목을 전부 모았다</div>
+    <div class="counters">
+      <div class="counter a" style="--d:.5s"><div class="v num"><span data-count="51" data-start=".8" data-dur="1.6">0</span><small>채널</small></div><div class="l">주식 33 · 코인 18</div></div>
+      <div class="counter a" style="--d:.8s"><div class="v num"><span data-count="44620" data-start="1.1" data-dur="2.4">0</span><small>영상</small></div><div class="l">2025.10 ~ 2026.10</div></div>
+      <div class="counter a" style="--d:1.1s"><div class="v num"><span data-count="283273" data-start="1.4" data-dur="2.6">0</span><small>시세</small></div><div class="l">주식 · ETF · 코인 · 지수</div></div>
+    </div>
+    <div class="marquee a fade" style="--d:1.6s"><div>전인구경제연구소 <i>·</i> 슈카월드 <i>·</i> 김작가 TV <i>·</i> 미국주식의 모든것 - 미주모 <i>·</i> 안정모의 주식투자 <i>·</i> 주식전망TV <i>·</i> 주식홀인원 <i>·</i> 민박사 <i>·</i> 코인 채널 18개 <i>·</i> 주식 채널 33개 <i>·</i> 51개 채널 전체</div></div>
+    <div class="chips">
+      <div class="chip a pop" style="--d:3.0s">YouTube Data API</div><div class="chip a pop" style="--d:3.2s">DART 공시</div><div class="chip a pop" style="--d:3.4s">공공데이터포털 주식시세</div><div class="chip a pop" style="--d:3.6s">Yahoo Finance</div><div class="chip a pop" style="--d:3.8s">Upbit</div><div class="chip a pop" style="--d:4.0s">네이버 증권 뉴스 크롤링</div>
+    </div>
+  </section>
+
+  <!-- 3. 매칭 -->
+  <section class="scene" id="s3" data-t="10">
+    <div class="kicker a" style="--d:0s">02 · 매칭 · 논조</div>
+    <div class="h2 a" style="--d:.1s">제목에서 종목과 말투를 읽는다</div>
+    <div class="title-box a" style="--d:.5s; margin-top:50px">
+      <span class="typed" data-type="삼성전자 지금이 바닥, 다음 주 반등 간다" data-start=".9" data-cps="18"></span>
+      <div class="stamp a pop" style="--d:5.4s">낙관</div>
+    </div>
+    <div class="flow">
+      <div class="box a" style="--d:6.2s"><div class="v num">29,206</div><div class="l">종목이 잡힌 영상</div></div>
+      <div class="arr a" style="--d:6.6s">→</div>
+      <div class="box a" style="--d:6.9s"><div class="v num red">18,641</div><div class="l">낙관 언급</div></div>
+      <div class="arr a" style="--d:7.3s">→</div>
+      <div class="box a" style="--d:7.6s"><div class="v num">902</div><div class="l">종목 · 테마</div></div>
+    </div>
+    <div class="cap a" style="--d:8.2s">"오른다 · 반등 · 바닥 · 돌파 · 급등 …" 같은 단어가 있는 제목만 <b>낙관</b>으로 센다</div>
+  </section>
+
+  <!-- 4. 측정 -->
+  <section class="scene" id="s4" data-t="10">
+    <div class="kicker a" style="--d:0s">03 · 측정</div>
+    <div class="h2 a" style="--d:.1s">언급 다음 거래일부터 5 · 20 · 60일</div>
+    <svg class="chart" viewBox="0 0 1600 640">
+      <line class="grid" x1="0" y1="560" x2="1600" y2="560"/>
+      <line class="grid" x1="0" y1="380" x2="1600" y2="380"/>
+      <line class="grid" x1="0" y1="200" x2="1600" y2="200"/>
+      <path class="price" d="M0,330 C80,310 120,360 200,340 S320,290 400,300 S520,250 600,240 S700,200 720,220 C780,300 820,330 900,340 S1020,390 1100,400 S1240,430 1320,450 S1500,470 1600,480"/>
+      <path class="bench" d="M600,240 C800,232 1000,226 1600,210"/>
+      <g style="--d:4.6s" class="legend"><line x1="1180" y1="40" x2="1240" y2="40" stroke="#5f6b80" stroke-width="5" stroke-dasharray="16 14"/><text class="lg" x="1256" y="50">벤치마크 (코스피 · S&amp;P500 · 비트코인)</text></g>
+      <circle class="ring" cx="600" cy="240" r="18"/>
+      <circle class="t0" cx="600" cy="240" r="18"/>
+      <text class="hzl" x="600" y="610" text-anchor="middle" style="--d:1.9s">언급 (t0)</text>
+      <line class="hz" x1="760" y1="120" x2="760" y2="560" style="--d:2.6s"/><text class="hzl" x="760" y="100" text-anchor="middle" style="--d:2.6s">+5</text><text class="hzv" x="760" y="340" text-anchor="middle" style="--d:2.9s">−0.9%</text>
+      <line class="hz" x1="1100" y1="120" x2="1100" y2="560" style="--d:3.3s"/><text class="hzl" x="1100" y="100" text-anchor="middle" style="--d:3.3s">+20</text><text class="hzv" x="1100" y="440" text-anchor="middle" style="--d:3.6s">−2.4%</text>
+      <line class="hz" x1="1540" y1="120" x2="1540" y2="560" style="--d:4.0s"/><text class="hzl" x="1540" y="100" text-anchor="middle" style="--d:4.0s">+60</text><text class="hzv" x="1540" y="520" text-anchor="middle" style="--d:4.3s">−2.5%</text>
+    </svg>
+    <div class="cap a" style="--d:5.4s">종가 기준 수익률을 <b>같은 기간 시장</b>과 비교 · 낙관 언급 <b>13,251</b>건의 평균</div>
+  </section>
+
+  <!-- 5. 결과 -->
+  <section class="scene" id="s5" data-t="11">
+    <div class="kicker a" style="--d:0s">04 · 결과 · 낙관 언급 뒤 20거래일</div>
+    <div class="h2 a" style="--d:.1s">"오른다"고 한 뒤, <span class="blue">평균은 내렸다</span></div>
+    <div class="result">
+      <div class="tiles">
+        <div class="tile a" style="--d:.6s"><div class="l">평균 수익률</div><div class="v num blue"><span data-count="-2.4" data-start=".9" data-dur="1.6" data-dec="1">0.0</span>%</div></div>
+        <div class="tile a" style="--d:1.0s"><div class="l">오른 비율 (승률)</div><div class="v num"><span data-count="42.6" data-start="1.3" data-dur="1.6" data-dec="1">0.0</span>%</div></div>
+        <div class="tile a" style="--d:1.4s"><div class="l">시장 대비 초과수익</div><div class="v num blue"><span data-count="-2.8" data-start="1.7" data-dur="1.6" data-dec="1">0.0</span>%p</div></div>
+      </div>
+      <div>
+        <div class="hist a fade" style="--d:2.2s">
+          <div class="zl">0%</div><div class="zero"></div>
+          <div class="bar" style="--h:100; --d:2.4s"><b>2,343</b><span>≤ −20%</span></div>
+          <div class="bar" style="--h:79; --d:2.55s"><b>1,862</b><span>−20 ~ −10</span></div>
+          <div class="bar" style="--h:70; --d:2.7s"><b>1,651</b><span>−10 ~ −5</span></div>
+          <div class="bar" style="--h:74; --d:2.85s"><b>1,733</b><span>−5 ~ 0</span></div>
+          <div class="bar plus" style="--h:65; --d:3.0s"><b>1,517</b><span>0 ~ 5</span></div>
+          <div class="bar plus" style="--h:59; --d:3.15s"><b>1,388</b><span>5 ~ 10</span></div>
+          <div class="bar plus" style="--h:64; --d:3.3s"><b>1,503</b><span>10 ~ 20</span></div>
+          <div class="bar plus" style="--h:53; --d:3.45s"><b>1,253</b><span>≥ 20%</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="cap a" style="--d:4.4s">n = <b>13,251</b> · 왼쪽(파랑) 7,589건 하락 · 오른쪽(빨강) 5,661건 상승 · 데이터 기준 2026-10-07</div>
+  </section>
+
+  <!-- 6. 기간 -->
+  <section class="scene" id="s6" data-t="8">
+    <div class="kicker a" style="--d:0s">05 · 기간별</div>
+    <div class="h2 a" style="--d:.1s">오래 들고 있을수록 <span class="blue">시장과 더 벌어진다</span></div>
+    <div class="hz3">
+      <div class="hzc a" style="--d:.5s"><div class="l">5거래일</div><div class="well"><div class="bar" style="--h:1.2; --d:.9s"></div></div><div class="v num">−1.2%p</div><div class="n">승률 43.9% · n 14,075</div></div>
+      <div class="hzc a" style="--d:.9s"><div class="l">20거래일</div><div class="well"><div class="bar" style="--h:2.8; --d:1.5s"></div></div><div class="v num">−2.8%p</div><div class="n">승률 42.6% · n 13,251</div></div>
+      <div class="hzc a" style="--d:1.3s"><div class="l">60거래일</div><div class="well"><div class="bar" style="--h:4.7; --d:2.1s"></div></div><div class="v num">−4.7%p</div><div class="n">승률 37.5% · n 11,016</div></div>
+    </div>
+    <div class="cap a" style="--d:3.4s">막대 = <b>시장 대비 초과수익</b> (낙관 언급 평균 − 같은 기간 벤치마크)</div>
+  </section>
+
+  <!-- 7. 채널 -->
+  <section class="scene" id="s7" data-t="9">
+    <div class="kicker a" style="--d:0s">06 · 채널별</div>
+    <div class="h2 a" style="--d:.1s">채널마다 다르다 · 시장 대비 20거래일</div>
+    <div class="rank">
+      <div>
+        <h3 class="a red" style="--d:.5s">시장을 이긴 채널 TOP 3</h3>
+        <div class="rrow up a" style="--d:.8s"><div class="nm">안정모의 주식투자<small>n 198 · 승률 69.7%</small></div><div class="bw"><div class="b" style="--w:100; --d:1.1s"><i>+5.0%p</i></div></div></div>
+        <div class="rrow up a" style="--d:1.1s"><div class="nm">미국주식의 모든것 - 미주모<small>낙관 언급 기준</small></div><div class="bw"><div class="b" style="--w:91; --d:1.4s"><i>+4.6%p</i></div></div></div>
+        <div class="rrow up a" style="--d:1.4s"><div class="nm">김작가 TV<small>낙관 언급 기준</small></div><div class="bw"><div class="b" style="--w:55; --d:1.7s"><i>+2.8%p</i></div></div></div>
+      </div>
+      <div>
+        <h3 class="a blue" style="--d:2.4s">시장에 뒤진 채널 BOTTOM 3</h3>
+        <div class="rrow dn a" style="--d:2.7s"><div class="nm">민박사 ㅣ 주식 끝까지 간다!<small>낙관 언급 기준</small></div><div class="bw"><div class="b" style="--w:100; --d:3.0s"><i>−18.0%p</i></div></div></div>
+        <div class="rrow dn a" style="--d:3.0s"><div class="nm">주식전망TV<small>낙관 언급 기준</small></div><div class="bw"><div class="b" style="--w:56; --d:3.3s"><i>−10.1%p</i></div></div></div>
+        <div class="rrow dn a" style="--d:3.3s"><div class="nm">주식홀인원<small>낙관 언급 기준</small></div><div class="bw"><div class="b" style="--w:33; --d:3.6s"><i>−5.9%p</i></div></div></div>
+      </div>
+    </div>
+    <div class="cap a" style="--d:4.6s">낙관 언급 <b>30건 이상 · 10종목 이상</b>인 채널만 순위에 올린다</div>
+  </section>
+
+  <!-- 8. 아키텍처 -->
+  <section class="scene" id="s8" data-t="10">
+    <div class="kicker a" style="--d:0s">07 · 매일 아침 스스로 돈다</div>
+    <div class="h2 a" style="--d:.1s">수집 → 매칭 → 계산, 하루 한 번</div>
+    <div class="arch">
+      <div class="node src lit" style="--d:.5s"><div class="t">데이터 소스 7</div><ul>
+        <li style="--d:.9s">YouTube Data API v3</li><li style="--d:1.05s">DART 기업코드 · 공시</li><li style="--d:1.2s">공공데이터포털 주식시세</li><li style="--d:1.35s">Yahoo Finance</li><li style="--d:1.5s">Upbit</li><li style="--d:1.65s">네이버 증권 뉴스 (크롤링)</li></ul></div>
+      <div class="link" style="--d:1.9s"></div>
+      <div class="node lit" style="--d:2.3s"><div class="tag">Render</div><div class="t">FastAPI</div><div class="s">4개 서비스 · 한 프로세스</div></div>
+      <div class="link" style="--d:2.8s"></div>
+      <div class="node lit" style="--d:3.2s"><div class="tag">Supabase</div><div class="t">PostgreSQL</div><div class="s">market · yt · mentions · stats</div></div>
+      <div class="link" style="--d:3.7s"></div>
+      <div class="node lit" style="--d:4.1s"><div class="tag">Vercel</div><div class="t">React</div><div class="s">홈 · 언급 뒤에 · 채널 · 종목 · 데이터</div></div>
+    </div>
+    <div class="cron a" style="--d:5.0s"><div class="dot"></div><div>GitHub Actions · 매일 <b>07:10</b> 새 영상 → 새 언급 → 수익률 갱신 · <b>Swagger</b> 문서 자동 생성</div></div>
+  </section>
+
+  <!-- 9. 아웃트로 -->
+  <section class="scene" id="s9" data-t="9">
+    <div class="logo a pop" style="--d:.1s; width:160px; height:160px; font-size:110px; border-radius:36px; margin-bottom:34px">H</div>
+    <div class="word" data-stagger=".4">HINDSIGHT</div>
+    <div class="lead a" style="--d:1.3s">유튜버가 오른다고 한 종목, 정말 올랐을까?</div>
+    <div class="urls">
+      <div class="a" style="--d:2.0s"><span>서비스</span>hindsight-web.vercel.app</div>
+      <div class="a" style="--d:2.3s"><span>API 문서</span>hindsight-api-edab.onrender.com/docs</div>
+      <div class="a" style="--d:2.6s"><span>GitHub</span>github.com/insung1939/hindsight</div>
+    </div>
+    <div class="members a" style="--d:3.3s">5조 <b>김지환</b><b>오선호</b><b>조인성</b><b>채재희</b><b>김현준</b></div>
+  </section>
+
+</div>
+</div>
+
+<div id="hud">
+  <button id="pp">⏸ 일시정지</button>
+  <button id="prev">‹ 이전</button>
+  <button id="next">다음 ›</button>
+  <div id="prog"><i></i></div>
+  <span id="time" class="num">0:00</span>
+  <span class="k">Space 재생 · ← → 장면 · R 처음 · F 전체화면</span>
+</div>
+
+<script>
+(() => {
+  const stage = document.getElementById("stage");
+  const scenes = [...stage.querySelectorAll(".scene")];
+  const starts = []; let total = 0;
+  scenes.forEach((s) => { starts.push(total); total += parseFloat(s.dataset.t); });
+  const q = new URLSearchParams(location.search);
+  const loop = !q.has("once");
+
+  // 글자 단위 등장(HINDSIGHT)
+  stage.querySelectorAll(".word").forEach((w) => {
+    const d0 = parseFloat(w.dataset.stagger || ".5"), txt = w.textContent; w.textContent = "";
+    [...txt].forEach((ch, i) => { const s = document.createElement("span"); s.textContent = ch; s.style.animationDelay = (d0 + i * .07) + "s"; w.appendChild(s); });
+  });
+
+  // 화면 맞춤
+  const fit = () => { const k = Math.min(innerWidth / 1920, innerHeight / 1080); stage.style.transform = `scale(${k})`; };
+  addEventListener("resize", fit); fit();
+
+  // 타임라인
+  let t = 0, playing = true, cur = -1, last = performance.now();
+  const prog = document.querySelector("#prog i"), timeEl = document.getElementById("time"), pp = document.getElementById("pp");
+  const progBar = document.getElementById("prog");
+  starts.slice(1).forEach((s) => { const b = document.createElement("b"); b.style.left = (s / total * 100) + "%"; progBar.appendChild(b); });
+
+  const fmtN = (v, dec) => { const s = Math.abs(v).toLocaleString("en-US", { minimumFractionDigits: dec, maximumFractionDigits: dec }); return (v < 0 ? "−" : "") + s; };
+  const ease = (x) => 1 - Math.pow(1 - x, 3);
+
+  function enter(i) {
+    scenes.forEach((s, j) => { s.classList.remove("on", "out"); if (j === cur && j !== i) s.classList.add("out"); });
+    const s = scenes[i]; void s.offsetWidth; s.classList.add("on"); cur = i;
+    s.querySelectorAll(".typed").forEach((el) => { el.textContent = ""; el.closest(".title-box")?.classList.remove("done"); });
+  }
+  function sceneAt(tt) { let i = 0; for (let j = 0; j < starts.length; j++) if (tt >= starts[j]) i = j; return i; }
+
+  function tick(now) {
+    const dt = Math.min((now - last) / 1000, .1); last = now; // 탭 전환 뒤 장면 건너뜀 방지
+    if (playing) t += dt;
+    if (t >= total) { if (loop) { t = 0; cur = -1; } else { t = total - .01; playing = false; pp.textContent = "▶ 재생"; } }
+    const i = sceneAt(t); if (i !== cur) enter(i);
+    const rel = t - starts[i], s = scenes[i];
+    // 숫자 카운터
+    s.querySelectorAll("[data-count]").forEach((el) => {
+      const to = parseFloat(el.dataset.count), st = parseFloat(el.dataset.start || 0), du = parseFloat(el.dataset.dur || 1.5), dec = parseInt(el.dataset.dec || 0);
+      const p = Math.max(0, Math.min(1, (rel - st) / du)); el.textContent = fmtN(to * ease(p), dec);
+    });
+    // 타자 효과 + 하이라이트
+    s.querySelectorAll(".typed").forEach((el) => {
+      const full = el.dataset.type, st = parseFloat(el.dataset.start || 0), cps = parseFloat(el.dataset.cps || 15);
+      const n = Math.max(0, Math.min(full.length, Math.floor((rel - st) * cps)));
+      if (n < full.length) { el.textContent = full.slice(0, n); el.dataset.n = n; }
+      else if (el.dataset.n !== "done") {
+        el.dataset.n = "done"; el.closest(".title-box")?.classList.add("done");
+        el.innerHTML = '<span class="mk asset lit" style="--d:.3s">삼성전자<span class="lab">종목 · KRX 005930</span></span> 지금이 <span class="mk bull lit" style="--d:1.0s">바닥<span class="lab">낙관 단어</span></span>, 다음 주 <span class="mk bull lit" style="--d:1.5s">반등<span class="lab">낙관 단어</span></span> 간다';
+      }
+    });
+    prog.style.width = (t / total * 100) + "%";
+    timeEl.textContent = `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")} / ${Math.floor(total / 60)}:${String(Math.floor(total % 60)).padStart(2, "0")}`;
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame((n) => { last = n; tick(n); });
+
+  // 컨트롤
+  const setPlay = (v) => { playing = v; stage.classList.toggle("paused", !v); pp.textContent = v ? "⏸ 일시정지" : "▶ 재생"; };
+  const go = (i) => { i = Math.max(0, Math.min(scenes.length - 1, i)); t = starts[i]; cur = -1; };
+  pp.onclick = () => setPlay(!playing);
+  document.getElementById("prev").onclick = () => go(t - starts[cur] > 1.5 ? cur : cur - 1);
+  document.getElementById("next").onclick = () => go(cur + 1);
+  progBar.onclick = (e) => { const r = progBar.getBoundingClientRect(); t = (e.clientX - r.left) / r.width * total; cur = -1; };
+  stage.onclick = () => setPlay(!playing);
+  addEventListener("keydown", (e) => {
+    if (e.key === " ") { e.preventDefault(); setPlay(!playing); }
+    else if (e.key === "ArrowRight") go(cur + 1);
+    else if (e.key === "ArrowLeft") go(t - starts[cur] > 1.5 ? cur : cur - 1);
+    else if (e.key.toLowerCase() === "r") { t = 0; cur = -1; setPlay(true); }
+    else if (e.key.toLowerCase() === "f") { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.(); }
+  });
+  // 마우스가 멈추면 컨트롤 숨김(녹화용)
+  let idle; const wake = () => { document.body.classList.remove("idle", "hide-cursor"); clearTimeout(idle); idle = setTimeout(() => document.body.classList.add("idle", "hide-cursor"), 2200); };
+  addEventListener("mousemove", wake); wake();
+  if (q.has("start")) go(parseInt(q.get("start")) || 0);
+  // ?still — 모션 없이 장면의 최종 상태만(스틸컷·검수용)
+  if (q.has("still")) { const st = document.createElement("style"); st.textContent = ".scene.on, .scene.on * { animation: none !important; opacity: 1 !important; transform: none !important; visibility: visible !important; stroke-dashoffset: 0 !important } .scene.on .marquee div { padding-left: 0 !important } .scene.on .stamp { transform: rotate(-8deg) !important } .scene.out { display: none !important }"; document.head.appendChild(st); const i = sceneAt(t); t = starts[i] + parseFloat(scenes[i].dataset.t) - .3; cur = -1; setTimeout(() => setPlay(false), 400); }
+})();
+</script>
+</body>
+</html>
