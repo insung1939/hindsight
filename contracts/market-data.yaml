@@ -431,70 +431,12 @@ paths:
         schema:
           type: string
         description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
-  /v1/news-daily:
-    get:
-      tags:
-      - attention
-      summary: 종목별 일별 뉴스 기사 수 (네이버 금융 크롤링). asset_ids 쉼표 구분, 기간
-      operationId: list_news_daily
-      parameters:
-      - name: asset_ids
-        in: query
-        required: true
-        schema:
-          type: string
-          title: Asset Ids
-      - name: from
-        in: query
-        required: false
-        schema:
-          anyOf:
-          - type: string
-            format: date
-          - type: 'null'
-          title: From
-      - name: to
-        in: query
-        required: false
-        schema:
-          anyOf:
-          - type: string
-            format: date
-          - type: 'null'
-          title: To
-      - name: limit
-        in: query
-        required: false
-        schema:
-          type: integer
-          maximum: 50000
-          default: 5000
-          title: Limit
-      - name: X-Request-ID
-        in: header
-        required: false
-        schema:
-          type: string
-        description: 요청 추적 ID. 없으면 서버가 만들어 응답 헤더로 돌려준다.
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ListNewsDaily'
-        '422':
-          description: Validation Error
-          content: *id001
-        '500':
-          description: 서버 내부 오류
-          content: *id001
   /internal/sync-attention:
     post:
       tags:
       - ops
-      summary: tracked 국내 종목의 DART 공시(days 소급) + 네이버 증권 뉴스 크롤링(news_days, 0 이면 건너뜀).
-        background=true 면 즉시 응답, /internal/sync-attention-status 로 확인
+      summary: tracked 국내 종목의 DART 공시(days 소급). background=true 면 즉시 응답, /internal/sync-attention-status
+        로 확인
       operationId: sync_attention
       parameters:
       - name: days
@@ -505,26 +447,6 @@ paths:
           maximum: 800
           default: 7
           title: Days
-      - name: news_days
-        in: query
-        required: false
-        schema:
-          type: integer
-          maximum: 30
-          description: 뉴스 크롤링 소급 일수. 0 이면 안 함
-          default: 7
-          title: News Days
-        description: 뉴스 크롤링 소급 일수. 0 이면 안 함
-      - name: news_limit
-        in: query
-        required: false
-        schema:
-          type: integer
-          maximum: 2000
-          description: 크롤링할 종목 수 상한(국내 추적 종목 순)
-          default: 100
-          title: News Limit
-        description: 크롤링할 종목 수 상한(국내 추적 종목 순)
       - name: background
         in: query
         required: false
@@ -565,7 +487,7 @@ paths:
     get:
       tags:
       - ops
-      summary: 비동기 공시·뉴스 수집 상태
+      summary: 비동기 공시 수집 상태
       operationId: attention_sync_status
       parameters:
       - name: X-Internal-Token
@@ -731,10 +653,6 @@ components:
         disclosures_added:
           type: integer
           title: Disclosures Added
-        news_rows_upserted:
-          type: integer
-          title: News Rows Upserted
-          default: 0
         assets_scanned:
           type: integer
           title: Assets Scanned
@@ -929,22 +847,6 @@ components:
       required:
       - items
       title: ListDisclosures
-    ListNewsDaily:
-      properties:
-        items:
-          items:
-            $ref: '#/components/schemas/NewsDailyOut'
-          type: array
-          title: Items
-        next_cursor:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Next Cursor
-      type: object
-      required:
-      - items
-      title: ListNewsDaily
     ListPrices:
       properties:
         items:
@@ -994,20 +896,6 @@ components:
             format: date
           - type: 'null'
           title: Last Disclosure Date
-        news_rows:
-          type: integer
-          title: News Rows
-          default: 0
-        news_assets:
-          type: integer
-          title: News Assets
-          default: 0
-        last_news_date:
-          anyOf:
-          - type: string
-            format: date
-          - type: 'null'
-          title: Last News Date
       type: object
       required:
       - assets_by_market
@@ -1018,28 +906,6 @@ components:
       - disclosure_assets
       - last_disclosure_date
       title: MarketCoverage
-    NewsDailyOut:
-      properties:
-        asset_id:
-          type: string
-          title: Asset Id
-        news_date:
-          type: string
-          format: date
-          title: News Date
-        count:
-          type: integer
-          title: Count
-        source:
-          type: string
-          title: Source
-      type: object
-      required:
-      - asset_id
-      - news_date
-      - count
-      - source
-      title: NewsDailyOut
     PriceOut:
       properties:
         asset_id:

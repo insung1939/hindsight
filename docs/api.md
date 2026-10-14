@@ -23,9 +23,8 @@
 | GET | `/v1/prices` | 여러 종목 시세를 한 번에 (stats 서비스용). asset_ids 는 쉼표 구분 | asset_ids, from, to | — | 200 BatchPrices |
 | GET | `/v1/disclosures` | DART 공시 (asset_ids 쉼표 구분, 기간). stats 가 '언급 전후 공시 여부' 에, 타임라인이 표시에 쓴다 | asset_ids, from, to, kind, limit | — | 200 ListDisclosures |
 | GET | `/v1/coverage` | 수집 현황 (데이터 페이지용): 사전·시세·거래량·공시·뉴스 건수 | — | — | 200 MarketCoverage |
-| GET | `/v1/news-daily` | 종목별 일별 뉴스 기사 수 (네이버 금융 크롤링). asset_ids 쉼표 구분, 기간 | asset_ids, from, to, limit | — | 200 ListNewsDaily |
-| POST | `/internal/sync-attention` | tracked 국내 종목의 DART 공시(days 소급) + 네이버 증권 뉴스 크롤링(news_days, 0 이면 건너뜀). background=true 면 즉시 응답, /internal/sync-attention-status 로 확인 | days, news_days, news_limit, background, X-Internal-Token | — | 200 AttentionSyncResult |
-| GET | `/internal/sync-attention-status` | 비동기 공시·뉴스 수집 상태 | X-Internal-Token | — | 200 JobStatus |
+| POST | `/internal/sync-attention` | tracked 국내 종목의 DART 공시(days 소급). background=true 면 즉시 응답, /internal/sync-attention-status 로 확인 | days, background, X-Internal-Token | — | 200 AttentionSyncResult |
+| GET | `/internal/sync-attention-status` | 비동기 공시 수집 상태 | X-Internal-Token | — | 200 JobStatus |
 | POST | `/internal/sync` | 사전 갱신(DART·업비트) + tracked 종목 시세 수집 | days, dictionary, X-Internal-Token | — | 200 SyncResult |
 
 ## youtube

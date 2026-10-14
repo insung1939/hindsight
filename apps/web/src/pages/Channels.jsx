@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { api, channelMap, compact, num, pct, pct0, sign, HORIZON_LABEL } from "../api";
 import { Disclaimer, ErrorBox, Seg, SkeletonRows, Term, useLoad } from "../components";
 
@@ -46,6 +46,9 @@ export default function Channels({ go }) {
   const data = useLoad(() => Promise.all([api("stats", "/v1/channels/ranking", { params: { horizon, metric, stance: "bull", min_n: 30, min_assets: 10, limit: 3 }, ttl: 5 * 60e3 }), channelMap()]), [horizon, metric]);
   const [rank, chs] = data.data || [null, {}];
   const all = rank?.all || [];
+  const [q, setQ] = useState("");
+  // 채널 검색 — 51개 전부에서 이름·핸들로 찾는다(순위에 없는 채널도 상세로 간다)
+  const found = useMemo(() => { const t = q.trim().toLowerCase(); if (!t) return []; return Object.values(chs || {}).filter((c) => c.title.toLowerCase().includes(t) || (c.handle || "").toLowerCase().includes(t)).slice(0, 8); }, [q, chs]);
 
   return (
     <div className="page container">
@@ -54,6 +57,14 @@ export default function Channels({ go }) {
         <h1>어느 채널이 오른다고 한 종목이 그 뒤에 잘 갔나</h1>
         <p>채널이 오른다고 한 종목들의 {HORIZON_LABEL[horizon].split(" ")[0]} 뒤 성적</p>
         <div className="controls" style={{ marginTop: 8 }}><span className="chip">표본 30건 이상</span><span className="chip">실력보다 스타일 차이로 읽기</span><span className="chip">학습용</span></div>
+      </div>
+      <div className="card" style={{ marginBottom: 16 }}>
+        <input type="search" placeholder="채널 검색 — 삼프로, 전인구, 김작가, 미주모… (Enter 로 첫 결과)" value={q} onChange={(e) => setQ(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Enter" && found[0]) { go("channel", found[0].channel_id); setQ(""); } if (e.key === "Escape") setQ(""); }} />
+        {q && <div className="controls" style={{ marginTop: 10 }}>
+          {found.map((c) => <button key={c.channel_id} className="btn" onClick={() => { go("channel", c.channel_id); setQ(""); }}>{c.title} <span className="muted" style={{ fontSize: 12 }}>{c.category === "crypto" ? "코인" : "주식"} · 구독자 {compact(c.subscriber_count)}</span></button>)}
+          {found.length === 0 && <span className="muted">51개 채널에 없는 이름</span>}
+        </div>}
       </div>
       <div className="card" style={{ marginBottom: 16 }}>
         <div className="controls">

@@ -178,3 +178,32 @@ html.deck-mode .rv { transition-delay: .15s; } html.deck-mode .rv.d1 { transitio
 .card { padding: 18px 20px; }
 .pipe .v { font-size: clamp(28px, 3vw, 44px); }
 .src p { font-size: clamp(17px, 1.7vw, 22px); }
+
+/* ── 10/14 추가: 목차 · 쇼릴 · 실패 · 우리만의 것 · DB/API 부록 ── */
+ol.toc { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 7px; counter-reset: toc; }
+ol.toc li { display: grid; grid-template-columns: 40px auto 1fr auto; gap: 0 14px; align-items: center; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 9px 16px; box-shadow: var(--shadow); counter-increment: toc; }
+ol.toc li::before { content: counter(toc); width: 32px; height: 32px; border-radius: 10px; background: var(--navy); color: #fff; display: grid; place-items: center; font-weight: 800; }
+ol.toc li > b { font-size: clamp(16px, 1.5vw, 20px); letter-spacing: -.01em; line-height: 1.2; white-space: nowrap; } ol.toc li > span { color: var(--muted); font-size: 13.5px; line-height: 1.2; }
+ol.toc li > em { font-style: normal; color: var(--accent); font-weight: 800; font-variant-numeric: tabular-nums; font-size: 16px; }
+.reel-wrap { width: 100%; aspect-ratio: 16 / 9; max-height: calc(100vh - 230px); margin: 0 auto; background: #0d1527; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); }
+.reel-wrap iframe { width: 100%; height: 100%; border: 0; display: block; }
+html.deck-mode .slide.reel > .in { max-width: min(1480px, calc((100vh - 230px) * 16 / 9)); }
+.fails { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.fails .card b { display: block; font-size: 18px; color: var(--up); margin-bottom: 6px; } .fails .card p { margin: 0; font-size: 15px; line-height: 1.55; color: var(--text); }
+.uniq { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.uniq .card { display: grid; grid-template-columns: 36px 1fr; gap: 12px; align-items: start; }
+.uniq .n { width: 32px; height: 32px; border-radius: 9px; background: var(--accent); color: #fff; display: grid; place-items: center; font-weight: 800; }
+.uniq b { display: block; font-size: 18px; margin-bottom: 4px; } .uniq p { margin: 0; font-size: 14.5px; line-height: 1.5; color: var(--muted); }
+@media (max-width: 900px) { .fails, .uniq { grid-template-columns: 1fr; } }
+.dbgrid { display: grid; grid-template-columns: 1fr 360px; gap: 18px; align-items: start; }
+@media (max-width: 1000px) { .dbgrid { grid-template-columns: 1fr; } }
+table.compact { font-size: 13.5px; } table.compact td, table.compact th { padding: 8px 10px; }
+table.compact.db td:first-child { white-space: nowrap; } table.compact.db td:last-child { white-space: nowrap; color: var(--muted); }
+table.compact.api td:nth-child(2) { white-space: nowrap; } table.compact.api td:nth-child(4) { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.erd svg { width: 100%; height: auto; }
+.erd .e rect { fill: var(--surface); stroke: var(--border); stroke-width: 1.5; } .erd .e.acc rect { fill: var(--accent-soft); stroke: var(--accent); }
+.erd .e text { text-anchor: middle; font-size: 13.5px; font-weight: 700; fill: var(--text); font-family: var(--font); }
+.erd .l { stroke: var(--navy); stroke-width: 2; fill: none; } .erd .c { font-size: 11.5px; fill: var(--muted); font-family: var(--font); }
+
+#s-toc h2 { margin-bottom: 8px; } #s-toc .kicker { margin-bottom: 6px; } html.deck-mode #s-toc { padding-top: 64px; padding-bottom: 40px; }
+.fails.limits .card b { color: var(--accent); }

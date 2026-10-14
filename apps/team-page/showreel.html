@@ -8,7 +8,8 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
-/* HINDSIGHT 쇼릴 — 1920×1080 무대를 화면에 맞춰 축소. 발표 페이지와 같은 팔레트(남색·파랑·빨강, Pretendard). */
+/* HINDSIGHT 쇼릴 — 1920×1080 무대를 화면에 맞춰 축소. 발표 페이지와 같은 팔레트(남색·파랑·빨강, Pretendard).
+   숫자는 data/snapshot.json 을 읽어 채운다(없으면 HTML 의 기본값). ?short = 발표용 짧은 컷, ?once = 반복 없음, ?start=N, ?still */
 :root {
   --bg: #fbfbfc; --surface: #fff; --text: #14213d; --muted: #5f6b80; --border: #e4e8ef;
   --accent: #2f5bea; --accent-soft: rgba(47,91,234,.10); --navy: #14213d;
@@ -42,7 +43,6 @@ body.hide-cursor { cursor: none; }
 @keyframes up { from { opacity: 0; transform: translateY(40px) } to { opacity: 1; transform: none } }
 @keyframes pop { from { opacity: 0; transform: scale(.85) } 70% { transform: scale(1.03) } to { opacity: 1; transform: none } }
 @keyframes slam { from { opacity: 0; transform: scale(1.6) } to { opacity: 1; transform: none } }
-.scene.on .gone { animation: fadeout .5s ease both; animation-delay: var(--g, 0s); }
 
 .kicker { color: var(--accent); font-weight: 800; font-size: 26px; letter-spacing: .14em; text-transform: uppercase; margin: 0 0 22px; }
 .h1 { font-size: 118px; line-height: 1.04; letter-spacing: -.04em; font-weight: 850; margin: 0; }
@@ -88,7 +88,6 @@ body.hide-cursor { cursor: none; }
 .marquee i { font-style: normal; margin: 0 28px; color: var(--border); }
 .chips { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 44px; }
 .chip { font-size: 28px; font-weight: 700; padding: 14px 26px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
-.chip.k { background: #eef1f6; color: var(--muted); }
 
 /* 3. 매칭 */
 .title-box { background: var(--surface); border: 1px solid var(--border); border-radius: 28px; padding: 54px 60px; box-shadow: 0 10px 30px rgba(20,33,61,.07); font-size: 66px; font-weight: 800; letter-spacing: -.025em; line-height: 1.35; position: relative; }
@@ -194,9 +193,34 @@ body.hide-cursor { cursor: none; }
 .scene.on .cron .dot { animation: pulse 1.6s ease-out infinite; }
 @keyframes pulse { to { box-shadow: 0 0 0 26px rgba(11,122,75,0) } }
 
-/* 9. 아웃트로 */
-#s9 { align-items: center; text-align: center; }
-#s9 .word { font-size: 150px; }
+/* 9. 요청 한 번의 흐름 — 클라이언트 → API → DB */
+.req { display: grid; grid-template-columns: 1fr 210px 1fr 210px 1fr; align-items: stretch; gap: 0; margin-top: 50px; }
+.rnode { background: var(--surface); border: 2px solid var(--border); border-radius: 26px; padding: 30px 34px; box-shadow: 0 10px 30px rgba(20,33,61,.07); position: relative; min-height: 420px; }
+.rnode .t { font-size: 38px; font-weight: 850; letter-spacing: -.02em; display: flex; align-items: center; gap: 14px; }
+.rnode .t i { font-style: normal; width: 44px; height: 44px; border-radius: 12px; background: var(--navy); color: #fff; display: grid; place-items: center; font-size: 24px; }
+.rnode .s { font-size: 24px; color: var(--muted); margin-top: 8px; font-weight: 600; }
+.rnode pre { margin: 22px 0 0; font-family: var(--mono); font-size: 21px; line-height: 1.5; background: #f4f6fa; border-radius: 16px; padding: 20px 22px; white-space: pre-wrap; color: var(--text); opacity: 0; }
+.scene.on .rnode pre { animation: up .5s ease both; animation-delay: var(--d); }
+.rnode pre b { color: var(--accent); font-weight: 800; } .rnode pre em { color: var(--up); font-style: normal; font-weight: 800; }
+.rlink { position: relative; align-self: center; height: 160px; z-index: 2; margin: 0 -8px; }
+.rlink .fwd, .rlink .back { position: absolute; left: 0; right: 0; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.rlink .fwd { top: 40px; } .rlink .back { bottom: 40px; }
+.rlink .fwd::after, .rlink .back::after { content: ""; position: absolute; inset: 0; transform: scaleX(0); }
+.rlink .fwd::after { background: var(--accent); transform-origin: left; } .rlink .back::after { background: var(--ok); transform-origin: right; }
+.scene.on .rlink .fwd::after { animation: growx .5s ease forwards; animation-delay: var(--f); }
+.scene.on .rlink .back::after { animation: growx .5s ease forwards; animation-delay: var(--b); }
+.rlink span { position: absolute; left: 50%; transform: translateX(-50%); font-size: 21px; font-weight: 800; white-space: nowrap; opacity: 0; }
+.rlink .lf { top: 6px; color: var(--accent); } .rlink .lb { bottom: 6px; color: var(--ok); }
+.scene.on .rlink .lf { animation: fadein .3s ease forwards; animation-delay: var(--f); }
+.scene.on .rlink .lb { animation: fadein .3s ease forwards; animation-delay: var(--b); }
+.rnode .screen { margin-top: 22px; border-radius: 16px; border: 1px solid var(--border); padding: 20px 22px; opacity: 0; }
+.scene.on .rnode .screen { animation: pop .5s ease both; animation-delay: var(--d); }
+.rnode .screen .k { font-size: 22px; color: var(--muted); font-weight: 600; } .rnode .screen .vv { font-size: 70px; font-weight: 900; letter-spacing: -.04em; line-height: 1.05; }
+.rnode .screen .vv small { font-size: 24px; color: var(--muted); font-weight: 700; margin-left: 10px; letter-spacing: 0; }
+
+/* 10. 아웃트로 */
+#s10 { align-items: center; text-align: center; }
+#s10 .word { font-size: 150px; }
 .urls { display: grid; gap: 14px; margin-top: 54px; font-size: 34px; font-family: var(--mono); color: var(--accent); font-weight: 600; }
 .urls span { color: var(--muted); font-family: var(--font); font-size: 26px; margin-right: 18px; font-weight: 700; }
 .members { margin-top: 54px; font-size: 32px; color: var(--muted); font-weight: 600; }
@@ -228,8 +252,8 @@ body.idle #hud { opacity: 0; }
     <div class="q"><div class="h1 a slam" style="--d:3.9s">정말 <span class="blue">올랐을까?</span></div></div>
   </section>
 
-  <!-- 1. 로고 -->
-  <section class="scene" id="s1" data-t="6">
+  <!-- 1. 로고 (발표용 짧은 컷에서는 건너뜀 — 표지가 이미 보여줬다) -->
+  <section class="scene" id="s1" data-t="6" data-short="skip">
     <div class="logo a pop" style="--d:.1s">H</div>
     <div class="word" data-stagger=".55">HINDSIGHT</div>
     <div class="lead a" style="--d:1.7s">유튜버가 오른다고 한 종목, 정말 올랐을까?</div>
@@ -241,13 +265,13 @@ body.idle #hud { opacity: 0; }
     <div class="kicker a" style="--d:0s">01 · 수집</div>
     <div class="h2 a" style="--d:.1s">1년치 제목을 전부 모았다</div>
     <div class="counters">
-      <div class="counter a" style="--d:.5s"><div class="v num"><span data-count="51" data-start=".8" data-dur="1.6">0</span><small>채널</small></div><div class="l">주식 33 · 코인 18</div></div>
-      <div class="counter a" style="--d:.8s"><div class="v num"><span data-count="44620" data-start="1.1" data-dur="2.4">0</span><small>영상</small></div><div class="l">2025.10 ~ 2026.10</div></div>
-      <div class="counter a" style="--d:1.1s"><div class="v num"><span data-count="283273" data-start="1.4" data-dur="2.6">0</span><small>시세</small></div><div class="l">주식 · ETF · 코인 · 지수</div></div>
+      <div class="counter a" style="--d:.5s"><div class="v num"><span data-count="51" data-snap="channels.total" data-start=".8" data-dur="1.6">0</span><small>채널</small></div><div class="l">주식 <span data-snap="channels.stock">33</span> · 코인 <span data-snap="channels.crypto">18</span></div></div>
+      <div class="counter a" style="--d:.8s"><div class="v num"><span data-count="44620" data-snap="youtube.videos" data-start="1.1" data-dur="2.4">0</span><small>영상</small></div><div class="l"><span data-snap="youtube.first_published" data-fmt="ym">2025.10</span> ~ <span data-snap="youtube.last_published" data-fmt="ym">2026.10</span></div></div>
+      <div class="counter a" style="--d:1.1s"><div class="v num"><span data-count="283273" data-snap="market.prices" data-start="1.4" data-dur="2.6">0</span><small>시세</small></div><div class="l">주식 · ETF · 코인 · 지수</div></div>
     </div>
     <div class="marquee a fade" style="--d:1.6s"><div>전인구경제연구소 <i>·</i> 슈카월드 <i>·</i> 김작가 TV <i>·</i> 미국주식의 모든것 - 미주모 <i>·</i> 안정모의 주식투자 <i>·</i> 주식전망TV <i>·</i> 주식홀인원 <i>·</i> 민박사 <i>·</i> 코인 채널 18개 <i>·</i> 주식 채널 33개 <i>·</i> 51개 채널 전체</div></div>
     <div class="chips">
-      <div class="chip a pop" style="--d:3.0s">YouTube Data API</div><div class="chip a pop" style="--d:3.2s">DART 공시</div><div class="chip a pop" style="--d:3.4s">공공데이터포털 주식시세</div><div class="chip a pop" style="--d:3.6s">Yahoo Finance</div><div class="chip a pop" style="--d:3.8s">Upbit</div><div class="chip a pop" style="--d:4.0s">네이버 증권 뉴스 크롤링</div>
+      <div class="chip a pop" style="--d:3.0s">YouTube Data API</div><div class="chip a pop" style="--d:3.2s">DART 기업코드 · 공시</div><div class="chip a pop" style="--d:3.4s">공공데이터포털 주식시세</div><div class="chip a pop" style="--d:3.6s">Yahoo Finance</div><div class="chip a pop" style="--d:3.8s">Upbit</div>
     </div>
   </section>
 
@@ -260,11 +284,11 @@ body.idle #hud { opacity: 0; }
       <div class="stamp a pop" style="--d:5.4s">낙관</div>
     </div>
     <div class="flow">
-      <div class="box a" style="--d:6.2s"><div class="v num">29,206</div><div class="l">종목이 잡힌 영상</div></div>
+      <div class="box a" style="--d:6.2s"><div class="v num" data-snap="mentions.videos_matched" data-fmt="n">29,206</div><div class="l">종목이 잡힌 영상</div></div>
       <div class="arr a" style="--d:6.6s">→</div>
-      <div class="box a" style="--d:6.9s"><div class="v num red">18,641</div><div class="l">낙관 언급</div></div>
+      <div class="box a" style="--d:6.9s"><div class="v num red" data-snap="stance_counts.bull" data-fmt="n">18,641</div><div class="l">낙관 언급</div></div>
       <div class="arr a" style="--d:7.3s">→</div>
-      <div class="box a" style="--d:7.6s"><div class="v num">902</div><div class="l">종목 · 테마</div></div>
+      <div class="box a" style="--d:7.6s"><div class="v num" data-snap="mentions.assets" data-fmt="n">902</div><div class="l">종목 · 테마</div></div>
     </div>
     <div class="cap a" style="--d:8.2s">"오른다 · 반등 · 바닥 · 돌파 · 급등 …" 같은 단어가 있는 제목만 <b>낙관</b>으로 센다</div>
   </section>
@@ -283,11 +307,11 @@ body.idle #hud { opacity: 0; }
       <circle class="ring" cx="600" cy="240" r="18"/>
       <circle class="t0" cx="600" cy="240" r="18"/>
       <text class="hzl" x="600" y="610" text-anchor="middle" style="--d:1.9s">언급 (t0)</text>
-      <line class="hz" x1="760" y1="120" x2="760" y2="560" style="--d:2.6s"/><text class="hzl" x="760" y="100" text-anchor="middle" style="--d:2.6s">+5</text><text class="hzv" x="760" y="340" text-anchor="middle" style="--d:2.9s">−0.9%</text>
-      <line class="hz" x1="1100" y1="120" x2="1100" y2="560" style="--d:3.3s"/><text class="hzl" x="1100" y="100" text-anchor="middle" style="--d:3.3s">+20</text><text class="hzv" x="1100" y="440" text-anchor="middle" style="--d:3.6s">−2.4%</text>
-      <line class="hz" x1="1540" y1="120" x2="1540" y2="560" style="--d:4.0s"/><text class="hzl" x="1540" y="100" text-anchor="middle" style="--d:4.0s">+60</text><text class="hzv" x="1540" y="520" text-anchor="middle" style="--d:4.3s">−2.5%</text>
+      <line class="hz" x1="760" y1="120" x2="760" y2="560" style="--d:2.6s"/><text class="hzl" x="760" y="100" text-anchor="middle" style="--d:2.6s">+5</text><text class="hzv" x="760" y="340" text-anchor="middle" style="--d:2.9s" data-snap="summary.bull:overall:5.mean" data-fmt="pct1">−0.9%</text>
+      <line class="hz" x1="1100" y1="120" x2="1100" y2="560" style="--d:3.3s"/><text class="hzl" x="1100" y="100" text-anchor="middle" style="--d:3.3s">+20</text><text class="hzv" x="1100" y="440" text-anchor="middle" style="--d:3.6s" data-snap="summary.bull:overall:20.mean" data-fmt="pct1">−2.4%</text>
+      <line class="hz" x1="1540" y1="120" x2="1540" y2="560" style="--d:4.0s"/><text class="hzl" x="1540" y="100" text-anchor="middle" style="--d:4.0s">+60</text><text class="hzv" x="1540" y="520" text-anchor="middle" style="--d:4.3s" data-snap="summary.bull:overall:60.mean" data-fmt="pct1">−2.5%</text>
     </svg>
-    <div class="cap a" style="--d:5.4s">종가 기준 수익률을 <b>같은 기간 시장</b>과 비교 · 낙관 언급 <b>13,251</b>건의 평균</div>
+    <div class="cap a" style="--d:5.4s">종가 기준 수익률을 <b>같은 기간 시장</b>과 비교 · 낙관 언급 <b data-snap="summary.bull:overall:20.n" data-fmt="n">13,251</b>건의 평균</div>
   </section>
 
   <!-- 5. 결과 -->
@@ -296,12 +320,12 @@ body.idle #hud { opacity: 0; }
     <div class="h2 a" style="--d:.1s">"오른다"고 한 뒤, <span class="blue">평균은 내렸다</span></div>
     <div class="result">
       <div class="tiles">
-        <div class="tile a" style="--d:.6s"><div class="l">평균 수익률</div><div class="v num blue"><span data-count="-2.4" data-start=".9" data-dur="1.6" data-dec="1">0.0</span>%</div></div>
-        <div class="tile a" style="--d:1.0s"><div class="l">오른 비율 (승률)</div><div class="v num"><span data-count="42.6" data-start="1.3" data-dur="1.6" data-dec="1">0.0</span>%</div></div>
-        <div class="tile a" style="--d:1.4s"><div class="l">시장 대비 초과수익</div><div class="v num blue"><span data-count="-2.8" data-start="1.7" data-dur="1.6" data-dec="1">0.0</span>%p</div></div>
+        <div class="tile a" style="--d:.6s"><div class="l">평균 수익률</div><div class="v num blue"><span data-count="-2.4" data-snap="summary.bull:overall:20.mean" data-mul="100" data-start=".9" data-dur="1.6" data-dec="1">0.0</span>%</div></div>
+        <div class="tile a" style="--d:1.0s"><div class="l">오른 비율 (승률)</div><div class="v num"><span data-count="42.6" data-snap="summary.bull:overall:20.win_rate" data-mul="100" data-start="1.3" data-dur="1.6" data-dec="1">0.0</span>%</div></div>
+        <div class="tile a" style="--d:1.4s"><div class="l">시장 대비 초과수익</div><div class="v num blue"><span data-count="-2.8" data-snap="summary.bull:overall:20.excess_mean" data-mul="100" data-start="1.7" data-dur="1.6" data-dec="1">0.0</span>%p</div></div>
       </div>
       <div>
-        <div class="hist a fade" style="--d:2.2s">
+        <div class="hist a fade" style="--d:2.2s" id="hist">
           <div class="zl">0%</div><div class="zero"></div>
           <div class="bar" style="--h:100; --d:2.4s"><b>2,343</b><span>≤ −20%</span></div>
           <div class="bar" style="--h:79; --d:2.55s"><b>1,862</b><span>−20 ~ −10</span></div>
@@ -314,37 +338,33 @@ body.idle #hud { opacity: 0; }
         </div>
       </div>
     </div>
-    <div class="cap a" style="--d:4.4s">n = <b>13,251</b> · 왼쪽(파랑) 7,589건 하락 · 오른쪽(빨강) 5,661건 상승 · 데이터 기준 2026-10-07</div>
+    <div class="cap a" style="--d:4.4s">n = <b data-snap="summary.bull:overall:20.n" data-fmt="n">13,251</b> · 왼쪽(파랑) <b id="hist-dn">7,589</b>건 하락 · 오른쪽(빨강) <b id="hist-up">5,661</b>건 상승 · 데이터 기준 <b data-snap="generated_at" data-fmt="date">2026-10-07</b></div>
   </section>
 
-  <!-- 6. 기간 -->
-  <section class="scene" id="s6" data-t="8">
+  <!-- 6. 기간 (짧은 컷에서는 건너뜀) -->
+  <section class="scene" id="s6" data-t="8" data-short="skip">
     <div class="kicker a" style="--d:0s">05 · 기간별</div>
     <div class="h2 a" style="--d:.1s">오래 들고 있을수록 <span class="blue">시장과 더 벌어진다</span></div>
     <div class="hz3">
-      <div class="hzc a" style="--d:.5s"><div class="l">5거래일</div><div class="well"><div class="bar" style="--h:1.2; --d:.9s"></div></div><div class="v num">−1.2%p</div><div class="n">승률 43.9% · n 14,075</div></div>
-      <div class="hzc a" style="--d:.9s"><div class="l">20거래일</div><div class="well"><div class="bar" style="--h:2.8; --d:1.5s"></div></div><div class="v num">−2.8%p</div><div class="n">승률 42.6% · n 13,251</div></div>
-      <div class="hzc a" style="--d:1.3s"><div class="l">60거래일</div><div class="well"><div class="bar" style="--h:4.7; --d:2.1s"></div></div><div class="v num">−4.7%p</div><div class="n">승률 37.5% · n 11,016</div></div>
+      <div class="hzc a" style="--d:.5s"><div class="l">5거래일</div><div class="well"><div class="bar" style="--h:1.2; --d:.9s" data-snapbar="summary.bull:overall:5.excess_mean"></div></div><div class="v num" data-snap="summary.bull:overall:5.excess_mean" data-fmt="pp">−1.2%p</div><div class="n">승률 <span data-snap="summary.bull:overall:5.win_rate" data-fmt="pct1s">43.9%</span> · n <span data-snap="summary.bull:overall:5.n" data-fmt="n">14,075</span></div></div>
+      <div class="hzc a" style="--d:.9s"><div class="l">20거래일</div><div class="well"><div class="bar" style="--h:2.8; --d:1.5s" data-snapbar="summary.bull:overall:20.excess_mean"></div></div><div class="v num" data-snap="summary.bull:overall:20.excess_mean" data-fmt="pp">−2.8%p</div><div class="n">승률 <span data-snap="summary.bull:overall:20.win_rate" data-fmt="pct1s">42.6%</span> · n <span data-snap="summary.bull:overall:20.n" data-fmt="n">13,251</span></div></div>
+      <div class="hzc a" style="--d:1.3s"><div class="l">60거래일</div><div class="well"><div class="bar" style="--h:4.7; --d:2.1s" data-snapbar="summary.bull:overall:60.excess_mean"></div></div><div class="v num" data-snap="summary.bull:overall:60.excess_mean" data-fmt="pp">−4.7%p</div><div class="n">승률 <span data-snap="summary.bull:overall:60.win_rate" data-fmt="pct1s">37.5%</span> · n <span data-snap="summary.bull:overall:60.n" data-fmt="n">11,016</span></div></div>
     </div>
     <div class="cap a" style="--d:3.4s">막대 = <b>시장 대비 초과수익</b> (낙관 언급 평균 − 같은 기간 벤치마크)</div>
   </section>
 
-  <!-- 7. 채널 -->
-  <section class="scene" id="s7" data-t="9">
+  <!-- 7. 채널 (짧은 컷에서는 건너뜀) -->
+  <section class="scene" id="s7" data-t="9" data-short="skip">
     <div class="kicker a" style="--d:0s">06 · 채널별</div>
     <div class="h2 a" style="--d:.1s">채널마다 다르다 · 시장 대비 20거래일</div>
     <div class="rank">
       <div>
         <h3 class="a red" style="--d:.5s">시장을 이긴 채널 TOP 3</h3>
-        <div class="rrow up a" style="--d:.8s"><div class="nm">안정모의 주식투자<small>n 198 · 승률 69.7%</small></div><div class="bw"><div class="b" style="--w:100; --d:1.1s"><i>+5.0%p</i></div></div></div>
-        <div class="rrow up a" style="--d:1.1s"><div class="nm">미국주식의 모든것 - 미주모<small>낙관 언급 기준</small></div><div class="bw"><div class="b" style="--w:91; --d:1.4s"><i>+4.6%p</i></div></div></div>
-        <div class="rrow up a" style="--d:1.4s"><div class="nm">김작가 TV<small>낙관 언급 기준</small></div><div class="bw"><div class="b" style="--w:55; --d:1.7s"><i>+2.8%p</i></div></div></div>
+        <div id="rank-top"></div>
       </div>
       <div>
         <h3 class="a blue" style="--d:2.4s">시장에 뒤진 채널 BOTTOM 3</h3>
-        <div class="rrow dn a" style="--d:2.7s"><div class="nm">민박사 ㅣ 주식 끝까지 간다!<small>낙관 언급 기준</small></div><div class="bw"><div class="b" style="--w:100; --d:3.0s"><i>−18.0%p</i></div></div></div>
-        <div class="rrow dn a" style="--d:3.0s"><div class="nm">주식전망TV<small>낙관 언급 기준</small></div><div class="bw"><div class="b" style="--w:56; --d:3.3s"><i>−10.1%p</i></div></div></div>
-        <div class="rrow dn a" style="--d:3.3s"><div class="nm">주식홀인원<small>낙관 언급 기준</small></div><div class="bw"><div class="b" style="--w:33; --d:3.6s"><i>−5.9%p</i></div></div></div>
+        <div id="rank-bottom"></div>
       </div>
     </div>
     <div class="cap a" style="--d:4.6s">낙관 언급 <b>30건 이상 · 10종목 이상</b>인 채널만 순위에 올린다</div>
@@ -352,11 +372,11 @@ body.idle #hud { opacity: 0; }
 
   <!-- 8. 아키텍처 -->
   <section class="scene" id="s8" data-t="10">
-    <div class="kicker a" style="--d:0s">07 · 매일 아침 스스로 돈다</div>
+    <div class="kicker a" style="--d:0s">05 · 매일 아침 스스로 돈다</div>
     <div class="h2 a" style="--d:.1s">수집 → 매칭 → 계산, 하루 한 번</div>
     <div class="arch">
-      <div class="node src lit" style="--d:.5s"><div class="t">데이터 소스 7</div><ul>
-        <li style="--d:.9s">YouTube Data API v3</li><li style="--d:1.05s">DART 기업코드 · 공시</li><li style="--d:1.2s">공공데이터포털 주식시세</li><li style="--d:1.35s">Yahoo Finance</li><li style="--d:1.5s">Upbit</li><li style="--d:1.65s">네이버 증권 뉴스 (크롤링)</li></ul></div>
+      <div class="node src lit" style="--d:.5s"><div class="t">공개 API 6개</div><ul>
+        <li style="--d:.9s">YouTube Data API v3</li><li style="--d:1.05s">DART 기업코드</li><li style="--d:1.2s">DART 공시검색</li><li style="--d:1.35s">공공데이터포털 주식시세</li><li style="--d:1.5s">Yahoo Finance</li><li style="--d:1.65s">Upbit</li></ul></div>
       <div class="link" style="--d:1.9s"></div>
       <div class="node lit" style="--d:2.3s"><div class="tag">Render</div><div class="t">FastAPI</div><div class="s">4개 서비스 · 한 프로세스</div></div>
       <div class="link" style="--d:2.8s"></div>
@@ -367,8 +387,44 @@ body.idle #hud { opacity: 0; }
     <div class="cron a" style="--d:5.0s"><div class="dot"></div><div>GitHub Actions · 매일 <b>07:10</b> 새 영상 → 새 언급 → 수익률 갱신 · <b>Swagger</b> 문서 자동 생성</div></div>
   </section>
 
-  <!-- 9. 아웃트로 -->
-  <section class="scene" id="s9" data-t="9">
+  <!-- 9. 요청 한 번의 흐름 -->
+  <section class="scene" id="s9" data-t="12">
+    <div class="kicker a" style="--d:0s">06 · 화면이 숫자 하나를 받기까지</div>
+    <div class="h2 a" style="--d:.1s">클라이언트 → API → DB → 다시 화면, 0.1초</div>
+    <div class="req">
+      <div class="rnode a" style="--d:.5s">
+        <div class="t"><i>1</i>브라우저 · React</div><div class="s">Vercel · "언급 뒤에" 탭을 연다</div>
+        <pre style="--d:1.0s"><b>GET</b> /stats/v1/summary
+  ?scope=<em>overall</em>
+  &amp;horizon=<em>20</em>
+  &amp;stance=<em>bull</em></pre>
+        <div class="screen" style="--d:7.4s"><div class="k">낙관 언급 뒤 20거래일 평균</div><div class="vv blue"><span data-snap="summary.bull:overall:20.mean" data-fmt="pct1">−2.4%</span></div><div class="k">n <span data-snap="summary.bull:overall:20.n" data-fmt="n">13,251</span></div></div>
+      </div>
+      <div class="rlink" style="--f:1.8s; --b:6.6s"><span class="lf">HTTPS · JSON</span><div class="fwd"></div><div class="back"></div><span class="lb">200 OK · 0.6 KB</span></div>
+      <div class="rnode a" style="--d:2.2s">
+        <div class="t"><i>2</i>FastAPI · stats</div><div class="s">Render · 입력 검증 → 키 조립</div>
+        <pre style="--d:2.8s">key = <em>"bull:overall:20"</em>
+<b>select</b>(Summary)
+  .where(Summary.key == key)</pre>
+        <pre style="--d:5.8s">→ {"key": …, "value": {
+    "n": <span data-snap="summary.bull:overall:20.n">13251</span>, "mean": <span data-snap="summary.bull:overall:20.mean" data-fmt="raw4">-0.0239</span>,
+    "win_rate": <span data-snap="summary.bull:overall:20.win_rate" data-fmt="raw4">0.4256</span>, … }}
+Cache-Control: max-age=600</pre>
+      </div>
+      <div class="rlink" style="--f:3.6s; --b:5.0s"><span class="lf">SQLAlchemy</span><div class="fwd"></div><div class="back"></div><span class="lb">1 row</span></div>
+      <div class="rnode a" style="--d:4.0s">
+        <div class="t"><i>3</i>PostgreSQL · stats</div><div class="s">Supabase · 배치가 미리 계산해 둔 요약</div>
+        <pre style="--d:4.4s"><b>SELECT</b> value <b>FROM</b> stats.summaries
+<b>WHERE</b> key = <em>'bull:overall:20'</em>;</pre>
+        <pre style="--d:4.9s">summaries <span data-snap="stats.summaries" data-fmt="n">8,661</span>행 · event_returns <span data-snap="stats.events" data-fmt="n">49,082</span>행
+외부 API 는 여기서 부르지 않는다
+(07:10 배치가 채워 둔다)</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. 아웃트로 -->
+  <section class="scene" id="s10" data-t="9">
     <div class="logo a pop" style="--d:.1s; width:160px; height:160px; font-size:110px; border-radius:36px; margin-bottom:34px">H</div>
     <div class="word" data-stagger=".4">HINDSIGHT</div>
     <div class="lead a" style="--d:1.3s">유튜버가 오른다고 한 종목, 정말 올랐을까?</div>
@@ -394,12 +450,57 @@ body.idle #hud { opacity: 0; }
 
 <script>
 (() => {
+  const q = new URLSearchParams(location.search);
   const stage = document.getElementById("stage");
+  const loop = !q.has("once");
+  const SHORT = q.has("short");
+  // 짧은 컷(발표용): data-short="skip" 장면 제거
+  if (SHORT) stage.querySelectorAll('.scene[data-short="skip"]').forEach((s) => s.remove());
   const scenes = [...stage.querySelectorAll(".scene")];
   const starts = []; let total = 0;
   scenes.forEach((s) => { starts.push(total); total += parseFloat(s.dataset.t); });
-  const q = new URLSearchParams(location.search);
-  const loop = !q.has("once");
+
+  // ── 숫자: data/snapshot.json 으로 채운다 (발표 페이지와 같은 파일) ──
+  const get = (o, p) => p.split(".").reduce((a, k) => (a == null ? undefined : a[k]), o);
+  const F = {
+    n: (v) => Math.round(v).toLocaleString("en-US"),
+    pct1: (v) => ((v * 100) < 0 ? "−" : (v * 100) > 0 ? "+" : "") + Math.abs(v * 100).toFixed(1) + "%",
+    pct1s: (v) => (v * 100).toFixed(1) + "%",
+    pp: (v) => ((v * 100) < 0 ? "−" : (v * 100) > 0 ? "+" : "") + Math.abs(v * 100).toFixed(1) + "%p",
+    raw4: (v) => Number(v).toFixed(4),
+    date: (v) => String(v).slice(0, 10),
+    ym: (v) => String(v).slice(0, 7).replace("-", "."),
+  };
+  function applySnapshot(d) {
+    stage.querySelectorAll("[data-snap]").forEach((el) => {
+      const v = get(d, el.dataset.snap); if (v == null) return;
+      if (el.dataset.count != null) { el.dataset.count = v * (parseFloat(el.dataset.mul || 1)); return; }  // 카운터는 목표값만 바꾼다
+      const f = el.dataset.fmt; el.textContent = f ? F[f](v) : (typeof v === "number" ? F.n(v) : v);
+    });
+    // 기간별 막대: 초과수익 절댓값(%p) 만큼
+    stage.querySelectorAll("[data-snapbar]").forEach((el) => { const v = get(d, el.dataset.snapbar); if (v != null) el.style.setProperty("--h", Math.abs(v * 100).toFixed(2)); });
+    // 히스토그램
+    const h = get(d, "summary.bull:overall:20.histogram");
+    const hist = document.getElementById("hist");
+    if (h && hist) {
+      const max = Math.max(...h.map((b) => b.n), 1);
+      const label = (b) => (b.from <= -1 ? "≤ −20%" : b.to >= 9 ? "≥ 20%" : `${Math.round(b.from * 100)} ~ ${Math.round(b.to * 100)}`.replace(/-/g, "−"));
+      hist.querySelectorAll(".bar").forEach((bar) => bar.remove());
+      h.forEach((b, i) => { const el = document.createElement("div"); el.className = "bar" + (b.from >= 0 ? " plus" : ""); el.style.setProperty("--h", (b.n / max * 100).toFixed(1)); el.style.setProperty("--d", (2.4 + i * .15) + "s"); el.innerHTML = `<b>${F.n(b.n)}</b><span>${label(b)}</span>`; hist.appendChild(el); });
+      const dn = h.filter((b) => b.from < 0).reduce((a, b) => a + b.n, 0), up = h.filter((b) => b.from >= 0).reduce((a, b) => a + b.n, 0);
+      const e1 = document.getElementById("hist-dn"), e2 = document.getElementById("hist-up"); if (e1) e1.textContent = F.n(dn); if (e2) e2.textContent = F.n(up);
+    }
+    // 채널 TOP3 · BOTTOM3
+    const rk = d.channel_ranking || {};
+    const row = (r, i, up, maxAbs) => `<div class="rrow ${up ? "up" : "dn"} a" style="--d:${(up ? .8 : 2.7) + i * .3}s"><div class="nm">${r.title}<small>n ${F.n(r.n)} · 승률 ${F.pct1s(r.win_rate)}</small></div><div class="bw"><div class="b" style="--w:${Math.max(8, Math.abs(r.excess_mean) / maxAbs * 100).toFixed(0)}; --d:${(up ? 1.1 : 3.0) + i * .3}s"><i>${F.pp(r.excess_mean)}</i></div></div></div>`;
+    const t = document.getElementById("rank-top"), b = document.getElementById("rank-bottom");
+    if (t && rk.top) { const m = Math.max(...rk.top.map((r) => Math.abs(r.excess_mean)), .001); t.innerHTML = rk.top.map((r, i) => row(r, i, true, m)).join(""); }
+    if (b && rk.bottom) { const m = Math.max(...rk.bottom.map((r) => Math.abs(r.excess_mean)), .001); b.innerHTML = rk.bottom.map((r, i) => row(r, i, false, m)).join(""); }
+  }
+  // 스냅샷이 없을 때도 채널 장면이 비지 않게 기본값
+  applySnapshot({ channel_ranking: { top: [{ title: "안정모의 주식투자", n: 198, win_rate: .697, excess_mean: .0502 }, { title: "미국주식의 모든것 - 미주모", n: 120, win_rate: .6, excess_mean: .0455 }, { title: "김작가 TV", n: 300, win_rate: .5, excess_mean: .0276 }],
+    bottom: [{ title: "민박사 ㅣ 주식 끝까지 간다!", n: 60, win_rate: .3, excess_mean: -.1797 }, { title: "주식전망TV", n: 80, win_rate: .35, excess_mean: -.1006 }, { title: "주식홀인원", n: 90, win_rate: .4, excess_mean: -.0592 }] } });
+  fetch("data/snapshot.json", { cache: "no-store" }).then((r) => r.ok ? r.json() : null).then((d) => { if (d) applySnapshot(d); }).catch(() => {});
 
   // 글자 단위 등장(HINDSIGHT)
   stage.querySelectorAll(".word").forEach((w) => {
@@ -423,7 +524,7 @@ body.idle #hud { opacity: 0; }
   function enter(i) {
     scenes.forEach((s, j) => { s.classList.remove("on", "out"); if (j === cur && j !== i) s.classList.add("out"); });
     const s = scenes[i]; void s.offsetWidth; s.classList.add("on"); cur = i;
-    s.querySelectorAll(".typed").forEach((el) => { el.textContent = ""; el.closest(".title-box")?.classList.remove("done"); });
+    s.querySelectorAll(".typed").forEach((el) => { el.textContent = ""; el.dataset.n = ""; el.closest(".title-box")?.classList.remove("done"); });
   }
   function sceneAt(tt) { let i = 0; for (let j = 0; j < starts.length; j++) if (tt >= starts[j]) i = j; return i; }
 
@@ -433,12 +534,10 @@ body.idle #hud { opacity: 0; }
     if (t >= total) { if (loop) { t = 0; cur = -1; } else { t = total - .01; playing = false; pp.textContent = "▶ 재생"; } }
     const i = sceneAt(t); if (i !== cur) enter(i);
     const rel = t - starts[i], s = scenes[i];
-    // 숫자 카운터
     s.querySelectorAll("[data-count]").forEach((el) => {
       const to = parseFloat(el.dataset.count), st = parseFloat(el.dataset.start || 0), du = parseFloat(el.dataset.dur || 1.5), dec = parseInt(el.dataset.dec || 0);
       const p = Math.max(0, Math.min(1, (rel - st) / du)); el.textContent = fmtN(to * ease(p), dec);
     });
-    // 타자 효과 + 하이라이트
     s.querySelectorAll(".typed").forEach((el) => {
       const full = el.dataset.type, st = parseFloat(el.dataset.start || 0), cps = parseFloat(el.dataset.cps || 15);
       const n = Math.max(0, Math.min(full.length, Math.floor((rel - st) * cps)));
@@ -464,17 +563,16 @@ body.idle #hud { opacity: 0; }
   stage.onclick = () => setPlay(!playing);
   addEventListener("keydown", (e) => {
     if (e.key === " ") { e.preventDefault(); setPlay(!playing); }
-    else if (e.key === "ArrowRight") go(cur + 1);
-    else if (e.key === "ArrowLeft") go(t - starts[cur] > 1.5 ? cur : cur - 1);
+    else if (e.key === "ArrowRight") { e.stopPropagation(); go(cur + 1); }
+    else if (e.key === "ArrowLeft") { e.stopPropagation(); go(t - starts[cur] > 1.5 ? cur : cur - 1); }
     else if (e.key.toLowerCase() === "r") { t = 0; cur = -1; setPlay(true); }
     else if (e.key.toLowerCase() === "f") { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.(); }
   });
-  // 마우스가 멈추면 컨트롤 숨김(녹화용)
   let idle; const wake = () => { document.body.classList.remove("idle", "hide-cursor"); clearTimeout(idle); idle = setTimeout(() => document.body.classList.add("idle", "hide-cursor"), 2200); };
   addEventListener("mousemove", wake); wake();
   if (q.has("start")) go(parseInt(q.get("start")) || 0);
   // ?still — 모션 없이 장면의 최종 상태만(스틸컷·검수용)
-  if (q.has("still")) { const st = document.createElement("style"); st.textContent = ".scene.on, .scene.on * { animation: none !important; opacity: 1 !important; transform: none !important; visibility: visible !important; stroke-dashoffset: 0 !important } .scene.on .marquee div { padding-left: 0 !important } .scene.on .stamp { transform: rotate(-8deg) !important } .scene.out { display: none !important }"; document.head.appendChild(st); const i = sceneAt(t); t = starts[i] + parseFloat(scenes[i].dataset.t) - .3; cur = -1; setTimeout(() => setPlay(false), 400); }
+  if (q.has("still")) { const st = document.createElement("style"); st.textContent = ".scene.on, .scene.on * { animation: none !important; opacity: 1 !important; transform: none !important; visibility: visible !important; stroke-dashoffset: 0 !important } .scene.on .marquee div { padding-left: 0 !important } .scene.on .stamp { transform: rotate(-8deg) !important } .scene.on .rlink .fwd::after, .scene.on .rlink .back::after { transform: none !important } .scene.out { display: none !important }"; document.head.appendChild(st); const i = sceneAt(t); t = starts[i] + parseFloat(scenes[i].dataset.t) - .3; cur = -1; setTimeout(() => setPlay(false), 400); }
 })();
 </script>
 </body>

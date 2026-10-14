@@ -9,7 +9,6 @@ const SOURCES = [
   { k: "yahoo", name: "Yahoo Finance chart API", org: "Yahoo", url: "https://finance.yahoo.com", what: "미국 종가·거래량, 코스피·S&P500 지수, 업종 ETF 20개", how: "키 없이 HTTP JSON." },
   { k: "upbit", name: "업비트 Open API", org: "두나무", url: "https://docs.upbit.com", what: "KRW 마켓 목록·한글명, 일봉 종가·거래량", how: "마켓 목록으로 코인 사전을 자동으로 채운다. 언급된 코인만 시세 수집." },
   { k: "disclosures", name: "DART 공시검색", org: "금융감독원", url: "https://opendart.fss.or.kr/guide/detail.do?apiGrpCd=DS001&apiId=2019001", what: "접수일·공시명 → 실적·계약·자금조달·주요사항·지분·기타", how: "언급된 국내 종목의 1년치. 언급 전후 ±3일 주요 공시 유무를 판정." },
-  { k: "news", name: "네이버 증권 종목 뉴스 (크롤링)", org: "네이버", url: "https://m.stock.naver.com", what: "종목별 일별 뉴스 기사 수", how: "공식 API 가 아니라 페이지가 부르는 웹 엔드포인트를 읽는다(수업 5주차 크롤링). 언급 많은 국내 종목 200개, 매일 7일치." },
 ];
 
 function Step({ n, title, big, unit, sub, loading }) {
@@ -32,7 +31,6 @@ export default function DataPage() {
     if (k === "yahoo") return `미국 ${mk.assets_by_market?.US?.total ?? 0} · 지수 ${mk.assets_by_market?.INDEX?.total ?? 0}`;
     if (k === "upbit") return `코인 사전 ${mk.assets_by_market?.CRYPTO?.total ?? 0} · 추적 ${mk.assets_by_market?.CRYPTO?.tracked ?? 0}`;
     if (k === "disclosures") return mk.disclosures ? `${num(mk.disclosures)}건 · 종목 ${mk.disclosure_assets} · ~${mk.last_disclosure_date}` : "키 대기";
-    if (k === "news") return mk.news_rows ? `${num(mk.news_rows)}행 · 종목 ${mk.news_assets} · ~${mk.last_news_date}` : "수집 전";
     return "";
   };
   const totalAssets = mk ? Object.values(mk.assets_by_market).reduce((a, v) => a + v.total, 0) : null;
@@ -43,7 +41,7 @@ export default function DataPage() {
       <div className="page-head">
         <div className="eyebrow">데이터</div>
         <h1>어떤 데이터를, 어디서, 어떻게 가공했나</h1>
-        <p>공개 API 6개 + 크롤링 1개 → 매일 한 번 5단계 가공. 숫자는 지금 DB의 실제 건수. <a href={API_BASE + "/docs"} target="_blank" rel="noreferrer" style={{ color: "var(--accent)" }}>Swagger</a> · <a href="https://github.com/insung1939/hindsight" target="_blank" rel="noreferrer" style={{ color: "var(--accent)" }}>GitHub</a></p>
+        <p>공개 API 6개 → 매일 한 번 5단계 가공. 숫자는 지금 DB의 실제 건수. <a href={API_BASE + "/docs"} target="_blank" rel="noreferrer" style={{ color: "var(--accent)" }}>Swagger</a> · <a href="https://github.com/insung1939/hindsight" target="_blank" rel="noreferrer" style={{ color: "var(--accent)" }}>GitHub</a></p>
       </div>
       <ErrorBox error={d.error} />
 
@@ -60,7 +58,7 @@ export default function DataPage() {
 
       <div className="grid">
         <div className="card col-12">
-          <div className="card-head"><div><h2>데이터 출처 7개</h2><p>공개 API 6개 + 크롤링 1개 · 키는 서버 환경변수에만 · 자막·댓글은 안 모은다</p></div></div>
+          <div className="card-head"><div><h2>데이터 출처 6개</h2><p>모두 공개 API · 키는 서버 환경변수에만 · 자막·댓글은 안 모은다</p></div></div>
           <div className="table-wrap"><table>
             <thead><tr><th>명칭 · 기관</th><th>가져오는 것</th><th>어떻게 쓰나</th><th>지금</th></tr></thead>
             <tbody>{SOURCES.map((s) => (

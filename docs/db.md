@@ -11,7 +11,6 @@ Supabase(PostgreSQL) 프로젝트 하나에 **서비스마다 스키마 하나**
 | `assets` | asset_id(`시장:심볼`), market(KRX·US·CRYPTO·INDEX), symbol, name, aliases(JSON), currency, asset_type(stock·etf·crypto·index·**theme**), source(datagokr·yahoo·upbit), yahoo_symbol, benchmark_id, tracked, curated, **corp_code**(DART 고유번호), updated_at | PK asset_id |
 | `prices` | id, asset_id, trade_date, close, **volume**, currency, collected_at | PK id · UQ(asset_id, trade_date) |
 | `disclosures` | rcept_no, asset_id, rcept_dt, report_nm, kind(실적·계약·자금조달·주요사항·지분·기타), collected_at | PK rcept_no |
-| `news_daily` | id, asset_id, news_date, count, source(naver_finance), collected_at | PK id · UQ(asset_id, news_date) |
 
 `assets` 가 곧 종목 사전이다. `tracked=True` 인 것만 시세를 매일 긁는다(언급되면 mentions 가 켠다). `benchmark_id` 는 초과수익 기준(코스피·S&P500·비트코인). `asset_type=theme` 은 업종·테마(반도체·2차전지 …)로, 제목에 종목 없이 업종만 나온 사건을 대표 ETF 시세로 잰다. `disclosures` 는 '언급이 공시를 따라가는가' 를 보기 위한 관심(attention) 데이터다.
 

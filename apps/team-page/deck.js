@@ -127,6 +127,8 @@ function show(i, push = true) {
   slides.forEach((s, k) => s.classList.toggle("active", k === cur));
   reveal(slides[cur]);
   slides[cur].scrollTop = 0;
+  // 쇼릴 장: 들어올 때 재생, 나갈 때 멈춤(iframe src 를 비운다)
+  slides.forEach((s, k) => { const f = s.querySelector("iframe[data-src]"); if (!f) return; if (k === cur) f.src = f.dataset.src + "&short&t=" + Date.now(); else if (f.src) f.removeAttribute("src"); });
   $("#pos").textContent = `${cur + 1} / ${slides.length}`;
   $("#progress").style.width = `${((cur + 1) / slides.length) * 100}%`;
   $$(".dots button").forEach((b, k) => b.classList.toggle("on", k === cur));
