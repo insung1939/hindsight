@@ -1,5 +1,5 @@
 # 서비스 CI — 테스트(계약 드리프트 포함) → main 이면 Docker 이미지를 GHCR 에 올린다.
-# 같은 이미지를 Render(팀 운영)와 k8s(세미나)가 쓴다.
+# 같은 이미지를 Render(팀 운영)와 k8s(분리 배포 실험)가 쓴다.
 name: services
 
 on:

@@ -39,7 +39,7 @@ web:             ## 프론트 개발 서버 (5173)
 compose:         ## Docker 로 서비스 4개
 	$(COMPOSE) up -d --build
 
-compose-all:     ## + APISIX 게이트웨이 + OTel·Tempo·Prometheus·Grafana (세미나)
+compose-all:     ## + APISIX 게이트웨이 + OTel·Tempo·Prometheus·Grafana (분리 배포 실험)
 	$(COMPOSE) --profile gateway --profile observability up -d --build
 
 compose-down:    ## compose 전체 종료

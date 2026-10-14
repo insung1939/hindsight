@@ -1,4 +1,4 @@
-# platform/k8s — 세미나 실험실 (7주차)
+# platform/k8s — 분리 배포 실험 (7주차 수업 범위 밖)
 
 같은 GHCR 이미지를 쿠버네티스에 올린다. 로컬 minikube/kind → EC2 k3s 순서.
 

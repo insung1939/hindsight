@@ -1,6 +1,6 @@
 # 로컬 통합 실행 — 서비스 5개를 컨테이너로 띄운다 (SQLite, 볼륨에 보존).
 #   docker compose -f platform/compose/docker-compose.yml up --build
-# 세미나 트랙에서 APISIX · OTel Collector · Grafana 를 여기에 덧붙인다 (7주차).
+# 분리 배포 실험: APISIX · OTel Collector · Grafana 를 여기에 덧붙인다 (수업 범위 밖).
 name: hindsight
 
 x-common: &common
@@ -46,7 +46,7 @@ services:
     ports: ["8004:8000"]
     depends_on: [mentions, market-data]
 
-  # ── 세미나 트랙: 게이트웨이 (docker compose --profile gateway up) ──
+  # ── 실험 트랙: 게이트웨이 (docker compose --profile gateway up) ──
   apisix:
     image: apache/apisix:3.11.0-debian
     profiles: [gateway]
@@ -58,7 +58,7 @@ services:
     ports: ["9080:9080", "9091:9091"]
     depends_on: [market-data, youtube, mentions, stats]
 
-  # ── 세미나 트랙: 관측 (docker compose --profile observability up) ──
+  # ── 실험 트랙: 관측 (docker compose --profile observability up) ──
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.111.0
     profiles: [observability]

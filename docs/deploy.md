@@ -1,6 +1,6 @@
 # 배포 절차 (수업 제출: Vercel · Render · Supabase · GitHub Actions)
 
-2026-10-07 결정: 백엔드는 **Render 웹 서비스 1개**(`apps/api`, 서비스 4개 + 게이트웨이를 한 컨테이너에). Swagger 주소도 하나다. 분리 배포(k8s·APISIX)는 세미나용으로 `platform/` 에 남겨 둔다.
+2026-10-07 결정: 백엔드는 **Render 웹 서비스 1개**(`apps/api`, 서비스 4개 + 게이트웨이를 한 컨테이너에). Swagger 주소도 하나다. 분리 배포(k8s·APISIX)는 실험용으로 `platform/` 에 남겨 둔다.
 
 ```
 ① Supabase 프로젝트 → DATABASE_URL (Session pooler)

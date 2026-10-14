@@ -1,9 +1,9 @@
 # 하인드사이트(hindsight) — 유튜버가 말한 종목, 그 뒤에 어떻게 됐나
 
-KAIST 디지털금융MBA 〈클라우드컴퓨팅실습〉 팀 프로젝트 계획서 · 2026-09-28 (루틴 안을 폐기하고 다시 씀)
+KAIST 디지털금융MBA 〈클라우드컴퓨팅실습〉 팀 프로젝트 계획서 · 2026-09-28 (첫 안을 폐기하고 다시 씀 · 현재 상태는 README · docs/checklist.md)
 
-두 목표를 같이 만족한다. ① 8주차(10/21) 팀 발표 필수 항목 전부. ② 사내 세미나 "MSA 환경에서 REST API 관리" Before/After 데모 (같은 코드).
-원칙: 팀 진도가 우선, 관리 툴 레이어는 개인 트랙.
+목표: 8주차(10/21) 팀 발표 필수 항목 전부를 데이터 중심으로. 서비스는 4개로 나누되(MSA) 제출은 한 프로세스로 합본 배포한다.
+원칙: 팀 진도가 우선, 분리 배포(k8s·게이트웨이) 레이어는 실험 트랙.
 
 ---
 
@@ -106,9 +106,9 @@ mentions stats  ╲  youtube   ╲
   └────────── market-data ◀───┘
 ```
 
-- market-data·youtube 는 아무도 부르지 않는 최하층(수집 전용). 루틴의 market-data 를 거의 그대로 재사용한다.
+- market-data·youtube 는 아무도 부르지 않는 최하층(수집 전용). 이전 프로토타입의 market-data 를 거의 그대로 재사용한다.
 - mentions 가 youtube 에서 새 영상을 받아 market-data 사전과 매칭한다. stats 가 mentions 와 시세를 받아 수익률을 계산한다.
-- 순환 없음. 동기 REST/JSON, `X-Request-ID` 전파, problem+json. (루틴에서 만든 공통 라이브러리·계약·CI 그대로)
+- 순환 없음. 동기 REST/JSON, `X-Request-ID` 전파, problem+json. (이전 프로토타입에서 만든 공통 라이브러리·계약·CI 그대로)
 
 ### 5.1 데이터 흐름 (하루)
 1. 새벽: youtube 수집 잡이 채널 20개의 새 영상을 받는다. market-data 수집 잡이 시세를 받는다.
@@ -117,13 +117,13 @@ mentions stats  ╲  youtube   ╲
 4. 화면은 stats·mentions 만 읽는다. 계산은 요청 시점이 아니라 배치에서 끝나 있다(Render 콜드 스타트 대비).
 
 ### 5.2 DB · 배포
-루틴과 같다. Supabase 스키마 5개(`market` `yt` `mentions` `stats` `watch`), Render ×5(Docker), Vercel, GitHub Actions 수집 스케줄. 세미나용 k8s·APISIX·OTel 도 서비스 이름만 바뀐다.
+이전 프로토타입과 같다. Supabase 스키마 5개(`market` `yt` `mentions` `stats` `watch`), Render ×5(Docker), Vercel, GitHub Actions 수집 스케줄. 실험용 k8s·APISIX·OTel 도 서비스 이름만 바뀐다.
 
 ---
 
 ## 6. 일정 (오늘 9/28)
 
-| 주차 | 날짜 | 팀 | 조인성 (플랫폼·세미나) |
+| 주차 | 날짜 | 팀 | 조인성 (플랫폼) |
 |---|---|---|---|
 | 5 | 9/30 | **아이디어 발표 2~3분 + 팀 페이지**: 1장 내용을 팀 페이지 한 화면으로. 채널 20개·별칭 사전 초안 합의. YouTube·DART·공공데이터포털 키 발급 | 저장소 개편(hindsight), market-data 재사용, youtube·mentions 뼈대, contracts |
 | 6 | 10/7 | youtube 수집기(채널·영상 백필 1년) · market-data 국내 시세(키) · 별칭 사전 완성 | mentions 매칭 구현, CI 정비 |
@@ -137,10 +137,10 @@ mentions stats  ╲  youtube   ╲
 | 담당 | 서비스 | 하는 일 |
 |---|---|---|
 | A | youtube | 채널 목록 확정, YouTube API 수집기, 백필 |
-| B | market-data | 루틴 것 재사용 + 국내 시세 키 연결 + DART corpCode 사전 + 코인 마켓 |
+| B | market-data | 이전 프로토타입 재사용 + 국내 시세 키 연결 + DART corpCode 사전 + 코인 마켓 |
 | C | mentions | 별칭 사전, 매칭 규칙, 매칭 성공률 |
 | D | stats + 분석 페이지 | 수익률·초과수익 계산, 표본 수 처리 |
-| 조인성 | watch + 화면 + 플랫폼 | 프론트, contracts·CI·배포, 세미나 트랙 |
+| 조인성 | watch + 화면 + 플랫폼 | 프론트, contracts·CI·배포 |
 
 각자 자기 서비스의 OpenAPI 명세·테이블 문서·실습 기록을 책임진다.
 
@@ -178,7 +178,7 @@ mentions stats  ╲  youtube   ╲
 - [ ] 팀원 공유 · 채널 20개 확정 · 별칭 사전 보강
 - [ ] Supabase · Render Blueprint · Vercel 배포 (docs/deploy.md)
 
-## 11. 루틴에서 가져온 것 / 버린 것
+## 11. 이전 프로토타입(9/19)에서 가져온 것 / 버린 것
 
-가져옴: `libs`(공통), `market-data`(어댑터·시세·환율), `contracts` 체계·Spectral·CI 3개, compose·gateway·k8s·backstage·세미나 런북, 프론트 골격.
-버림: income·portfolio·plan·backtest 서비스, 루틴 화면 5개.
+가져옴: `libs`(공통), `market-data`(어댑터·시세·환율), `contracts` 체계·Spectral·CI 3개, compose·gateway·k8s·backstage, 프론트 골격.
+버림: income·portfolio·plan·backtest 서비스, 이전 화면 5개.

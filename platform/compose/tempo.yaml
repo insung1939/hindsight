@@ -1,4 +1,4 @@
-# Grafana Tempo — 트레이스 저장소 (로컬 파일). 세미나용 최소 설정.
+# Grafana Tempo — 트레이스 저장소 (로컬 파일). 실험용 최소 설정.
 server:
   http_listen_port: 3200
 

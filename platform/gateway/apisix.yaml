@@ -1,4 +1,4 @@
-# Apache APISIX standalone 설정 — 세미나 2번 항목 (North-South 게이트웨이).
+# Apache APISIX standalone 설정 — 실험 트랙 (North-South 게이트웨이).
 # 프론트는 서비스 주소 4개 대신 게이트웨이 하나만 안다: http://localhost:9080/api/<service>/v1/...
 #
 #   Before: 프론트 → 서비스 4개 직접 호출, 인증·속도제한 없음, /internal/sync 가 외부에 노출

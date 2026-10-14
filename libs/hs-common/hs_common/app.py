@@ -42,7 +42,7 @@ def create_app(service_name: str, title: str, version: str, description: str = "
     def healthz():
         return {"status": "ok", "service": service_name, "version": version}
 
-    if env("OTEL_EXPORTER_OTLP_ENDPOINT"):  # 세미나(관측) 때만. import 자체를 늦춰 평소엔 메모리를 쓰지 않는다 (Render 무료 512MB 에 프로세스 5개)
+    if env("OTEL_EXPORTER_OTLP_ENDPOINT"):  # 관측 스택을 붙일 때만. import 자체를 늦춰 평소엔 메모리를 쓰지 않는다 (Render 무료 512MB 에 프로세스 5개)
         try:
             from .telemetry import setup_telemetry
             setup_telemetry(app, service_name)

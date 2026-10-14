@@ -1,4 +1,4 @@
-# Backstage 카탈로그 — 서비스 4개와 각 API, 소유자, 의존 관계. 세미나 3번 항목(디스커버리·카탈로그).
+# Backstage 카탈로그 — 서비스 4개와 각 API, 소유자, 의존 관계. 실험 트랙: 디스커버리·카탈로그.
 apiVersion: backstage.io/v1alpha1
 kind: System
 metadata:

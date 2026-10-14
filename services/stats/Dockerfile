@@ -1,4 +1,4 @@
-# 빌드 컨텍스트 = 저장소 루트.  docker build -f services/stats/Dockerfile -t routine/stats .
+# 빌드 컨텍스트 = 저장소 루트.  docker build -f services/stats/Dockerfile -t hindsight/stats .
 FROM python:3.12-slim
 WORKDIR /app
 COPY libs/hs-common /libs/hs-common
