@@ -102,7 +102,7 @@ Docker: `make compose` (서비스 4개) · `make compose-all` (+ APISIX 9080 · 
 
 ## 팀 · 역할 분담 (5조)
 
-| 이름 | 영역 | 맡은 것 | 발표에서 말하는 장 |
+| 이름 | 영역 | 맡은 것 | 담당 장 (내용 점검 · 질의응답 대비) |
 |---|---|---|---|
 | 김지환 | 유튜브 수집 · 채널 선정 | 채널 후보 547개 측정과 2단 선정 규칙 검토(`docs/channel-selection.md`), `scripts/channels.json` 관리, YouTube 쿼터 설계(재생목록 1유닛), 매일 배치의 수집 단계 점검 | 6장 채널 선정 · 5장 YouTube 소스 |
 | 오선호 | 종목 매칭 · 논조 | 별칭 사전(삼전·하닉 …)과 업종·테마 20개 보강, 매칭 오탐·낙관 오분류 검수(무작위 100건), `tests/test_matcher.py` 사례 추가, 못 잡은 제목(unmatched) 분류 | 7장 파이프라인(매칭·논조) · 13장 한계 1·2 |
@@ -110,7 +110,7 @@ Docker: `make compose` (서비스 4개) · `make compose-all` (+ APISIX 9080 · 
 | 김현준 | 데이터 출처 · 문서 · BM | 데이터 출처 표(`docs/data-sources.md`)와 DB 테이블 문서(`docs/db.md`)의 최신화, 데이터 탭 설명 검토, 활용 시나리오·비즈니스 모델 정리, 예상 질문 답(`docs/professor-questions.md`) | 5장 데이터 소스 · 15장 BM · 19~20장 부록 |
 | 조인성 | 아키텍처 · 백엔드 · 배포 · 화면 · 쇼릴 | 서비스 4개와 공통 라이브러리, OpenAPI 계약·CI, Render·Supabase·Vercel 배포, GitHub Actions 배치, React 화면, 발표 페이지·쇼릴·대본 | 1~4장 · 8~9장 · 14장 · 16~18장 |
 
-10/21 전까지 각자 할 일: 자기 영역의 문서를 한 번 읽고 틀린 숫자·설명을 고친다(PR 또는 조인성에게 전달) → 10/17 데이터 확정 뒤 자기 장의 숫자를 대본(`docs/script.md`)과 맞춘다 → 자기 장의 예상 질문 2개씩 준비한다. 개발을 몰라도 되는 설명은 [docs/team-guide.md](docs/team-guide.md).
+발표는 조인성이 진행하고, 나머지는 자기 영역의 내용 점검과 질의응답을 맡는다. 10/21 전까지 각자 할 일: 자기 영역의 문서를 한 번 읽고 틀린 숫자·설명을 고친다(PR 또는 조인성에게 전달) → 10/17 데이터 확정 뒤 자기 장의 숫자를 대본(`docs/script.md`)과 맞춘다 → 자기 장의 예상 질문 2개씩 준비한다. 개발을 몰라도 되는 설명은 [docs/team-guide.md](docs/team-guide.md).
 
 ## AI 활용
 
