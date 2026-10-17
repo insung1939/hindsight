@@ -99,12 +99,14 @@ async function loadSnapshot() {
 async function loadLive() {
   const api = CONFIG.api; const j = async (p) => (await fetch(api + p, { signal: AbortSignal.timeout(8000) })).json();
   try {
-    const [yt, me, mk, st, ch, sums, rk] = await Promise.all([j("/youtube/v1/coverage"), j("/mentions/v1/coverage"), j("/market-data/v1/coverage"), j("/stats/v1/coverage"), j("/youtube/v1/channels"), j("/stats/v1/summaries?slim=true"), j("/stats/v1/channels/ranking?horizon=20&limit=3")]);
-    const summary = Object.fromEntries(sums.items.map((i) => [i.key, i.value]));
+    // 화면·대본은 낙관(bull) 언급 기준이므로 전체 논조 키와 bull: 키를 모두 받고, 랭킹도 stance=bull·min_n=30 으로 스냅샷(snapshot_deck.py)과 같은 조건을 쓴다
+    const [yt, me, mk, st, ch, sums, sumsBull, rk] = await Promise.all([j("/youtube/v1/coverage"), j("/mentions/v1/coverage"), j("/market-data/v1/coverage"), j("/stats/v1/coverage"), j("/youtube/v1/channels"), j("/stats/v1/summaries?slim=true"), j("/stats/v1/summaries?slim=true&stance=bull"), j("/stats/v1/channels/ranking?horizon=20&metric=excess_mean&min_n=30&stance=bull&limit=3")]);
+    const summary = Object.fromEntries([...sums.items.map((i) => [i.key, i.value]), ...sumsBull.items.map((i) => ["bull:" + i.key, i.value])]);
+    if (!summary["bull:overall:20"]?.n) throw new Error("bull summary missing");  // 낙관 키가 없으면 스냅샷을 유지한다
     if (window.__snap?.summary) Object.keys(window.__snap.summary).forEach((k) => { if (summary[k] && !summary[k].histogram && window.__snap.summary[k]) summary[k].histogram = window.__snap.summary[k].histogram; });
     const chm = Object.fromEntries(ch.items.map((c) => [c.channel_id, c]));
     const channel_ranking = Object.fromEntries(["top", "bottom"].map((side) => [side, rk[side].map((r) => ({ ...r, title: chm[r.channel_id]?.title || r.channel_id }))]));
-    const d = derive({ youtube: yt, mentions: me, market: mk, stats: st, summary,
+    const d = derive({ youtube: yt, mentions: me, market: mk, stats: st, summary, stance_counts: me.by_stance,
       channels: { total: ch.items.length, stock: ch.items.filter((c) => c.category === "stock").length, crypto: ch.items.filter((c) => c.category === "crypto").length },
       generated_at: "실시간", top_assets_20: window.__snap?.top_assets_20, top_themes_20: window.__snap?.top_themes_20, trending_30d: window.__snap?.trending_30d, channel_ranking });
     bind(d);

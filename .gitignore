@@ -12,3 +12,9 @@ dist/
 platform/k8s/base/secret.yaml
 .vercel
 .env*
+
+# 발표 대본은 비공개 (로컬에만)
+docs/script.md
+docs/script.docx
+docs/script.pdf
+~$*

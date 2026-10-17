@@ -2,7 +2,7 @@
 SERVICES := market-data youtube mentions stats
 COMPOSE  := docker compose -f platform/compose/docker-compose.yml
 
-.PHONY: help setup up down smoke test lint contracts docs web compose compose-all compose-down
+.PHONY: help setup up down smoke test lint contracts docs script web compose compose-all compose-down
 
 help:            ## 이 목록
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
@@ -44,3 +44,6 @@ compose-all:     ## + APISIX 게이트웨이 + OTel·Tempo·Prometheus·Grafana 
 
 compose-down:    ## compose 전체 종료
 	$(COMPOSE) --profile gateway --profile observability down
+
+script:          ## 발표 대본 docs/script.md → docs/script.docx (둘 다 비공개, 로컬에만)
+	python3 scripts/build_script_docx.py docs/script.md docs/script.docx

@@ -3,7 +3,7 @@ import { Disclaimer, ErrorBox, SkeletonRows, Term, useLoad } from "../components
 
 // 데이터 — 어떤 소스에서, 어떻게 가공해, 얼마나 쌓였나 (수업 필수 페이지)
 const SOURCES = [
-  { k: "youtube", name: "YouTube Data API v3", org: "Google", url: "https://developers.google.com/youtube/v3", what: "채널 51개의 영상 제목·설명·게시일·조회수", how: "검색(100유닛) 대신 채널 업로드 목록(1유닛)만 읽는다. 1년치 4만 4천 편을 약 1,500유닛에." },
+  { k: "youtube", name: "YouTube Data API v3", org: "Google", url: "https://developers.google.com/youtube/v3", what: "채널 51개의 영상 제목·설명·게시일·조회수", how: "검색(100유닛) 대신 채널 업로드 목록(1유닛)만 읽는다. 1년치 4만 5천 편을 약 1,500유닛에." },
   { k: "dart", name: "DART OpenAPI corpCode", org: "금융감독원", url: "https://opendart.fss.or.kr", what: "국내 전 상장사 이름·종목코드·고유번호", how: "종목 사전의 뼈대. 별칭(삼전·하닉…)과 업종 20개는 팀이 보강." },
   { k: "datagokr", name: "금융위원회 주식시세정보 V2", org: "공공데이터포털", url: "https://www.data.go.kr/data/15094808/openapi.do", what: "국내 일별 종가·거래량", how: "언급된 국내 종목만 매일. 키가 없거나 장애면 Yahoo 국내 심볼로 대체." },
   { k: "yahoo", name: "Yahoo Finance chart API", org: "Yahoo", url: "https://finance.yahoo.com", what: "미국 종가·거래량, 코스피·S&P500 지수, 업종 ETF 20개", how: "키 없이 HTTP JSON." },
@@ -76,7 +76,7 @@ export default function DataPage() {
           <details className="help"><summary>더 보기 — 채널 선정 규칙 · 매칭 규칙 · 채널 목록 · 못 잡은 제목</summary>
           <div className="grid" style={{ marginTop: 12 }}>
         <div className="card col-6">
-          <div className="card-head"><div><h3>채널 {chList.length}개 · 사람이 고르지 않았다</h3><p>후보 547개를 API로 재서 두 단계 규칙으로 걸렀다</p></div></div>
+          <div className="card-head"><div><h3>채널 {chList.length}개 · 사람이 고르지 않았다</h3><p>후보 547개를 API로 재서 두 갈래 규칙 중 하나만 넘으면 채택. 언급률 = 최근 50편 제목 중 종목이 나온 비율</p></div></div>
           <div className="table-wrap" style={{ marginBottom: 12 }}><table>
             <thead><tr><th>단</th><th>구독자</th><th>언급률</th><th>뜻</th></tr></thead>
             <tbody>
@@ -84,7 +84,7 @@ export default function DataPage() {
               <tr><td><span className="chip">B</span></td><td>주식 5만 · 코인 10만 이상</td><td>30% 이상</td><td className="muted" style={{ fontSize: 13 }}>규모는 작아도 제목에 종목을 콕 집는다</td></tr>
             </tbody>
           </table></div>
-          <p className="muted" style={{ fontSize: 13, margin: 0 }}>공통: 45일 내 활동 · 쇼츠 50% 이하 · 방송사·증권사·거래소 제외. 구독자 373만이어도 제목에 종목이 2%면 탈락.</p>
+          <p className="muted" style={{ fontSize: 13, margin: 0 }}>둘로 나눈 이유: 30% 하나로 자르면 삼프로TV·김작가TV 같은 큰 채널이 전부 빠진다. 공통: 45일 내 활동 · 쇼츠 50% 이하 · 하루 5편 넘는 자동 생성형·방송사·증권사·거래소 제외. 구독자 373만이어도 제목에 종목이 2%면 탈락.</p>
         </div>
         <div className="card col-6">
           <div className="card-head"><div><h3>매칭 규칙</h3><p>규칙마다 테스트가 있다</p></div></div>

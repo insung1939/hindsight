@@ -4,7 +4,7 @@
 
 KAIST 디지털금융MBA 〈클라우드컴퓨팅실습〉 팀 프로젝트. 주식·코인 유튜브 채널이 영상 제목에서 언급한 종목을 모아, **언급 뒤 5·20·60 거래일 동안 주가가 실제로 어떻게 움직였는지** 통계로 보여준다. 채널 실명과 채널별 성적(상·하위)을 보여주되 학습용 통계임을 고지하고, 종목 추천 문구는 없다.
 
-**처음 보면 [docs/overview.md](docs/overview.md)(검토 가이드) 부터.** 교수님 요구사항·중간 피드백·디자인 원칙은 [docs/requirements.md](docs/requirements.md), 현재 상태와 10/21 까지의 할 일은 [docs/checklist.md](docs/checklist.md). 기획·역할은 [PLAN.md](PLAN.md), API 설명은 [docs/api.md](docs/api.md), 테이블은 [docs/db.md](docs/db.md), 데이터 출처는 [docs/data-sources.md](docs/data-sources.md), 배포는 [docs/deploy.md](docs/deploy.md), 발표 대본은 [docs/script.md](docs/script.md).
+**처음 보면 [docs/overview.md](docs/overview.md)(검토 가이드) 부터.** 교수님 요구사항·중간 피드백·디자인 원칙은 [docs/requirements.md](docs/requirements.md), 현재 상태와 10/21 까지의 할 일은 [docs/checklist.md](docs/checklist.md). 기획·역할은 [PLAN.md](PLAN.md), API 설명은 [docs/api.md](docs/api.md), 테이블은 [docs/db.md](docs/db.md), 데이터 출처는 [docs/data-sources.md](docs/data-sources.md), 배포는 [docs/deploy.md](docs/deploy.md).
 
 > 평가 포인트(교수 피드백): **어떤 소스에서 데이터를 가져와 어떻게 가공해 무슨 가치를 주는가.** UI 가 아니라 데이터와 API 호출이 중심. 발표의 절반은 파이프라인(소스 → 수집 → 매칭 → 계산 → 결과)에 실제 건수를 붙여 설명한다.
 
@@ -43,7 +43,7 @@ hindsight/
 ├── apps/api/           합본 배포(Render 1개): 서비스 4개를 한 프로세스에 마운트(/docs 하나) — single.py · Dockerfile
 ├── apps/team-page/     발표 페이지(정적)
 ├── platform/           compose(서비스+게이트웨이+관측) · gateway(APISIX) · k8s(kustomize) · backstage
-├── docs/               requirements · checklist · data-plan · channel-selection · api · db · data-sources · deploy · script (archive/: 이전 계획)
+├── docs/               requirements · checklist · data-plan · channel-selection · api · db · data-sources · deploy · script
 ├── scripts/            dev_up/down · smoke.py · discover_channels.py(채널 선정) · register_channels.py · migrate_sqlite_to_pg.py · export_contracts.py · gen_api_docs.py
 └── .github/workflows/  contracts(Spectral·oasdiff) · services(pytest·GHCR 이미지) · sync(매일 수집)
 ```
@@ -110,7 +110,7 @@ Docker: `make compose` (서비스 4개) · `make compose-all` (+ APISIX 9080 · 
 | 김현준 | 데이터 출처 · 문서 · BM | 데이터 출처 표(`docs/data-sources.md`)와 DB 테이블 문서(`docs/db.md`)의 최신화, 데이터 탭 설명 검토, 활용 시나리오·비즈니스 모델 정리, 예상 질문 답(`docs/professor-questions.md`) | 5장 데이터 소스 · 15장 BM · 19~20장 부록 |
 | 조인성 | 아키텍처 · 백엔드 · 배포 · 화면 · 쇼릴 | 서비스 4개와 공통 라이브러리, OpenAPI 계약·CI, Render·Supabase·Vercel 배포, GitHub Actions 배치, React 화면, 발표 페이지·쇼릴·대본 | 1~4장 · 8~9장 · 14장 · 16~18장 |
 
-발표는 조인성이 진행하고, 나머지는 자기 영역의 내용 점검과 질의응답을 맡는다. 10/21 전까지 각자 할 일: 자기 영역의 문서를 한 번 읽고 틀린 숫자·설명을 고친다(PR 또는 조인성에게 전달) → 10/17 데이터 확정 뒤 자기 장의 숫자를 대본(`docs/script.md`)과 맞춘다 → 자기 장의 예상 질문 2개씩 준비한다. 개발을 몰라도 되는 설명은 [docs/team-guide.md](docs/team-guide.md).
+발표는 조인성이 진행하고, 질의응답은 각자 자기 영역을 맡는다. 서비스 전체를 코드 없이 설명한 문서는 [docs/team-guide.md](docs/team-guide.md).
 
 ## AI 활용
 

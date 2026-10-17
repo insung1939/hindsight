@@ -29,7 +29,7 @@
     <p class="kicker rv">KAIST 디지털금융MBA · 클라우드컴퓨팅실습 · 팀 프로젝트</p>
     <div class="team-badge rv d1"><span class="num5">5</span><span>조</span></div>
     <h1 class="display rv d1">유튜버가 오른다고 한 종목,<br>정말 올랐을까?</h1>
-    <p class="lead rv d2">주식·코인 유튜브 채널 <b data-bind="channels.total">51</b>개 · 1년치 영상 <b data-bind="youtube.videos" data-fmt="n">44,620</b>편 · "오른다"고 한 언급 <b data-bind="stance_counts.bull" data-fmt="n">18,641</b>건의 사후 성적표</p>
+    <p class="lead rv d2">주식·코인 유튜브 채널 <b data-bind="channels.total">51</b>개 · 1년치 영상 <b data-bind="youtube.videos" data-fmt="n">45,660</b>편 · "오른다"고 한 언급 <b data-bind="stance_counts.bull" data-fmt="n">19,016</b>건의 사후 성적표</p>
     <ul class="members rv d3">
       <li>김지환</li><li>오선호</li><li>조인성</li><li>채재희</li><li>김현준</li>
     </ul>
@@ -96,7 +96,7 @@
       <div class="src"><b>금융위원회 주식시세정보 V2</b><small>공공데이터포털 · data.go.kr</small><p>그 뒤 주가는</p><em>국내 일별 종가·거래량</em></div>
       <div class="src"><b>Yahoo Finance chart</b><small>Yahoo · finance.yahoo.com</small><p>시장이 오른 덕인가</p><em>미국 시세 · 코스피·S&P500 · 업종 ETF 20</em></div>
       <div class="src"><b>업비트 Open API</b><small>두나무 · docs.upbit.com</small><p>코인은</p><em>KRW 마켓 292 · 일봉·거래량</em></div>
-      <div class="src"><b>DART 공시검색</b><small>금융감독원 · opendart.fss.or.kr</small><p>공시를 따라간 건가</p><em>공시 <span data-bind="market.disclosures" data-fmt="n">47,950</span>건 → 실적·계약·자금조달·주요사항</em></div>
+      <div class="src"><b>DART 공시검색</b><small>금융감독원 · opendart.fss.or.kr</small><p>공시를 따라간 건가</p><em>공시 <span data-bind="market.disclosures" data-fmt="n">49,099</span>건 → 실적·계약·자금조달·주요사항</em></div>
     </div>
     <p class="note rv d3">URL·수집 항목·갱신 주기 표: <code>docs/data-sources.md</code> · 키는 서버 환경변수에만 · 자막·댓글은 수집하지 않음 · 크롤링(네이버 증권 뉴스)은 넣었다가 뺐다 → 16장</p>
   </div>
@@ -109,14 +109,15 @@
     <h2 class="rv d1">채널은 사람이 고르지 않았다</h2>
     <div class="bignums rv d2">
       <div><b>547</b><span>YouTube 검색 후보</span></div><i>→</i>
-      <div><b>272</b><span>구독자·업로드·언급률·쇼츠 측정</span></div><i>→</i>
-      <div class="acc"><b data-bind="channels.total">51</b><span>채택 · 주식 <span data-bind="channels.stock">33</span> 코인 <span data-bind="channels.crypto">18</span></span></div>
+      <div><b>272</b><span>구독자·업로드·쇼츠·<strong>언급률</strong> 측정<br>(언급률 = 최근 50편 제목 중 종목이 나온 비율)</span></div><i>→</i>
+      <div class="acc"><b data-bind="channels.total">51</b><span>채택 · 주식 <span data-bind="channels.stock">38</span> 코인 <span data-bind="channels.crypto">13</span></span></div>
     </div>
+    <p class="note rv d3" style="margin-bottom:8px"><b>두 갈래 중 하나만 넘으면 채택</b> — 30% 하나로 자르면 삼프로TV·김작가TV 같은 큰 채널이 전부 빠진다</p>
     <div class="two rv d3">
       <div class="card"><h3>A단 · 대형 영향력</h3><p class="big">100만<small>구독자 이상 · 언급률 15%+</small></p><p class="note">삼프로TV(22%)·김작가TV(28%)처럼 시황이 섞여도 한 번의 언급이 닿는 사람이 많다</p></div>
-      <div class="card"><h3>B단 · 종목 집중</h3><p class="big">30%<small>언급률 이상 · 구독자 5만+</small></p><p class="note">규모는 작아도 제목에 종목을 콕 집는다. 쇼츠 공장·방송사·증권사 제외</p></div>
+      <div class="card"><h3>B단 · 종목 집중</h3><p class="big">30%<small>언급률 이상 · 구독자 주식 5만 · 코인 10만+</small></p><p class="note">규모는 작아도 제목에 종목을 콕 집는다</p></div>
     </div>
-    <p class="note rv d4">구독자 373만 채널도 제목에 종목이 2%뿐이면 탈락 · 근거 <code>docs/channel-selection.md</code></p>
+    <p class="note rv d4">공통 제외: 45일 내 업로드 없음 · 쇼츠 50% 초과 · 하루 5편 넘는 자동 생성형 · 방송사·증권사·거래소 공식 채널 · 구독자 373만 슈카월드도 제목에 종목이 2%뿐이라 탈락 · 근거 <code>docs/channel-selection.md</code></p>
   </div>
 </section>
 
@@ -289,7 +290,7 @@
     <h2 class="rv d1">막혔던 것 여섯 가지</h2>
     <div class="fails rv d2">
       <div class="card"><b>매칭 26%</b><p>못 잡은 제목 1,304건을 읽음 → 종목이 아니라 업종 이야기 → 테마 사전 20개(대표 ETF) → <span data-bind="mentions.match_rate" data-fmt="pct0">65%</span></p></div>
-      <div class="card"><b>낙관 오탐</b><p>"삼성전자 급등했던 이유" 같은 사후 해설이 낙관으로 잡힘 → 과거 단서만 있고 전망 단어가 없으면 중립 → 낙관 19,925 → 18,641</p></div>
+      <div class="card"><b>낙관 오탐</b><p>"삼성전자 급등했던 이유" 같은 사후 해설이 낙관으로 잡힘 → 과거 단서만 있고 전망 단어가 없으면 중립 → 낙관 19,925 → 18,641 (10/8 당시, 1,284건 제외)</p></div>
       <div class="card"><b>Render 512MB OOM</b><p>서비스 4개 = 프로세스 5개가 메모리 초과 → 한 프로세스에 마운트, DART 3,998건 스트리밍 파싱, 사전 갱신은 주 1회 → 95MB</p></div>
       <div class="card"><b>Supabase 연결 15개 한도</b><p>재배포마다 "max clients reached" → 엔진당 풀 1(+2), 유휴 연결 정리, 15분 넘는 배치는 백그라운드 + 상태 폴링</p></div>
       <div class="card"><b>공공데이터포털 "미등록 키"</b><p>키 문제가 아니라 옛 V1 주소를 부르고 있었다 → V2 엔드포인트로 수정, 실패 시 Yahoo 국내 심볼로 자동 대체</p></div>
