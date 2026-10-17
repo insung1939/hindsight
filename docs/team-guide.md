@@ -56,7 +56,7 @@
 - API 문서(Swagger) https://hindsight-api-edab.onrender.com/docs
 - 코드 https://github.com/insung1939/hindsight
 
-## 9. 영역별 담당 (10/14 확정, README 역할 분담과 같음) — 발표는 조인성, 각자는 자기 영역 점검과 질의응답
+## 9. 영역별 담당 — 발표는 조인성, 질의응답은 각자 자기 영역
 | 영역 | 말할 내용 | 참고 문서 |
 |---|---|---|
 | 유튜브 수집·채널 선정 — 김지환 | 채널 51개를 어떻게 골랐나(547개 측정 → 2단 규칙), 쿼터 설계 | docs/channel-selection.md |
