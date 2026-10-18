@@ -127,10 +127,25 @@ const SCROLL = new URLSearchParams(location.search).has("scroll");
 const slides = $$(".slide");
 let cur = 0;
 function reveal(el) { $$(".rv", el).forEach((x) => x.classList.add("on")); }
-function show(i, push = true) {
+// ── 단계 등장(Reveal.js 의 fragment): .fg 하나씩, .fglist 는 자식 하나씩, .steps 안에서는 현재 단계만 밝다 ──
+const frags = (el) => [...el.querySelectorAll(".fg"), ...[...el.querySelectorAll(".fglist")].flatMap((l) => [...l.children])];
+function setFrag(el, n) {  // 앞에서 n 개를 켠다
+  const fs = frags(el);
+  fs.forEach((f, k) => { f.classList.toggle("on", k < n); f.classList.remove("past", "cur"); });
+  const steps = fs.filter((f) => f.classList.contains("step") && f.classList.contains("on"));
+  steps.forEach((f, k) => f.classList.add(k === steps.length - 1 ? "cur" : "past"));
+  const pos = $("#fgpos"); if (pos) pos.textContent = fs.length ? `${Math.min(n, fs.length)} / ${fs.length}` : "";
+}
+const fragShown = (el) => frags(el).filter((f) => f.classList.contains("on")).length;
+function show(i, push = true, dir) {
+  const prev = cur;
   cur = Math.max(0, Math.min(slides.length - 1, i));
+  dir = dir ?? (cur > prev ? 1 : cur < prev ? -1 : 0);
+  document.body.dataset.dir = dir;
   slides.forEach((s, k) => s.classList.toggle("active", k === cur));
   reveal(slides[cur]);
+  // 앞으로 가면 단계 요소는 숨긴 채 시작, 뒤로 가거나 건너뛰면 전부 보인 상태(STATIC 도 전부)
+  setFrag(slides[cur], dir === 1 && !STATIC ? 0 : 999);
   slides[cur].scrollTop = 0;
   // 쇼릴 장: 들어올 때 재생, 나갈 때 멈춤(iframe src 를 비운다)
   slides.forEach((s, k) => { const f = s.querySelector("iframe[data-src]"); if (!f) return; if (k === cur) f.src = f.dataset.src + "&short&t=" + Date.now(); else if (f.src) f.removeAttribute("src"); });
@@ -144,8 +159,9 @@ if (!SCROLL) {
   const dots = document.createElement("div"); dots.className = "dots";
   slides.forEach((s, k) => { const b = document.createElement("button"); b.title = s.querySelector("h1,h2")?.textContent?.slice(0, 30) || `${k + 1}`; b.onclick = () => show(k); dots.appendChild(b); });
   document.body.appendChild(dots);
-  const hint = document.createElement("div"); hint.className = "navhint"; hint.innerHTML = '<span class="kbd">←</span><span class="kbd">→</span> 넘기기 · <span class="kbd">Home</span> 처음 · <span class="kbd">F</span> 전체화면 · 쇼릴에서 <span class="kbd">Space</span> 멈춤 <span class="kbd">R</span> 처음';
+  const hint = document.createElement("div"); hint.className = "navhint"; hint.innerHTML = '<span class="kbd">←</span><span class="kbd">→</span> 다음 단계 · 다음 장 · <span class="kbd">Home</span> 처음 · <span class="kbd">F</span> 전체화면 · 쇼릴에서 <span class="kbd">Space</span> 멈춤 <span class="kbd">R</span> 처음';
   document.body.appendChild(hint);
+  const fgpos = document.createElement("div"); fgpos.id = "fgpos"; fgpos.className = "fgpos"; document.body.appendChild(fgpos);
   const fromHash = parseInt((location.hash || "#1").slice(1), 10);
   const byId = location.hash && location.hash.length > 3 ? slides.findIndex((s) => "#" + s.id === location.hash) : -1;
   show(byId >= 0 ? byId : (isNaN(fromHash) ? 0 : fromHash - 1), false);
@@ -159,16 +175,24 @@ if (!SCROLL) {
     if (f && e.key === " ") { e.preventDefault(); f.contentWindow?.postMessage({ reel: "toggle" }, "*"); return; }
     if (f && e.key.toLowerCase() === "r") { e.preventDefault(); f.contentWindow?.postMessage({ reel: "restart" }, "*"); return; }
     if (e.key.toLowerCase() === "f") { toggleFull(); return; }
-    if (["ArrowRight", "ArrowDown", "PageDown", " ", "Enter"].includes(e.key)) { e.preventDefault(); show(cur + 1); }
-    if (["ArrowLeft", "ArrowUp", "PageUp", "Backspace"].includes(e.key)) { e.preventDefault(); show(cur - 1); }
+    if (["ArrowRight", "ArrowDown", "PageDown", " ", "Enter"].includes(e.key)) {
+      e.preventDefault();
+      const n = fragShown(slides[cur]), total = frags(slides[cur]).length;
+      if (!STATIC && n < total) setFrag(slides[cur], n + 1); else show(cur + 1, true, 1);
+    }
+    if (["ArrowLeft", "ArrowUp", "PageUp", "Backspace"].includes(e.key)) {
+      e.preventDefault();
+      const n = fragShown(slides[cur]);
+      if (!STATIC && n > 0) setFrag(slides[cur], n - 1); else show(cur - 1, true, -1);
+    }
     if (e.key === "Home") show(0);
     if (e.key === "End") show(slides.length - 1);
   });
   let touchX = null;
   window.addEventListener("touchstart", (e) => { touchX = e.touches[0].clientX; }, { passive: true });
-  window.addEventListener("touchend", (e) => { if (touchX == null) return; const dx = e.changedTouches[0].clientX - touchX; if (Math.abs(dx) > 60) show(cur + (dx < 0 ? 1 : -1)); touchX = null; });
+  window.addEventListener("touchend", (e) => { if (touchX == null) return; const dx = e.changedTouches[0].clientX - touchX; if (Math.abs(dx) > 60) { const n = fragShown(slides[cur]), t = frags(slides[cur]).length; if (dx < 0 && n < t) setFrag(slides[cur], n + 1); else show(cur + (dx < 0 ? 1 : -1)); } touchX = null; });
   // iframe(쇼릴) 안에 포커스가 가 있어도 ← → 로 장을 넘길 수 있게, 쇼릴이 보내는 메시지를 받는다
-  window.addEventListener("message", (e) => { if (e.data?.deck === "next") show(cur + 1); else if (e.data?.deck === "prev") show(cur - 1); });
+  window.addEventListener("message", (e) => { if (e.data?.deck === "next") show(cur + 1, true, 1); else if (e.data?.deck === "prev") show(cur - 1, true, -1); });
   window.addEventListener("hashchange", () => { const n = parseInt(location.hash.slice(1), 10); if (!isNaN(n) && n - 1 !== cur) show(n - 1, false); });
 } else {
   const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) reveal(e.target); }), { threshold: 0.18 });

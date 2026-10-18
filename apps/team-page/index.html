@@ -23,7 +23,7 @@
 <main id="deck">
 
 <!-- 1 표지 -->
-<section class="slide cover" id="s-cover">
+<section class="slide cover" id="s-cover" data-transition="zoom">
   <div class="hero-bg"></div>
   <div class="in hero2">
     <div>
@@ -72,7 +72,7 @@
       <figure><img src="img/story-4.webp" alt="유튜버 말대로 올라서 환호하는 캐릭터들" width="1400" height="788"><figcaption>"역시 유튜버 말이 맞았어!"</figcaption></figure>
       <figure><img src="img/story-5.webp" alt="로켓이 터지고 떨어지는 캐릭터들" width="1400" height="788"><figcaption>"다음엔… 잘되겠지?"</figcaption></figure>
     </div>
-    <p class="lead center rv d3">"지금이 매수 타이밍"을 수십만 명이 본다 — 그 뒤가 어땠는지는 <b>아무도 세지 않는다</b></p>
+    <p class="lead center fg">"지금이 매수 타이밍"을 수십만 명이 본다 — 그 뒤가 어땠는지는 <b>아무도 세지 않는다</b></p>
   </div>
 </section>
 
@@ -87,13 +87,13 @@
       <div class="f"><b>시세 · 공시</b><span>종가 · 거래량 · DART</span></div><i>→</i>
       <div class="f acc"><b>5 · 20 · 60일</b><span>수익률 · 시장 대비</span></div>
     </div>
-    <div class="bignums rv d3">
+    <div class="bignums fg">
       <div><b data-bind="channels.total">51</b><span>채널</span></div>
       <div><b data-bind="youtube.videos" data-fmt="n">45,660</b><span>영상 제목 · 1년</span></div>
       <div><b data-bind="stance_counts.bull" data-fmt="n">19,016</b><span>"오른다"고 한 언급</span></div>
       <div class="acc"><b data-bind="summary.bull:overall:20.n" data-fmt="n">13,611</b><span>20거래일 수익률 계산</span></div>
     </div>
-    <div class="pillrow rv d4"><span>홈 · 지금 뜨는 종목</span><span>언급 뒤에 · 전체 성적표</span><span>채널 · 누가 맞았나</span><span>종목 · 주가 위 언급 시점</span><span>데이터 · 출처와 가공</span></div>
+    <div class="pillrow fg"><span>홈 · 지금 뜨는 종목</span><span>언급 뒤에 · 전체 성적표</span><span>채널 · 누가 맞았나</span><span>종목 · 주가 위 언급 시점</span><span>데이터 · 출처와 가공</span></div>
   </div>
 </section>
 
@@ -123,11 +123,11 @@
       <div><b>272</b><span>구독자 · 업로드 · 쇼츠 · 언급률 측정</span></div><i>→</i>
       <div class="acc"><b data-bind="channels.total">51</b><span>채택 · 주식 <span data-bind="channels.stock">38</span> 코인 <span data-bind="channels.crypto">13</span></span></div>
     </div>
-    <div class="two rv d3">
+    <div class="two fg">
       <div class="card"><h3>A · 대형 영향력</h3><p class="big">100만<small>구독자 이상 · 언급률 15% 이상</small></p></div>
       <div class="card"><h3>B · 종목 집중</h3><p class="big">30%<small>언급률 이상 · 구독자 주식 5만 · 코인 10만 이상</small></p></div>
     </div>
-    <p class="note rv d4"><b>언급률</b> = 최근 50편 제목 중 종목이 나온 비율 · 둘 중 하나만 넘으면 채택 · 30% 하나로 자르면 삼프로TV·김작가TV가 빠진다</p>
+    <p class="note fg"><b>언급률</b> = 최근 50편 제목 중 종목이 나온 비율 · 둘 중 하나만 넘으면 채택 · 30% 하나로 자르면 삼프로TV·김작가TV가 빠진다</p>
   </div>
 </section>
 
@@ -143,7 +143,7 @@
       <div class="st"><div class="k">④ 시세 · 공시</div><div class="v num" data-bind="market.prices" data-fmt="n">—</div><div class="d">시세 행 · 공시 <span data-bind="market.disclosures" data-fmt="n"></span></div></div>
       <div class="st acc"><div class="k">⑤ 수익률</div><div class="v num" data-bind="stats.events" data-fmt="n">—</div><div class="d">언급별 5 · 20 · 60일</div></div>
     </div>
-    <div class="pillrow big rv d3"><span>매칭 26% → 65% · 업종 테마 사전</span><span>사건일 = 영상 뒤 처음 거래할 수 있는 날</span><span>오탐은 규칙 + 테스트 18개</span></div>
+    <div class="pillrow big fg"><span>매칭 26% → 65% · 업종 테마 사전</span><span>사건일 = 영상 뒤 처음 거래할 수 있는 날</span><span>오탐은 규칙 + 테스트 18개</span></div>
   </div>
 </section>
 
@@ -187,15 +187,15 @@
   <div class="in">
     <p class="kicker rv">아키텍처 ② 동작 원리</p>
     <h2 class="rv d1">읽기는 GET, 쓰기는 배치만 — 외부 API 는 요청 때 부르지 않는다</h2>
-    <div class="req rv d2">
+    <div class="req steps rv d2">
       <div class="lab">요청 한 번<small>화면이 숫자 하나를 받기까지</small></div>
-      <div class="rn"><b>브라우저 · React</b><small>Vercel · "언급 뒤에" 탭</small></div>
-      <div class="rl"><code>GET /stats/v1/summary?scope=overall&amp;horizon=20&amp;stance=bull</code><em>← JSON · 0.6KB · 캐시 10분</em></div>
-      <div class="rn"><b>FastAPI · stats</b><small>Render · 키 조립 <code>bull:overall:20</code></small></div>
-      <div class="rl"><code>SELECT value FROM stats.summaries WHERE key = …</code><em>← 1 row</em></div>
-      <div class="rn ok"><b>PostgreSQL</b><small>Supabase · 미리 계산된 요약</small></div>
+      <div class="rn fg step"><b>브라우저 · React</b><small>Vercel · "언급 뒤에" 탭</small></div>
+      <div class="rl fg step"><code>GET /stats/v1/summary?scope=overall&amp;horizon=20&amp;stance=bull</code><em>← JSON · 0.6KB · 캐시 10분</em></div>
+      <div class="rn fg step"><b>FastAPI · stats</b><small>Render · 키 조립 <code>bull:overall:20</code></small></div>
+      <div class="rl fg step"><code>SELECT value FROM stats.summaries WHERE key = …</code><em>← 1 row</em></div>
+      <div class="rn ok fg step"><b>PostgreSQL</b><small>Supabase · 미리 계산된 요약</small></div>
     </div>
-    <div class="req batch rv d3">
+    <div class="req batch fg">
       <div class="lab">하루 한 번<small>매일 07:10 · 10/17 확정</small></div>
       <div class="rn warn"><b>GitHub Actions</b><small>cron · 토큰은 Secrets</small></div>
       <div class="rl"><code>POST /{service}/internal/sync</code><em>X-Internal-Token</em></div>
@@ -209,9 +209,9 @@
 <!-- 11 막혔던 것 · 고친 것 -->
 <section class="slide" id="s-fail">
   <div class="in">
-    <p class="kicker rv">아키텍처 ③ 막혔던 것과 고친 것</p>
+    <p class="kicker rv">아키텍처 ③ 막혔던 것과 고친 것 · 실패한 실험의 원인과 개선 과정</p>
     <h2 class="rv d1">여섯 번 막혔고, 여섯 번 고쳤다</h2>
-    <div class="fixes rv d2">
+    <div class="fixes rv d2 fglist">
       <div class="fx"><b>매칭 성공률 26%</b><i>→</i><span>못 잡은 제목 1,304건을 읽음 → 업종 테마 사전 → <strong data-bind="mentions.match_rate" data-fmt="pct0">65%</strong></span></div>
       <div class="fx"><b>낙관 오탐</b><i>→</i><span>"급등했던 이유" 같은 사후 해설 → 중립으로 → <strong>1,284건</strong> 제외</span></div>
       <div class="fx"><b>Render 512MB OOM</b><i>→</i><span>프로세스 5개 → 1개 · DART 스트리밍 파싱 → <strong>95MB</strong></span></div>
@@ -223,17 +223,17 @@
 </section>
 
 <!-- 12 결과 1 -->
-<section class="slide alt" id="s-result1">
+<section class="slide alt" id="s-result1" data-transition="slide">
   <div class="in">
     <p class="kicker rv">분석 결과 ① <span class="live" id="live2"><i></i><span>스냅샷 <span data-bind="generated_at"></span></span></span></p>
     <h2 class="rv d1">"오른다"고 한 뒤, 실제로는</h2>
     <div class="grid g3 rv d2" id="overall-cards"></div>
-    <div class="card rv d3" style="margin-top:16px"><h3>낙관 언급 뒤 20거래일 수익률 분포 · 파랑 하락 · 빨강 상승</h3><div class="hist" id="hist-overall"></div></div>
+    <div class="card fg" style="margin-top:16px"><h3>낙관 언급 뒤 20거래일 수익률 분포 · 파랑 하락 · 빨강 상승</h3><div class="hist" id="hist-overall"></div></div>
   </div>
 </section>
 
 <!-- 13 결과 2 -->
-<section class="slide" id="s-result2">
+<section class="slide" id="s-result2" data-transition="slide">
   <div class="in">
     <p class="kicker rv">분석 결과 ② 시장별 · 채널별</p>
     <h2 class="rv d1">시장은 모두 같은 방향, 채널은 다르다</h2>
@@ -249,11 +249,11 @@
 </section>
 
 <!-- 14 발견 -->
-<section class="slide alt" id="s-findings">
+<section class="slide alt" id="s-findings" data-transition="slide">
   <div class="in">
     <p class="kicker rv">분석 결과 ③ 발견</p>
     <h2 class="rv d1">숫자가 말해 준 다섯 가지</h2>
-    <div class="findings2 rv d2">
+    <div class="findings2 rv d2 fglist">
       <div class="card"><b class="n" data-fnum="1">—</b><div><p data-finding="1">—</p><small data-fsub="1"></small></div></div>
       <div class="card"><b class="n" data-fnum="2">—</b><div><p data-finding="2">—</p><small data-fsub="2"></small></div></div>
       <div class="card"><b class="n" data-fnum="3">—</b><div><p data-finding="3">—</p><small data-fsub="3"></small></div></div>
@@ -281,16 +281,16 @@
 </section>
 
 <!-- 16 한 문장 -->
-<section class="slide kick" id="s-kick">
+<section class="slide kick" id="s-kick" data-transition="zoom">
   <div class="in">
     <p class="kicker rv" style="color:#9db4ff">데이터가 말하는 한 문장</p>
     <h2 class="display rv d1" style="color:#fff">유튜브가 "오른다"고 할 때는<br>이미 늦었다</h2>
-    <div class="kick-nums rv d2">
+    <div class="kick-nums fg">
       <div><b data-bind="summary.bull:overall:20.win_rate" data-fmt="pct0">42%</b><span>낙관 언급 뒤 20일 상승 확률</span></div>
       <div><b data-bind="summary.bull:overall:20.excess_mean" data-fmt="pct1">−2.8%</b><span>시장 대비</span></div>
       <div><b data-bind="summary.bull:overall:20.vol_ratio_median" data-fmt="x">0.92배</b><span>언급 뒤 ÷ 앞 거래량</span></div>
     </div>
-    <p class="lead rv d3" style="color:rgba(255,255,255,.8)">그래서 — 영상이 말한 종목을 사기 전에, 그 종목이 전에 떴을 때 어땠는지 먼저 본다</p>
+    <p class="lead fg" style="color:rgba(255,255,255,.8)">그래서 — 영상이 말한 종목을 사기 전에, 그 종목이 전에 떴을 때 어땠는지 먼저 본다</p>
   </div>
 </section>
 
@@ -299,7 +299,7 @@
   <div class="in">
     <p class="kicker rv">활용 · 비즈니스 모델</p>
     <h2 class="rv d1">누가, 어떻게, 무엇으로 지속하나</h2>
-    <div class="three rv d2">
+    <div class="three rv d2 fglist">
       <div class="card"><h3>누가</h3><ul class="plain big"><li><b>개인투자자</b> — 유튜브로 정보를 얻는 사람</li><li><b>리서치 · 콘텐츠팀</b> — 출연자 · 인용 채널 고를 때</li></ul></div>
       <div class="card"><h3>어떻게 · 사기 전 두 번 클릭</h3><ul class="plain big"><li><b>종목</b> — 전에 떴을 때 어땠나</li><li><b>채널</b> — 이 채널 말은 맞았나</li></ul></div>
       <div class="card"><h3>수익 · 운영</h3><ul class="plain big"><li>언급 급증 알림 구독 · 채널 적중 리포트 · 데이터 API</li><li>운영비 ≈ 0 — 무료 티어 + 하루 1회 배치 (YouTube 쿼터 300유닛)</li></ul></div>
@@ -308,7 +308,7 @@
 </section>
 
 <!-- 18 마무리 -->
-<section class="slide kick end" id="s-end">
+<section class="slide kick end" id="s-end" data-transition="zoom">
   <div class="in endgrid">
     <div>
       <p class="kicker rv" style="color:#9db4ff">마무리</p>

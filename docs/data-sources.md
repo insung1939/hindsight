@@ -12,7 +12,7 @@
 | 공시 목록 | DART 공시검색 `list.json` · 금융감독원 | https://opendart.fss.or.kr/guide/detail.do?apiGrpCd=DS001&apiId=2019001 | Open API (키) | 접수번호, 접수일, 공시명(→ 실적·계약·자금조달·주요사항·지분·기타 분류). 언급된 국내 종목만 | 일 1회 | market-data |
 
 메모
-- YouTube 는 `search.list`(100 유닛)를 쓰지 않고 채널 업로드 재생목록(`playlistItems.list`, 50개당 1 유닛)만 읽는다. 채널 20개 × 1년 백필도 수백 유닛. 하루 한도 10,000.
+- YouTube 는 `search.list`(100 유닛)를 쓰지 않고 채널 업로드 재생목록(`playlistItems.list`, 50개당 1 유닛)만 읽는다. 채널 51개 × 1년 백필도 수천 유닛. 하루 한도 10,000.
 - 자막·댓글은 수집하지 않는다. 채널 실명은 저장은 하되 API 응답·화면·통계에 내지 않는다.
 - 업비트 일봉은 초당 10회 제한이라 429 면 잠깐 쉬고 재시도한다. 업비트 KRW 마켓 전부(약 280개)를 사전에 넣되 언급된 것만 시세를 긁는다.
 - 시드 종목코드(국내 57개)는 DART corpCode 로 검증한다. 별칭 사전과 업종·테마 사전(20개, 테마 → 대표 ETF)은 `services/market-data/seed.py` 에서 팀이 계속 보강한다.

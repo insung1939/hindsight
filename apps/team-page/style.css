@@ -287,3 +287,20 @@ html.deck-mode .slide.reel > .in { max-width: min(1800px, calc((100vh - 80px) * 
 ol.toc li { grid-template-columns: 40px auto 1fr; } ol.toc li > span { font-size: 15px; }
 .hero2 .display { font-size: clamp(36px, 5vw, 74px); }
 html.deck-mode body:has(.slide.reel.active) .navhint, html.deck-mode body:has(.slide.reel.active) .dots { display: none; }
+
+/* ── 10/18 5차: Reveal.js 식 연출 — 단계 등장(.fg) · 코드 단계 강조(.steps) · 장 전환(fade · slide · zoom) ── */
+.fg { opacity: 0; transform: translateY(14px); transition: opacity .45s ease, transform .45s ease; }
+.fg.on { opacity: 1; transform: none; }
+.fglist > * { opacity: 0; transform: translateY(14px); transition: opacity .4s ease, transform .4s ease; }
+.fglist > .on { opacity: 1; transform: none; }
+html.deck-mode .slide.active .fg, html.deck-mode .slide.active .fglist > * { transition-delay: 0s; }
+.steps .step.on.past { opacity: .4; }  /* 지나간 단계는 흐리게 — 현재 단계만 밝다 */
+.steps .step.on.cur .rn, .steps .rn.step.on.cur { box-shadow: 0 0 0 3px var(--accent), var(--shadow); }
+.steps .rl.step.on.cur code { background: var(--accent); color: #fff; }
+.fgpos { position: fixed; right: 18px; bottom: 14px; font-size: 12px; color: var(--muted); z-index: 25; font-variant-numeric: tabular-nums; }
+@media (prefers-reduced-motion: reduce) { .fg, .fglist > * { transition: none; } }
+/* 전환 — 기본 fade(위로 살짝), slide(옆에서), zoom(확대) */
+html.deck-mode .slide[data-transition="slide"] { transform: translateX(60px); }
+html.deck-mode body[data-dir="-1"] .slide[data-transition="slide"] { transform: translateX(-60px); }
+html.deck-mode .slide[data-transition="zoom"] { transform: scale(.93); transition-duration: .55s, .55s; }
+html.deck-mode .slide.active { transform: none; }
