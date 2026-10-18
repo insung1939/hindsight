@@ -304,3 +304,11 @@ html.deck-mode .slide[data-transition="slide"] { transform: translateX(60px); }
 html.deck-mode body[data-dir="-1"] .slide[data-transition="slide"] { transform: translateX(-60px); }
 html.deck-mode .slide[data-transition="zoom"] { transform: scale(.93); transition-duration: .55s, .55s; }
 html.deck-mode .slide.active { transform: none; }
+
+/* 한계 — 셋만, 크게 */
+.limits3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.limits3 .card { padding: 22px 24px; }
+.limits3 .n { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: var(--navy); color: #fff; font-weight: 800; margin-bottom: 10px; }
+.limits3 .card b { display: block; font-size: clamp(20px, 2vw, 28px); color: var(--navy); letter-spacing: -.02em; line-height: 1.2; margin-bottom: 10px; }
+.limits3 .card p { margin: 0; font-size: clamp(15px, 1.4vw, 18px); color: var(--muted); line-height: 1.5; }
+@media (max-width: 900px) { .limits3 { grid-template-columns: 1fr; } }

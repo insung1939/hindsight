@@ -13,7 +13,7 @@ from engine import HORIZONS, event_day, forward_returns, summarize
 from hs_common import InternalOnly, ServiceClient, create_app, memo_ttl
 from models import EventReturn, Summary, db
 
-app = create_app("stats", "하인드사이트 stats", "0.1.1", "언급 뒤 5·20·60 거래일 수익률과 벤치마크 대비 초과수익. 채널별 랭킹 포함.")
+app = create_app("stats", "하인드사이트 stats", "0.1.2", "언급 뒤 5·20·60 거래일 수익률과 벤치마크 대비 초과수익. 채널별 랭킹 포함.")
 mentions = ServiceClient("mentions", timeout=60)
 market = ServiceClient("market-data", timeout=120)
 
