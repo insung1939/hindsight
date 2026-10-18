@@ -4,7 +4,7 @@ import { Disclaimer, ErrorBox, SkeletonRows, Term, useLoad } from "../components
 // 데이터 — 어떤 소스에서, 어떻게 가공해, 얼마나 쌓였나 (수업 필수 페이지)
 const SOURCES = [
   { k: "youtube", name: "YouTube Data API v3", org: "Google", url: "https://developers.google.com/youtube/v3", what: "채널 51개의 영상 제목·설명·게시일·조회수", how: "검색(100유닛) 대신 채널 업로드 목록(1유닛)만 읽는다. 1년치 4만 5천 편을 약 1,500유닛에." },
-  { k: "dart", name: "DART OpenAPI corpCode", org: "금융감독원", url: "https://opendart.fss.or.kr", what: "국내 전 상장사 이름·종목코드·고유번호", how: "종목 사전의 뼈대. 별칭(삼전·하닉…)과 업종 20개는 팀이 보강." },
+  { k: "dart", name: "DART OpenAPI corpCode", org: "금융감독원", url: "https://opendart.fss.or.kr", what: "국내 전 상장사 이름·종목코드·고유번호", how: "공식 회사명·종목코드가 사전의 뼈대. 제목에 쓰이는 별칭(삼전→삼성전자, 하닉→SK하이닉스 …)과 업종 테마 20개(반도체→반도체 ETF …)는 DART 에 없어서 우리가 직접 적어 넣었다." },
   { k: "datagokr", name: "금융위원회 주식시세정보 V2", org: "공공데이터포털", url: "https://www.data.go.kr/data/15094808/openapi.do", what: "국내 일별 종가·거래량", how: "언급된 국내 종목만 매일. 키가 없거나 장애면 Yahoo 국내 심볼로 대체." },
   { k: "yahoo", name: "Yahoo Finance chart API", org: "Yahoo", url: "https://finance.yahoo.com", what: "미국 종가·거래량, 코스피·S&P500 지수, 업종 ETF 20개", how: "키 없이 HTTP JSON." },
   { k: "upbit", name: "업비트 Open API", org: "두나무", url: "https://docs.upbit.com", what: "KRW 마켓 목록·한글명, 일봉 종가·거래량", how: "마켓 목록으로 코인 사전을 자동으로 채운다. 언급된 코인만 시세 수집." },
