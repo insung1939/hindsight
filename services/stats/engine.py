@@ -62,7 +62,7 @@ def summarize(rows: list[dict], horizon: int) -> dict:
     d = [x.get("d") for x in rows if x.get("d") is not None]
     if not r:
         return {"horizon": horizon, "n": 0, "low_sample": True}
-    buckets = [(-1, -0.2), (-0.2, -0.1), (-0.1, -0.05), (-0.05, 0), (0, 0.05), (0.05, 0.1), (0.1, 0.2), (0.2, 9)]
+    buckets = [(-1, -0.2), (-0.2, -0.1), (-0.1, -0.05), (-0.05, 0), (0, 0.05), (0.05, 0.1), (0.1, 0.2), (0.2, float("inf"))]  # 상한은 무한 — 20일에 10배 뛴 종목(감자·병합 미조정)도 마지막 칸에 센다
     hist = [{"from": a, "to": b, "n": sum(1 for val in r if a <= val < b)} for a, b in buckets]
     sr = sorted(r)
     return {"horizon": horizon, "n": len(r), "low_sample": len(r) < 30,

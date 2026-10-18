@@ -51,7 +51,7 @@ function renderOverall(d) {
     const cls = v.mean > 0 ? "pos-v" : v.mean < 0 ? "neg-v" : "";
     return card(`${h}거래일 뒤 · n=${fmt.n(v.n)}`,
       `${fmt.pct1(v.mean)}<small>평균</small>`,
-      `상승 <b>${fmt.pct0(v.win_rate)}</b> · 시장 대비 <b>${fmt.pct1(v.excess_mean)}</b>` + (v.vol_ratio_median ? ` · 거래량 <b>${v.vol_ratio_median}배</b>` : ""), cls);
+      `상승 <b>${fmt.pct0(v.win_rate)}</b> · 시장 대비 <b>${fmt.pct1(v.excess_mean)}</b>` + (h === 20 && v.vol_ratio_median ? ` · 거래량 <b>${v.vol_ratio_median}배</b>(언급 뒤 5일 ÷ 앞 20일, 기간 무관)` : ""), cls);
   }).join("");
 }
 function renderHist(d) {

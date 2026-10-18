@@ -107,7 +107,7 @@
       <div class="src"><b>DART 기업코드</b><small>금융감독원</small><p>"삼전"이 어느 종목인가</p><em>상장사 3,998개 → 종목 사전</em></div>
       <div class="src"><b>주식시세정보 V2</b><small>공공데이터포털 · 금융위원회</small><p>그 뒤 주가는</p><em>국내 종가 · 거래량</em></div>
       <div class="src"><b>Yahoo Finance</b><small>Yahoo</small><p>시장이 오른 덕인가</p><em>미국 시세 · 코스피 · S&amp;P500 · 업종 ETF 20</em></div>
-      <div class="src"><b>업비트 Open API</b><small>두나무</small><p>코인은</p><em>KRW 마켓 292 · 일봉</em></div>
+      <div class="src"><b>업비트 Open API</b><small>두나무</small><p>코인은</p><em>KRW 마켓 <span data-bind="market.assets_by_market.CRYPTO.total">294</span> · 일봉</em></div>
       <div class="src"><b>DART 공시검색</b><small>금융감독원</small><p>공시를 따라간 건가</p><em>공시 <span data-bind="market.disclosures" data-fmt="n">49,099</span>건</em></div>
     </div>
   </div>
@@ -375,7 +375,7 @@
 <section class="slide alt" id="s-api">
   <div class="in">
     <p class="kicker rv">부록 · API 설명 문서 · 전체 <code>docs/api.md</code> · 실행 <span data-url="docs"></span></p>
-    <h2 class="rv d1">GET 으로 읽고, 쓰기는 배치만 · 엔드포인트 31개 중 주요 8개</h2>
+    <h2 class="rv d1">GET 으로 읽고, 쓰기는 배치만 · 엔드포인트 36개(읽기 24 · 내부·상태 12) 중 주요 8개</h2>
     <table class="compact api rv d2">
       <thead><tr><th>기능</th><th>요청</th><th>입력값</th><th>응답(JSON)</th></tr></thead>
       <tbody>
