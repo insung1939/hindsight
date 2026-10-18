@@ -61,3 +61,16 @@ def test_summarize_disclosure_rate():
     rows = [{"r": 0.1, "x": 0.0, "d": True}, {"r": 0.0, "x": 0.0, "d": False}, {"r": 0.0, "x": 0.0, "d": None}]
     out = summarize(rows, 5)
     assert out["disclosure_n"] == 2 and out["disclosure_rate"] == 0.5
+
+
+def test_unadjusted_reverse_split_is_not_a_return():
+    """하루에 종가가 13배 뛰는 날(감자 미조정)이 구간 안에 있으면 그 구간을 지나는 수익률은 None, 그 앞 구간은 그대로."""
+    s = _series()
+    i0 = 30
+    for k in range(i0 + 10, len(s)):
+        s[k] = (s[k][0], s[k][1] * 13.0, s[k][2])            # 사건일 뒤 10거래일째부터 13배(병합)
+    fr = forward_returns(s, s[i0][0])
+    assert fr["r5"] is not None and abs(fr["r5"]) < 0.2        # 점프 전 구간은 정상
+    assert fr["r20"] is None and fr["r60"] is None             # 점프를 지나는 구간은 계산 안 함
+    clean = forward_returns(_series(120), _series(120)[i0][0])    # 점프가 없으면(120거래일) 60일까지 다 나온다
+    assert clean["r20"] is not None and clean["r60"] is not None

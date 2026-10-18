@@ -29,6 +29,9 @@ def event_day(published_utc: datetime, market: str) -> date:
     return local.date() if local.time() < time(15, 30) else local.date() + timedelta(days=1)
 
 
+JUMP_FACTOR = 3.0  # 하루 종가 변동이 이 배수를 넘으면 시세 불연속(미조정 감자·분할)로 본다
+
+
 def _empty() -> dict:
     return {"t0_date": None, "t0_close": None, "vol_ratio": None, **{f"r{h}": None for h in HORIZONS}}
 
@@ -44,9 +47,14 @@ def forward_returns(series: list, event_day_: date) -> dict:
         return _empty()
     t0_close = series[i0][1]
     out = {"t0_date": dates[i0], "t0_close": t0_close, "vol_ratio": None}
+    # 감자(병합)·분할이 시세에 반영되지 않으면 하루에 종가가 3배 넘게 뛰거나 1/3 아래로 떨어진다(국내는 상·하한가 ±30% 라 실제로는 불가능).
+    # 그런 날이 사건일 뒤 구간 안에 있으면 그 구간을 지나는 수익률은 계산하지 않는다(None). 큐캐피탈 293 → 3,870원 같은 +992% 가 평균에 들어가지 않게.
+    jump_at = next((k for k in range(i0 + 1, min(len(series), i0 + max(HORIZONS) + 1))
+                    if series[k - 1][1] and series[k][1] and not (1 / JUMP_FACTOR < series[k][1] / series[k - 1][1] < JUMP_FACTOR)), None)
     for h in HORIZONS:
         j = i0 + h
-        out[f"r{h}"] = (series[j][1] / t0_close - 1) if j < len(series) and t0_close else None
+        ok = j < len(series) and t0_close and (jump_at is None or jump_at > j)
+        out[f"r{h}"] = (series[j][1] / t0_close - 1) if ok else None
     before = [row[2] for row in series[max(0, i0 - VOL_BEFORE):i0] if len(row) > 2 and row[2]]
     after = [row[2] for row in series[i0:i0 + VOL_AFTER] if len(row) > 2 and row[2]]
     if len(before) >= 5 and len(after) >= VOL_AFTER:
