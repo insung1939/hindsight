@@ -35,10 +35,10 @@ export default function Channel({ channelId, go }) {
         <div className="col-3"><Stat k="win" label={`${horizon}거래일 뒤 오른 비율`} loading={sumData.loading && !sum} value={pct0(sum?.win_rate)} sub={sum ? `시장 대비 ${pct(sum.excess_mean)}` : ""} /></div>
         <div className="col-3"><Stat k="awin" label="종목 승률" loading={sumData.loading && !sum} value={sum?.assets_n ? pct0(sum.asset_win_rate) : "—"} sub={sum?.assets_n ? `종목 ${sum.assets_n}개 중 ${sum.assets_up}개 상승 · ${horizon}거래일` : "언급 종목 10개 미만"} /></div>
         <div className="card col-12">
-          <div className="card-head"><div><h3>이 채널이 오른다고 한 종목 · 많이 말한 순</h3><p>종목을 누르면 주가 위 언급 시점을 본다</p></div></div>
+          <div className="card-head"><div><h3>이 채널이 오른다고 한 종목 · 많이 말한 순</h3><p>종목을 누르면 주가 위 언급 시점을 본다 · "오른 건"은 {horizon}거래일이 아직 안 지난 최근 언급을 빼고 센다</p></div></div>
           {data.loading && !d ? <SkeletonRows n={8} /> : (
             <div className="table-wrap" style={{ maxHeight: 480, overflowY: "auto" }}><table>
-              <thead><tr><th>종목</th><th className="num">언급</th><th className="num"><Term k="horizon">{horizon}일 평균</Term></th><th className="num">오른 건</th><th>마지막 언급</th></tr></thead>
+              <thead><tr><th>종목</th><th className="num">언급</th><th className="num"><Term k="horizon">{horizon}일 평균</Term></th><th className="num">오른 건 / 계산된 건</th><th>마지막 언급</th></tr></thead>
               <tbody>{assets.map((a) => { const nm = d.names[a.id]; const last = d.events.filter((e) => e.asset_id === a.id).map((e) => e.published_at).sort().pop(); return (
                 <tr key={a.id} className="clickable" onClick={() => go("ticker", a.id)}>
                   <td className="name"><b>{nm?.name || a.id}</b><small>{nm?.asset_type === "theme" ? "업종·테마" : MARKET_LABEL[nm?.market] || ""} · {a.id.split(":")[1]}</small></td>

@@ -102,7 +102,7 @@ Docker: `make compose` (서비스 4개) · `make compose-all` (+ APISIX 9080 · 
 
 ## 팀 (5조)
 
-김지환 · 오선호 · 조인성 · 채재희 · 김현준. 발표는 조인성이 진행한다. 서비스 전체를 코드 없이 설명한 문서는 [docs/team-guide.md](docs/team-guide.md).
+김지환 · 김현준 · 오선호 · 조인성 · 채재희. 발표는 조인성이 진행한다. 서비스 전체를 코드 없이 설명한 문서는 [docs/team-guide.md](docs/team-guide.md).
 
 ## AI 활용
 

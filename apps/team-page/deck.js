@@ -79,17 +79,20 @@ function renderTables(d) {
   if (tr) tr.innerHTML = (d.trending_30d || []).slice(0, 8).map((t) => row([`<b>${t.name}</b>`, fmt.n(t.mentions), fmt.n(t.prev), t.channels])).join("");
 }
 function renderFindings(d) {
+  // 발견 5개: 큰 숫자 하나 + 한 줄 결론 + 보조 숫자. 긴 문장은 대본에서 말한다.
   const s = d.summary || {}; const o = s["bull:overall:20"] || s["overall:20"], o5 = s["bull:overall:5"] || s["overall:5"], o60 = s["bull:overall:60"] || s["overall:60"]; const th = s["bull:kind:theme:20"] || s["kind:theme:20"];
-  const f = {};
-  if (o && o.n) f[1] = `"오른다"고 한 언급 뒤 20거래일 평균 <b>${fmt.pct1(o.mean)}</b>, 상승 확률 <b>${fmt.pct0(o.win_rate)}</b> (n=${fmt.n(o.n)}). ${o.win_rate >= 0.45 && o.win_rate <= 0.55 ? "동전 던지기와 같다. 언급은 방향 정보가 아니다." : o.win_rate > 0.55 ? "오른 쪽이 많았다. 시장 효과는 다음 줄에서." : "내린 쪽이 많았다. 언급이 몰릴 땐 이미 오른 뒤였다."}`;
-  if (o && o.excess_mean != null) f[2] = `시장을 빼면 <b>${fmt.pct1(o.excess_mean)}</b>, 시장을 이긴 비율 <b>${fmt.pct0(o.excess_win_rate)}</b>. ${Math.abs(o.excess_mean) < 0.01 ? "오른 건 시장 덕이었다." : o.excess_mean > 0 ? "시장보다 조금 더 올랐다." : "언급 뒤에 사면 시장을 못 따라갔다."}`;
-  if (o && o.vol_ratio_median) f[3] = o.vol_ratio_median < 1
-    ? `거래량은 언급 <b>앞</b>이 더 많았다 (언급 뒤 5일 ÷ 앞 20일 = <b>${o.vol_ratio_median}배</b>, 늘어난 언급 <b>${fmt.pct0(o.vol_up_rate)}</b>). 관심이 먼저, 유튜브는 뒤따른다.`
-    : `언급 뒤 거래량이 <b>${o.vol_ratio_median}배</b>로 늘었다 (늘어난 언급 <b>${fmt.pct0(o.vol_up_rate)}</b>). 가격과 별개로 관심은 움직였다.`;
-  if (o5 && o60 && o5.n && o60.n) f[4] = `5일 ${fmt.pct1(o5.mean)} → 20일 ${fmt.pct1(o.mean)} → 60일 ${fmt.pct1(o60.mean)}${th && th.n ? `. 종목 없이 업종만 말한 언급(${fmt.n(th.n)}건)은 20일 ${fmt.pct1(th.mean)}, 상승 ${fmt.pct0(th.win_rate)} — 종목 언급보다 ${th.win_rate > o.win_rate + 0.03 ? "자주 올랐다" : th.win_rate < o.win_rate - 0.03 ? "덜 올랐다" : "비슷했다"}` : ""}.`;
   const kr = s["bull:market:KRX:20"] || s["market:KRX:20"];
-  if (kr && kr.disclosure_n) f[5] = `국내 언급 ${fmt.n(kr.disclosure_n)}건 중 <b>${fmt.pct0(kr.disclosure_rate)}</b>는 사건일 ±3일에 DART 주요 공시가 있었다. ${kr.disclosure_rate >= 0.3 ? "언급의 상당수는 공시를 뒤따른 해설이다." : "대부분은 공시와 무관했다. 수급·테마가 언급을 만든다."}`;
-  Object.entries(f).forEach(([k, v]) => { const el = $(`[data-finding="${k}"]`); if (el) el.innerHTML = v; });
+  const f = {};
+  if (o && o.n) f[1] = [fmt.pct1(o.mean), o.mean, o.win_rate < 0.45 ? "내린 쪽이 많았다" : o.win_rate > 0.55 ? "오른 쪽이 많았다" : "동전 던지기와 같다", `20거래일 평균 · 상승 확률 ${fmt.pct0(o.win_rate)} · n=${fmt.n(o.n)}`];
+  if (o && o.excess_mean != null) f[2] = [fmt.pct1(o.excess_mean) + "p", o.excess_mean, Math.abs(o.excess_mean) < 0.01 ? "오른 건 시장 덕이었다" : o.excess_mean > 0 ? "시장보다 조금 더 올랐다" : "시장도 못 따라갔다", `시장 대비 · 시장을 이긴 비율 ${fmt.pct0(o.excess_win_rate)}`];
+  if (o && o.vol_ratio_median) f[3] = [o.vol_ratio_median + "배", o.vol_ratio_median - 1, o.vol_ratio_median < 1 ? "관심이 먼저, 유튜브는 뒤따른다" : "가격과 별개로 관심은 움직였다", `언급 뒤 5일 ÷ 앞 20일 거래량 · 늘어난 언급 ${fmt.pct0(o.vol_up_rate)}`];
+  if (o5 && o60 && o5.n && o60.n) f[4] = [`${fmt.pct1(o5.excess_mean)} → ${fmt.pct1(o60.excess_mean)}p`, o60.excess_mean, "오래 들수록 시장과 더 벌어진다", `시장 대비 5일 → 20일(${fmt.pct1(o.excess_mean)}p) → 60일` + (th && th.n ? ` · 업종만 말한 언급(${fmt.n(th.n)}건)은 20일 ${fmt.pct1(th.mean)}, 상승 ${fmt.pct0(th.win_rate)}` : "")];
+  if (kr && kr.disclosure_n) f[5] = [fmt.pct0(kr.disclosure_rate), 0, kr.disclosure_rate >= 0.3 ? "언급의 상당수는 공시를 뒤따른 해설이다" : "대부분은 공시와 무관했다 — 수급 · 테마가 언급을 만든다", `국내 언급 ${fmt.n(kr.disclosure_n)}건 중 사건일 ±3일에 DART 주요 공시가 있던 비율`];
+  Object.entries(f).forEach(([k, [num, signv, line, sub]]) => {
+    const n = $(`[data-fnum="${k}"]`), p = $(`[data-finding="${k}"]`), sm = $(`[data-fsub="${k}"]`);
+    if (n) { n.textContent = num; n.classList.toggle("pos-v", signv > 0); }
+    if (p) p.textContent = line; if (sm) sm.textContent = sub;
+  });
 }
 
 // ── 스냅샷 → 실시간 ──
@@ -141,14 +144,21 @@ if (!SCROLL) {
   const dots = document.createElement("div"); dots.className = "dots";
   slides.forEach((s, k) => { const b = document.createElement("button"); b.title = s.querySelector("h1,h2")?.textContent?.slice(0, 30) || `${k + 1}`; b.onclick = () => show(k); dots.appendChild(b); });
   document.body.appendChild(dots);
-  const hint = document.createElement("div"); hint.className = "navhint"; hint.innerHTML = '<span class="kbd">←</span><span class="kbd">→</span> 넘기기 · <span class="kbd">Home</span> 처음';
+  const hint = document.createElement("div"); hint.className = "navhint"; hint.innerHTML = '<span class="kbd">←</span><span class="kbd">→</span> 넘기기 · <span class="kbd">Home</span> 처음 · <span class="kbd">F</span> 전체화면 · 쇼릴에서 <span class="kbd">Space</span> 멈춤 <span class="kbd">R</span> 처음';
   document.body.appendChild(hint);
   const fromHash = parseInt((location.hash || "#1").slice(1), 10);
   const byId = location.hash && location.hash.length > 3 ? slides.findIndex((s) => "#" + s.id === location.hash) : -1;
   show(byId >= 0 ? byId : (isNaN(fromHash) ? 0 : fromHash - 1), false);
   if (STATIC) $$(".rv").forEach((x) => x.classList.add("on"));
+  // 쇼릴 장에서는 Space = 멈춤/재생, R = 처음부터. iframe 에 메시지로 전달한다(키 입력은 부모 문서가 받으므로)
+  const reelFrame = () => slides[cur].classList.contains("reel") ? slides[cur].querySelector("iframe") : null;
+  const toggleFull = () => (document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.());
   window.addEventListener("keydown", (e) => {
     if (["INPUT", "TEXTAREA"].includes(document.activeElement.tagName)) return;
+    const f = reelFrame();
+    if (f && e.key === " ") { e.preventDefault(); f.contentWindow?.postMessage({ reel: "toggle" }, "*"); return; }
+    if (f && e.key.toLowerCase() === "r") { e.preventDefault(); f.contentWindow?.postMessage({ reel: "restart" }, "*"); return; }
+    if (e.key.toLowerCase() === "f") { toggleFull(); return; }
     if (["ArrowRight", "ArrowDown", "PageDown", " ", "Enter"].includes(e.key)) { e.preventDefault(); show(cur + 1); }
     if (["ArrowLeft", "ArrowUp", "PageUp", "Backspace"].includes(e.key)) { e.preventDefault(); show(cur - 1); }
     if (e.key === "Home") show(0);
@@ -157,6 +167,8 @@ if (!SCROLL) {
   let touchX = null;
   window.addEventListener("touchstart", (e) => { touchX = e.touches[0].clientX; }, { passive: true });
   window.addEventListener("touchend", (e) => { if (touchX == null) return; const dx = e.changedTouches[0].clientX - touchX; if (Math.abs(dx) > 60) show(cur + (dx < 0 ? 1 : -1)); touchX = null; });
+  // iframe(쇼릴) 안에 포커스가 가 있어도 ← → 로 장을 넘길 수 있게, 쇼릴이 보내는 메시지를 받는다
+  window.addEventListener("message", (e) => { if (e.data?.deck === "next") show(cur + 1); else if (e.data?.deck === "prev") show(cur - 1); });
   window.addEventListener("hashchange", () => { const n = parseInt(location.hash.slice(1), 10); if (!isNaN(n) && n - 1 !== cur) show(n - 1, false); });
 } else {
   const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) reveal(e.target); }), { threshold: 0.18 });

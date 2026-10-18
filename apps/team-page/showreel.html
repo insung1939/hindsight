@@ -433,7 +433,7 @@ Cache-Control: max-age=600</pre>
       <div class="a" style="--d:2.3s"><span>API 문서</span>hindsight-api-edab.onrender.com/docs</div>
       <div class="a" style="--d:2.6s"><span>GitHub</span>github.com/insung1939/hindsight</div>
     </div>
-    <div class="members a" style="--d:3.3s">5조 <b>김지환</b><b>오선호</b><b>조인성</b><b>채재희</b><b>김현준</b></div>
+    <div class="members a" style="--d:3.3s">5조 <b>김지환</b><b>김현준</b><b>오선호</b><b>조인성</b><b>채재희</b></div>
   </section>
 
 </div>
@@ -561,13 +561,17 @@ Cache-Control: max-age=600</pre>
   document.getElementById("next").onclick = () => go(cur + 1);
   progBar.onclick = (e) => { const r = progBar.getBoundingClientRect(); t = (e.clientX - r.left) / r.width * total; cur = -1; };
   stage.onclick = () => setPlay(!playing);
+  const EMBED = q.has("embed") && window.parent !== window;  // 발표 페이지 3장 안의 iframe
   addEventListener("keydown", (e) => {
     if (e.key === " ") { e.preventDefault(); setPlay(!playing); }
-    else if (e.key === "ArrowRight") { e.stopPropagation(); go(cur + 1); }
-    else if (e.key === "ArrowLeft") { e.stopPropagation(); go(t - starts[cur] > 1.5 ? cur : cur - 1); }
+    else if (e.key === "ArrowRight") { e.stopPropagation(); if (EMBED) window.parent.postMessage({ deck: "next" }, "*"); else go(cur + 1); }
+    else if (e.key === "ArrowLeft") { e.stopPropagation(); if (EMBED) window.parent.postMessage({ deck: "prev" }, "*"); else go(t - starts[cur] > 1.5 ? cur : cur - 1); }
     else if (e.key.toLowerCase() === "r") { t = 0; cur = -1; setPlay(true); }
-    else if (e.key.toLowerCase() === "f") { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.(); }
+    else if (e.key.toLowerCase() === "f" && !EMBED) { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.(); }
   });
+  // 부모(발표 페이지)가 보내는 Space(멈춤/재생) · R(처음부터)
+  addEventListener("message", (e) => { if (e.data?.reel === "toggle") setPlay(!playing); else if (e.data?.reel === "restart") { t = 0; cur = -1; setPlay(true); } });
+  if (EMBED) { document.querySelector("#hud .k").textContent = "Space 멈춤 · R 처음 · ← → 다음 장"; document.getElementById("prev").remove(); document.getElementById("next").remove(); }
   let idle; const wake = () => { document.body.classList.remove("idle", "hide-cursor"); clearTimeout(idle); idle = setTimeout(() => document.body.classList.add("idle", "hide-cursor"), 2200); };
   addEventListener("mousemove", wake); wake();
   if (q.has("start")) go(parseInt(q.get("start")) || 0);

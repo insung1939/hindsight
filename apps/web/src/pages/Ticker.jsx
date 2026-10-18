@@ -57,6 +57,7 @@ export default function Ticker({ assetId, go }) {
     const s = q.trim().toLowerCase(); if (!s) return [];
     return Object.values(all).filter((a) => a.asset_type !== "index" && (a.name.toLowerCase().includes(s) || a.symbol.toLowerCase().includes(s) || (a.aliases || []).some((x) => x.toLowerCase().includes(s)))).slice(0, 8);
   }, [q, all]);
+  // 종목 없이 들어왔다가 고르면 effect 가 loading 을 켜기 전에 한 번 렌더된다(loading=false, data=null). 그래서 d 가 없으면 무조건 스켈레톤.
   const a = all[assetId]; const d = data.data; const sum = d?.sum;
   const shown = (d?.events || []).filter((e) => e.stance === "bull");  // 오른다고 한 언급만
   const popular = ["KRX:005930", "KRX:000660", "US:NVDA", "US:TSLA", "CRYPTO:KRW-BTC", "KRX:091160"];
@@ -88,11 +89,11 @@ export default function Ticker({ assetId, go }) {
           <div className="card col-12">
             <div className="card-head"><div><h3>주가와 언급 시점</h3><p>점 = <Term k="t0">사건일</Term> 종가 · 빨강 20일 뒤 상승 · 파랑 하락 · 회색 아직{d?.disc?.length > 0 && ` · 노란 눈금 = 주요 공시 ${d.disc.length}건`}</p></div>
               {hover && <span className="chip accent">{dateOnly(hover.published_at)} · {chs.data?.[hover.channel_id]?.title || "채널"} · 20일 {pct(hover.r20)}</span>}</div>
-            {data.loading && !d ? <div className="sk" style={{ height: 260 }} /> : <Chart prices={d.prices} events={shown} disclosures={d.disc} onHover={setHover} hover={hover} />}
+            {!d ? <div className="sk" style={{ height: 260 }} /> : <Chart prices={d.prices} events={shown} disclosures={d.disc} onHover={setHover} hover={hover} />}
           </div>
           <div className="card col-12">
             <div className="card-head"><div><h3>언급별 기록</h3><p>최근 순 · 행에 올리면 차트의 점이 커진다</p></div></div>
-            {data.loading && !d ? <SkeletonRows n={8} /> : (
+            {!d ? <SkeletonRows n={8} /> : (
               <div className="table-wrap" style={{ maxHeight: 520, overflowY: "auto" }}><table>
                 <thead><tr><th>언급일</th><th>채널</th><th>근거 단어</th><th><Term k="t0">T0</Term></th><th className="num">T0 종가</th><th className="num">5일</th><th className="num">20일</th><th className="num">60일</th><th className="num"><Term k="excess">20일 초과</Term></th><th className="num"><Term k="vol">거래량</Term></th><th><Term k="disc">공시</Term></th></tr></thead>
                 <tbody>{[...shown].reverse().slice(0, limit).map((e) => (

@@ -25,35 +25,33 @@
 <!-- 1 표지 -->
 <section class="slide cover" id="s-cover">
   <div class="hero-bg"></div>
-  <div class="in">
-    <p class="kicker rv">KAIST 디지털금융MBA · 클라우드컴퓨팅실습 · 팀 프로젝트</p>
-    <div class="team-badge rv d1"><span class="num5">5</span><span>조</span></div>
-    <h1 class="display rv d1">유튜버가 오른다고 한 종목,<br>정말 올랐을까?</h1>
-    <p class="lead rv d2">주식·코인 유튜브 채널 <b data-bind="channels.total">51</b>개 · 1년치 영상 <b data-bind="youtube.videos" data-fmt="n">45,660</b>편 · "오른다"고 한 언급 <b data-bind="stance_counts.bull" data-fmt="n">19,016</b>건의 사후 성적표</p>
-    <ul class="members rv d3">
-      <li>김지환</li><li>오선호</li><li>조인성</li><li>채재희</li><li>김현준</li>
-    </ul>
-    <div class="links rv d4">
-      <a class="btn primary" id="btn-web" href="#" target="_blank" rel="noreferrer">서비스 <span class="u" data-url="web"></span></a>
-      <a class="btn" id="btn-docs" href="#" target="_blank" rel="noreferrer">Swagger <span class="u" data-url="docs"></span></a>
-      <a class="btn" href="https://github.com/insung1939/hindsight" target="_blank" rel="noreferrer">GitHub <span class="u">insung1939/hindsight</span></a>
+  <div class="in hero2">
+    <div>
+      <p class="kicker rv">KAIST 디지털금융MBA · 클라우드컴퓨팅실습</p>
+      <div class="team-badge rv d1"><span class="num5">5</span><span>조</span></div>
+      <h1 class="display rv d1">유튜버가 오른다고 한 종목,<br>정말 올랐을까?</h1>
+      <p class="brandline rv d2"><img src="favicon.svg" alt="" width="34" height="34">HINDSIGHT</p>
+      <ul class="members rv d3">
+        <li>김지환</li><li>김현준</li><li>오선호</li><li>조인성</li><li>채재희</li>
+      </ul>
     </div>
+    <figure class="hero-art rv d2"><img src="img/story-1.webp" alt="주식·코인 유튜브 영상 목록을 보고 있는 캐릭터들" width="1400" height="788"></figure>
   </div>
 </section>
 
 <!-- 2 목차 -->
 <section class="slide alt" id="s-toc">
   <div class="in">
-    <p class="kicker rv">목차 · 12분</p>
+    <p class="kicker rv">목차</p>
     <h2 class="rv d1">오늘 이야기할 순서</h2>
     <ol class="toc rv d2">
-      <li><b>쇼릴</b><span>1분 18초로 보는 HINDSIGHT</span><em>1:20</em></li>
-      <li><b>문제와 답</b><span>왜 만들었나 · "오른다"를 사건으로 센다</span><em>1:00</em></li>
-      <li><b>데이터</b><span>출처 6개 · 채널 선정 · 파이프라인</span><em>2:20</em></li>
-      <li><b>아키텍처 · 화면</b><span>Vercel · Render · Supabase · Actions</span><em>1:20</em></li>
-      <li><b>분석 결과 · 한계</b><span>정말 올랐을까 — 숫자, 그리고 숫자가 말하지 않는 것</span><em>3:00</em></li>
-      <li><b>BM · 실패와 개선 · 우리만의 것</b><span></span><em>1:30</em></li>
-      <li><b>주소 3개 · 문서 2개</b><span>GitHub · 서비스 · Swagger · API 문서 · DB 문서</span><em>0:20</em></li>
+      <li><b>쇼릴</b><span>1분 16초로 보는 HINDSIGHT</span></li>
+      <li><b>문제와 답</b><span>왜 만들었나 · 무엇을 세나</span></li>
+      <li><b>데이터 · API</b><span>공개 API 6개 · 채널 선정 · 파이프라인</span></li>
+      <li><b>아키텍처</b><span>구조 · 요청 한 번의 흐름 · 막혔던 것과 고친 것</span></li>
+      <li><b>분석 결과</b><span>정말 올랐을까 · 발견 · 한계</span></li>
+      <li><b>활용</b><span>한 문장 · 누가 어떻게 쓰나</span></li>
+      <li><b>마무리</b><span>주소 3개 · 부록(DB · API 문서)</span></li>
     </ol>
   </div>
 </section>
@@ -61,162 +59,188 @@
 <!-- 3 쇼릴 -->
 <section class="slide reel" id="s-reel">
   <div class="in">
-    <p class="kicker rv">쇼릴 · 발표용 컷 1분 18초 · 숫자는 실제 데이터</p>
-    <div class="reel-wrap rv d1"><iframe data-src="showreel.html?once" title="HINDSIGHT 쇼릴" allow="fullscreen"></iframe></div>
-    <p class="note rv d2">멈추면 Space · 다시 보려면 R · 따로 열기 <a href="showreel.html" target="_blank" rel="noreferrer">showreel.html</a></p>
+    <div class="reel-wrap rv"><iframe data-src="showreel.html?once&embed" title="HINDSIGHT 쇼릴" allow="fullscreen"></iframe></div>
   </div>
 </section>
 
-<!-- 4 문제 → 답 -->
+<!-- 4 문제 -->
 <section class="slide alt" id="s-problem">
   <div class="in">
-    <p class="kicker rv">문제 → 우리의 답</p>
-    <h2 class="display-sm rv d1">맞으면 기억하고 틀리면 잊는다 —<br>그래서 <u>"오른다"고 한 영상을 사건으로 보고</u> 그 뒤 주가를 전부 센다</h2>
+    <p class="kicker rv">왜 만들었나</p>
+    <h2 class="display-sm rv d1">맞으면 기억하고, 틀리면 잊는다</h2>
+    <div class="pair rv d2">
+      <figure><img src="img/story-4.webp" alt="유튜버 말대로 올라서 환호하는 캐릭터들" width="1400" height="788"><figcaption>"역시 유튜버 말이 맞았어!"</figcaption></figure>
+      <figure><img src="img/story-5.webp" alt="로켓이 터지고 떨어지는 캐릭터들" width="1400" height="788"><figcaption>"다음엔… 잘되겠지?"</figcaption></figure>
+    </div>
+    <p class="lead center rv d3">"지금이 매수 타이밍"을 수십만 명이 본다 — 그 뒤가 어땠는지는 <b>아무도 세지 않는다</b></p>
+  </div>
+</section>
+
+<!-- 5 답 -->
+<section class="slide" id="s-answer">
+  <div class="in">
+    <p class="kicker rv">우리의 답</p>
+    <h2 class="display-sm rv d1">"오른다"고 한 영상 하나하나를 <u>사건</u>으로 보고,<br>그 뒤 주가를 전부 센다</h2>
     <div class="flow rv d2">
       <div class="f"><b>YouTube</b><span>제목 · 게시 시각</span></div><i>→</i>
-      <div class="f"><b>매칭 · 논조</b><span>종목 · 별칭 · 업종 · 낙관/비관</span></div><i>→</i>
+      <div class="f"><b>종목 · 논조</b><span>"삼전" → 삼성전자 · 낙관만</span></div><i>→</i>
       <div class="f"><b>시세 · 공시</b><span>종가 · 거래량 · DART</span></div><i>→</i>
       <div class="f acc"><b>5 · 20 · 60일</b><span>수익률 · 시장 대비</span></div>
     </div>
-    <div class="two rv d3">
-      <div class="card"><h3>왜 아무도 안 셌나</h3><p class="note">"지금이 매수 타이밍!"을 수십만 명이 본다. 그 뒤가 어땠는지는 댓글과 기억에만 남는다. 리포트 적중률 서비스는 유튜브를 다루지 않는다.</p></div>
-      <div class="card"><h3>무엇을 세나</h3><p class="note">제목에 오른다·급등·매수·기회 같은 말이 있는 언급만 — 전체 <b data-bind="mentions.mentions" data-fmt="n"></b>건 중 <b data-bind="stance_counts.bull" data-fmt="n"></b>건. 하락·조심이 더 많은 제목과 지난 일만 말하는 제목은 뺀다.</p></div>
+    <div class="bignums rv d3">
+      <div><b data-bind="channels.total">51</b><span>채널</span></div>
+      <div><b data-bind="youtube.videos" data-fmt="n">45,660</b><span>영상 제목 · 1년</span></div>
+      <div><b data-bind="stance_counts.bull" data-fmt="n">19,016</b><span>"오른다"고 한 언급</span></div>
+      <div class="acc"><b data-bind="summary.bull:overall:20.n" data-fmt="n">13,611</b><span>20거래일 수익률 계산</span></div>
     </div>
+    <div class="pillrow rv d4"><span>홈 · 지금 뜨는 종목</span><span>언급 뒤에 · 전체 성적표</span><span>채널 · 누가 맞았나</span><span>종목 · 주가 위 언급 시점</span><span>데이터 · 출처와 가공</span></div>
   </div>
 </section>
 
-<!-- 5 데이터 소스 -->
-<section class="slide" id="s-sources">
+<!-- 6 데이터 소스 -->
+<section class="slide alt" id="s-sources">
   <div class="in">
-    <p class="kicker rv">사용 데이터 및 출처 · 공개 API 6개</p>
-    <h2 class="rv d1">소스 6개, 각각 다른 질문에 답한다</h2>
+    <p class="kicker rv">데이터 · API ① 출처</p>
+    <h2 class="rv d1">공개 API 6개, 각각 다른 질문에 답한다</h2>
     <div class="src-grid rv d2">
-      <div class="src"><b>YouTube Data API v3</b><small>Google · developers.google.com/youtube/v3</small><p>누가 언제 무슨 종목을 말했나</p><em>채널·영상 제목·게시일·조회수 · 재생목록 1유닛</em></div>
-      <div class="src"><b>DART corpCode</b><small>금융감독원 · opendart.fss.or.kr</small><p>"삼전"이 어느 종목인가</p><em>상장사 3,998개 이름·코드 → 종목 사전</em></div>
-      <div class="src"><b>금융위원회 주식시세정보 V2</b><small>공공데이터포털 · data.go.kr</small><p>그 뒤 주가는</p><em>국내 일별 종가·거래량</em></div>
-      <div class="src"><b>Yahoo Finance chart</b><small>Yahoo · finance.yahoo.com</small><p>시장이 오른 덕인가</p><em>미국 시세 · 코스피·S&P500 · 업종 ETF 20</em></div>
-      <div class="src"><b>업비트 Open API</b><small>두나무 · docs.upbit.com</small><p>코인은</p><em>KRW 마켓 292 · 일봉·거래량</em></div>
-      <div class="src"><b>DART 공시검색</b><small>금융감독원 · opendart.fss.or.kr</small><p>공시를 따라간 건가</p><em>공시 <span data-bind="market.disclosures" data-fmt="n">49,099</span>건 → 실적·계약·자금조달·주요사항</em></div>
+      <div class="src"><b>YouTube Data API v3</b><small>Google</small><p>누가 언제 무슨 종목을 말했나</p><em>채널 · 제목 · 게시일 · 조회수</em></div>
+      <div class="src"><b>DART 기업코드</b><small>금융감독원</small><p>"삼전"이 어느 종목인가</p><em>상장사 3,998개 → 종목 사전</em></div>
+      <div class="src"><b>주식시세정보 V2</b><small>공공데이터포털 · 금융위원회</small><p>그 뒤 주가는</p><em>국내 종가 · 거래량</em></div>
+      <div class="src"><b>Yahoo Finance</b><small>Yahoo</small><p>시장이 오른 덕인가</p><em>미국 시세 · 코스피 · S&amp;P500 · 업종 ETF 20</em></div>
+      <div class="src"><b>업비트 Open API</b><small>두나무</small><p>코인은</p><em>KRW 마켓 292 · 일봉</em></div>
+      <div class="src"><b>DART 공시검색</b><small>금융감독원</small><p>공시를 따라간 건가</p><em>공시 <span data-bind="market.disclosures" data-fmt="n">49,099</span>건</em></div>
     </div>
-    <p class="note rv d3">URL·수집 항목·갱신 주기 표: <code>docs/data-sources.md</code> · 키는 서버 환경변수에만 · 자막·댓글은 수집하지 않음 · 크롤링(네이버 증권 뉴스)은 넣었다가 뺐다 → 16장</p>
   </div>
 </section>
 
-<!-- 6 채널 선정 -->
-<section class="slide alt" id="s-channels">
+<!-- 7 채널 선정 -->
+<section class="slide" id="s-channels">
   <div class="in">
-    <p class="kicker rv">데이터 수집 ① 채널</p>
+    <p class="kicker rv">데이터 · API ② 채널 선정</p>
     <h2 class="rv d1">채널은 사람이 고르지 않았다</h2>
     <div class="bignums rv d2">
       <div><b>547</b><span>YouTube 검색 후보</span></div><i>→</i>
-      <div><b>272</b><span>구독자·업로드·쇼츠·<strong>언급률</strong> 측정<br>(언급률 = 최근 50편 제목 중 종목이 나온 비율)</span></div><i>→</i>
+      <div><b>272</b><span>구독자 · 업로드 · 쇼츠 · 언급률 측정</span></div><i>→</i>
       <div class="acc"><b data-bind="channels.total">51</b><span>채택 · 주식 <span data-bind="channels.stock">38</span> 코인 <span data-bind="channels.crypto">13</span></span></div>
     </div>
-    <p class="note rv d3" style="margin-bottom:8px"><b>두 갈래 중 하나만 넘으면 채택</b> — 30% 하나로 자르면 삼프로TV·김작가TV 같은 큰 채널이 전부 빠진다</p>
     <div class="two rv d3">
-      <div class="card"><h3>A단 · 대형 영향력</h3><p class="big">100만<small>구독자 이상 · 언급률 15%+</small></p><p class="note">삼프로TV(22%)·김작가TV(28%)처럼 시황이 섞여도 한 번의 언급이 닿는 사람이 많다</p></div>
-      <div class="card"><h3>B단 · 종목 집중</h3><p class="big">30%<small>언급률 이상 · 구독자 주식 5만 · 코인 10만+</small></p><p class="note">규모는 작아도 제목에 종목을 콕 집는다</p></div>
+      <div class="card"><h3>A · 대형 영향력</h3><p class="big">100만<small>구독자 이상 · 언급률 15% 이상</small></p></div>
+      <div class="card"><h3>B · 종목 집중</h3><p class="big">30%<small>언급률 이상 · 구독자 주식 5만 · 코인 10만 이상</small></p></div>
     </div>
-    <p class="note rv d4">공통 제외: 45일 내 업로드 없음 · 쇼츠 50% 초과 · 하루 5편 넘는 자동 생성형 · 방송사·증권사·거래소 공식 채널 · 구독자 373만 슈카월드도 제목에 종목이 2%뿐이라 탈락 · 근거 <code>docs/channel-selection.md</code></p>
+    <p class="note rv d4"><b>언급률</b> = 최근 50편 제목 중 종목이 나온 비율 · 둘 중 하나만 넘으면 채택 · 30% 하나로 자르면 삼프로TV·김작가TV가 빠진다</p>
   </div>
 </section>
 
-<!-- 7 파이프라인 -->
-<section class="slide" id="s-pipeline">
+<!-- 8 파이프라인 -->
+<section class="slide alt" id="s-pipeline">
   <div class="in">
-    <p class="kicker rv">데이터 수집 ② 파이프라인 · 매일 07:10 GitHub Actions · 10/17 수집 종료 후 숫자 확정</p>
+    <p class="kicker rv">데이터 · API ③ 파이프라인 · 매일 07:10 GitHub Actions</p>
     <h2 class="rv d1">제목 한 줄이 통계가 되기까지</h2>
     <div class="pipe rv d2">
       <div class="st"><div class="k">① 수집</div><div class="v num" data-bind="youtube.videos" data-fmt="n">—</div><div class="d">영상 제목</div></div>
-      <div class="st"><div class="k">② 사전</div><div class="v num" data-bind="market.assets_total" data-fmt="n">—</div><div class="d">종목·코인·테마</div></div>
-      <div class="st"><div class="k">③ 매칭 · 논조</div><div class="v num" data-bind="mentions.match_rate" data-fmt="pct0">—</div><div class="d">성공률 · 낙관 <span data-bind="stance_counts.bull" data-fmt="n"></span> / 전체 <span data-bind="mentions.mentions" data-fmt="n"></span></div></div>
-      <div class="st"><div class="k">④ 시세·공시</div><div class="v num" data-bind="market.prices" data-fmt="n">—</div><div class="d">시세 행 · 공시 <span data-bind="market.disclosures" data-fmt="n"></span></div></div>
-      <div class="st acc"><div class="k">⑤ 수익률</div><div class="v num" data-bind="stats.events" data-fmt="n">—</div><div class="d">언급별 5·20·60일</div></div>
+      <div class="st"><div class="k">② 사전</div><div class="v num" data-bind="market.assets_total" data-fmt="n">—</div><div class="d">종목 · 코인 · 테마</div></div>
+      <div class="st"><div class="k">③ 매칭 · 논조</div><div class="v num" data-bind="mentions.match_rate" data-fmt="pct0">—</div><div class="d">성공률 · 낙관 <span data-bind="stance_counts.bull" data-fmt="n"></span></div></div>
+      <div class="st"><div class="k">④ 시세 · 공시</div><div class="v num" data-bind="market.prices" data-fmt="n">—</div><div class="d">시세 행 · 공시 <span data-bind="market.disclosures" data-fmt="n"></span></div></div>
+      <div class="st acc"><div class="k">⑤ 수익률</div><div class="v num" data-bind="stats.events" data-fmt="n">—</div><div class="d">언급별 5 · 20 · 60일</div></div>
     </div>
-    <div class="three rv d3">
-      <div class="card"><h3>매칭 26% → <span data-bind="mentions.match_rate" data-fmt="pct0">65%</span></h3><p class="note">못 잡은 제목을 읽어 보니 "반도체 급등"처럼 업종만 있었다 → 업종 20개를 대표 ETF로 재는 테마 사전 추가</p></div>
-      <div class="card"><h3>사건일 = 처음 거래할 수 있는 날</h3><p class="note">국내 15:30 KST · 미국 동부 16:00 · 코인 업비트 09:00 캔들 기준. 장 마감 뒤 영상이 지난 가격을 쓰지 않게</p></div>
-      <div class="card"><h3>오탐은 규칙과 테스트로</h3><p class="note">긴 이름 우선 · 흔한 단어 금지 · 한글·영문 단어 경계("아스트라"≠아스트, "SOL글로벌"≠솔라나) · 사후 해설 제목은 낙관에서 제외 · 테스트 18개</p></div>
-    </div>
+    <div class="pillrow big rv d3"><span>매칭 26% → 65% · 업종 테마 사전</span><span>사건일 = 영상 뒤 처음 거래할 수 있는 날</span><span>오탐은 규칙 + 테스트 18개</span></div>
   </div>
 </section>
 
-<!-- 8 아키텍처 -->
-<section class="slide alt" id="s-arch">
+<!-- 9 아키텍처 -->
+<section class="slide" id="s-arch">
   <div class="in">
-    <p class="kicker rv">서비스 아키텍처 · 데이터 흐름</p>
-    <h2 class="rv d1">수업 구성 그대로 · Vercel · Render · Supabase · Actions</h2>
-    <svg class="arch rv d2" viewBox="0 0 1180 470" role="img" aria-label="아키텍처">
+    <p class="kicker rv">아키텍처 ① 구조</p>
+    <h2 class="rv d1">Vercel · Render · Supabase · GitHub Actions</h2>
+    <svg class="arch rv d2" viewBox="0 0 1180 440" role="img" aria-label="아키텍처">
       <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#14213d"/></marker></defs>
-      <rect class="box" x="20" y="30" width="220" height="410" rx="16"/><text class="t" x="40" y="60">외부 API 6개</text>
+      <rect class="box" x="20" y="30" width="220" height="380" rx="16"/><text class="t" x="40" y="60">외부 API 6개</text>
       <g class="s"><rect class="box" x="36" y="80" width="188" height="44" rx="10"/><text x="48" y="107">YouTube Data API</text>
-        <rect class="box" x="36" y="134" width="188" height="44" rx="10"/><text x="48" y="161">DART corpCode · 공시</text>
+        <rect class="box" x="36" y="134" width="188" height="44" rx="10"/><text x="48" y="161">DART 기업코드 · 공시</text>
         <rect class="box" x="36" y="188" width="188" height="44" rx="10"/><text x="48" y="215">공공데이터포털 시세</text>
         <rect class="box" x="36" y="242" width="188" height="44" rx="10"/><text x="48" y="269">Yahoo Finance</text>
         <rect class="box" x="36" y="296" width="188" height="44" rx="10"/><text x="48" y="323">업비트 Open API</text>
-        <text class="m" x="40" y="420">HTTPS REST · 키는 환경변수</text></g>
-      <rect class="box acc" x="320" y="30" width="430" height="410" rx="16"/><text class="t" x="340" y="60">Render · FastAPI 1개 (한 프로세스에 서비스 4개)</text>
+        <text class="m" x="40" y="390">키는 환경변수에만</text></g>
+      <rect class="box acc" x="320" y="30" width="430" height="380" rx="16"/><text class="t" x="340" y="60">Render · FastAPI · 한 프로세스에 서비스 4개</text>
       <g class="s">
-        <rect class="box" x="340" y="84" width="190" height="70" rx="10"/><text class="t" x="352" y="108">market-data</text><text class="m" x="352" y="130">사전 · 시세 · 거래량 · 공시</text>
-        <rect class="box" x="540" y="84" width="190" height="70" rx="10"/><text class="t" x="552" y="108">youtube</text><text class="m" x="552" y="130">채널 · 영상 제목</text>
-        <rect class="box" x="340" y="176" width="190" height="70" rx="10"/><text class="t" x="352" y="200">mentions</text><text class="m" x="352" y="222">제목 → 종목·테마 · 논조</text>
-        <rect class="box" x="540" y="176" width="190" height="70" rx="10"/><text class="t" x="552" y="200">stats</text><text class="m" x="552" y="222">수익률 · 시장 대비 · 랭킹</text>
-        <path class="ln" d="M435 176 L435 154"/><path class="ln" d="M470 176 Q470 165 540 154"/><path class="ln" d="M540 211 L530 211"/><path class="ln" d="M635 176 Q635 165 530 154"/>
-        <text class="m" x="340" y="280">읽기 GET /v1/* · 쓰기는 /internal/sync 만(토큰) · problem+json · X-Request-ID</text>
-        <text class="m" x="340" y="300">서비스 간 호출은 REST · 명세 contracts/*.yaml 먼저, CI 가 드리프트 검사</text>
-        <text class="m" x="340" y="340">/docs 하나에 명세 4개 합침 · gzip · Cache-Control 10분</text>
-        <text class="m" x="340" y="360">무료 512MB: 프로세스 5→1, 기본 메모리 350→95MB</text>
+        <rect class="box" x="340" y="90" width="190" height="80" rx="10"/><text class="t" x="352" y="118">market-data</text><text class="m" x="352" y="142">사전 · 시세 · 공시</text>
+        <rect class="box" x="540" y="90" width="190" height="80" rx="10"/><text class="t" x="552" y="118">youtube</text><text class="m" x="552" y="142">채널 · 영상 제목</text>
+        <rect class="box" x="340" y="200" width="190" height="80" rx="10"/><text class="t" x="352" y="228">mentions</text><text class="m" x="352" y="252">제목 → 종목 · 논조</text>
+        <rect class="box" x="540" y="200" width="190" height="80" rx="10"/><text class="t" x="552" y="228">stats</text><text class="m" x="552" y="252">수익률 · 시장 대비 · 랭킹</text>
+        <text class="m" x="340" y="330">스키마 4개 · OpenAPI 명세 4개 · 서로는 REST 로만</text>
+        <text class="m" x="340" y="352">읽기 GET /v1/* · 쓰기 /internal/sync (토큰)</text>
+        <text class="m" x="340" y="390">무료 512MB → 프로세스 5개를 1개로 (95MB)</text>
       </g>
-      <rect class="box ok" x="830" y="30" width="330" height="150" rx="16"/><text class="t" x="850" y="60">Supabase · PostgreSQL</text>
-      <g class="s"><text class="m" x="850" y="90">스키마 4개 · 테이블 9개</text><text class="m" x="850" y="112">market · yt · mentions · stats</text><text class="m" x="850" y="134">서비스 간 FK 없음 — id 만 보관</text><text class="m" x="850" y="156">Session pooler · 엔진당 연결 1(+2)</text></g>
-      <rect class="box" x="830" y="200" width="330" height="110" rx="16"/><text class="t" x="850" y="230">Vercel · React</text>
-      <g class="s"><text class="m" x="850" y="256">홈 · 언급 뒤에 · 채널 · 종목 · 데이터</text><text class="m" x="850" y="278">GET 만 부른다 · 계산된 결과만 읽는다</text></g>
-      <rect class="box warn" x="830" y="330" width="330" height="110" rx="16"/><text class="t" x="850" y="360">GitHub · Actions</text>
-      <g class="s"><text class="m" x="850" y="386">push → Vercel·Render 자동 배포</text><text class="m" x="850" y="408">매일 07:10 /internal/sync ①→⑤ · 10/17 확정</text></g>
-      <path class="ln" d="M240 200 L320 200"/><path class="ln" d="M750 110 L830 110"/><path class="ln" d="M830 255 L750 255"/><path class="ln d" d="M830 385 L790 385 L790 300 L750 300"/>
+      <rect class="box ok" x="830" y="30" width="330" height="120" rx="16"/><text class="t" x="850" y="60">Supabase · PostgreSQL</text>
+      <g class="s"><text class="m" x="850" y="92">스키마 4개 · 테이블 9개</text><text class="m" x="850" y="116">서비스 사이는 FK 없이 id 만</text></g>
+      <rect class="box" x="830" y="170" width="330" height="110" rx="16"/><text class="t" x="850" y="200">Vercel · React</text>
+      <g class="s"><text class="m" x="850" y="230">홈 · 언급 뒤에 · 채널 · 종목 · 데이터</text><text class="m" x="850" y="254">GET 만 부른다</text></g>
+      <rect class="box warn" x="830" y="300" width="330" height="110" rx="16"/><text class="t" x="850" y="330">GitHub · Actions</text>
+      <g class="s"><text class="m" x="850" y="360">push → Vercel · Render 자동 배포</text><text class="m" x="850" y="384">매일 07:10 /internal/sync ① → ⑤</text></g>
+      <path class="ln" d="M240 200 L320 200"/><path class="ln" d="M750 90 L830 90"/><path class="ln" d="M830 225 L750 225"/><path class="ln d" d="M830 355 L790 355 L790 300 L750 300"/>
     </svg>
-    <p class="note rv d3">요청 한 번의 흐름: 브라우저 → <code>GET /stats/v1/summary?scope=overall&horizon=20&stance=bull</code> → FastAPI(stats) → <code>SELECT value FROM stats.summaries WHERE key='bull:overall:20'</code> → JSON → 화면. 외부 API 는 요청 때 부르지 않고 배치에서만 부른다.</p>
   </div>
 </section>
 
-<!-- 9 화면 -->
-<section class="slide" id="s-pages">
+<!-- 10 요청 한 번의 흐름 -->
+<section class="slide alt" id="s-flow">
   <div class="in">
-    <p class="kicker rv">주요 페이지 및 기능</p>
-    <h2 class="rv d1">다섯 화면, 계산된 결과만 읽는다</h2>
-    <div class="five rv d2">
-      <div class="card"><span class="tag ok">홈</span><p>지금 유튜브에서 뜨는 종목 · 급증 배수 · 과거 반응</p></div>
-      <div class="card"><span class="tag ok">언급 뒤에</span><p>5·20·60일 분포 · 시장 대비 · 거래량 · 공시 동반 · 용어 설명</p></div>
-      <div class="card"><span class="tag ok">채널</span><p>TOP 3 · BOTTOM 3 · 랭킹 차트 · 채널 상세(5·20·60일 전환)</p></div>
-      <div class="card"><span class="tag ok">종목</span><p>주가 위 언급 점 · 공시 눈금 · 언급별 기록 · 근거 단어</p></div>
-      <div class="card"><span class="tag ok">데이터</span><p>파이프라인 실건수 · 출처 6개 · 채널 선정 · 매칭 규칙</p></div>
+    <p class="kicker rv">아키텍처 ② 동작 원리</p>
+    <h2 class="rv d1">읽기는 GET, 쓰기는 배치만 — 외부 API 는 요청 때 부르지 않는다</h2>
+    <div class="req rv d2">
+      <div class="lab">요청 한 번<small>화면이 숫자 하나를 받기까지</small></div>
+      <div class="rn"><b>브라우저 · React</b><small>Vercel · "언급 뒤에" 탭</small></div>
+      <div class="rl"><code>GET /stats/v1/summary?scope=overall&amp;horizon=20&amp;stance=bull</code><em>← JSON · 0.6KB · 캐시 10분</em></div>
+      <div class="rn"><b>FastAPI · stats</b><small>Render · 키 조립 <code>bull:overall:20</code></small></div>
+      <div class="rl"><code>SELECT value FROM stats.summaries WHERE key = …</code><em>← 1 row</em></div>
+      <div class="rn ok"><b>PostgreSQL</b><small>Supabase · 미리 계산된 요약</small></div>
     </div>
-    <p class="note rv d3">프론트는 평가 제외 — 화면은 API 를 읽기만 한다. 예정: 못 잡은 제목에서 사전 후보 추출 · 관심 종목 언급 급증 알림 · 사건 출처 교체(트윗·뉴스·리포트)</p>
+    <div class="req batch rv d3">
+      <div class="lab">하루 한 번<small>매일 07:10 · 10/17 확정</small></div>
+      <div class="rn warn"><b>GitHub Actions</b><small>cron · 토큰은 Secrets</small></div>
+      <div class="rl"><code>POST /{service}/internal/sync</code><em>X-Internal-Token</em></div>
+      <div class="rn"><b>FastAPI · ① → ⑤</b><small>수집 → 사전 → 매칭 → 시세 · 공시 → 수익률</small></div>
+      <div class="rl"><code>외부 API 6개 읽기 → INSERT</code><em>쓰기는 여기뿐</em></div>
+      <div class="rn ok"><b>PostgreSQL</b><small>summaries <span data-bind="stats.summaries" data-fmt="n">8,673</span>행 갱신</small></div>
+    </div>
   </div>
 </section>
 
-<!-- 10 결과 1 -->
+<!-- 11 막혔던 것 · 고친 것 -->
+<section class="slide" id="s-fail">
+  <div class="in">
+    <p class="kicker rv">아키텍처 ③ 막혔던 것과 고친 것</p>
+    <h2 class="rv d1">여섯 번 막혔고, 여섯 번 고쳤다</h2>
+    <div class="fixes rv d2">
+      <div class="fx"><b>매칭 성공률 26%</b><i>→</i><span>못 잡은 제목 1,304건을 읽음 → 업종 테마 사전 → <strong data-bind="mentions.match_rate" data-fmt="pct0">65%</strong></span></div>
+      <div class="fx"><b>낙관 오탐</b><i>→</i><span>"급등했던 이유" 같은 사후 해설 → 중립으로 → <strong>1,284건</strong> 제외</span></div>
+      <div class="fx"><b>Render 512MB OOM</b><i>→</i><span>프로세스 5개 → 1개 · DART 스트리밍 파싱 → <strong>95MB</strong></span></div>
+      <div class="fx"><b>Supabase 연결 15개 한도</b><i>→</i><span>엔진당 풀 1개 · 긴 배치는 백그라운드 + 상태 폴링</span></div>
+      <div class="fx"><b>공공데이터포털 "미등록 키"</b><i>→</i><span>키가 아니라 옛 V1 주소 → V2 · 실패 시 Yahoo 대체</span></div>
+      <div class="fx"><b>뉴스 크롤링</b><i>→</i><span>넣었다 뺐다 — 소급 불가 · 비공식 → 같은 질문은 <strong>DART 공시</strong>로</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 12 결과 1 -->
 <section class="slide alt" id="s-result1">
   <div class="in">
-    <p class="kicker rv">데이터 분석 결과 ① <span class="live" id="live2"><i></i><span>스냅샷 <span data-bind="generated_at"></span></span></span></p>
-    <h2 class="rv d1">정말 올랐을까 — "오른다"고 한 뒤 실제로는</h2>
+    <p class="kicker rv">분석 결과 ① <span class="live" id="live2"><i></i><span>스냅샷 <span data-bind="generated_at"></span></span></span></p>
+    <h2 class="rv d1">"오른다"고 한 뒤, 실제로는</h2>
     <div class="grid g3 rv d2" id="overall-cards"></div>
-    <div class="two rv d3" style="margin-top:18px">
-      <div class="card"><h3>20거래일 수익률 분포</h3><div class="hist" id="hist-overall"></div></div>
-      <div class="card"><h3>읽는 법</h3><ul class="plain"><li>상승 확률 50% 아래 → 언급 뒤에 사면 내린 쪽이 많았다</li><li>시장 대비 음수 → 시장을 따라가지도 못했다</li><li>거래량 비율 1 미만 → 거래는 언급 <b>전</b>에 몰렸다</li></ul></div>
-    </div>
+    <div class="card rv d3" style="margin-top:16px"><h3>낙관 언급 뒤 20거래일 수익률 분포 · 파랑 하락 · 빨강 상승</h3><div class="hist" id="hist-overall"></div></div>
   </div>
 </section>
 
-<!-- 11 결과 2 -->
+<!-- 13 결과 2 -->
 <section class="slide" id="s-result2">
   <div class="in">
-    <p class="kicker rv">데이터 분석 결과 ②</p>
-    <h2 class="rv d1">시장별 · 채널</h2>
+    <p class="kicker rv">분석 결과 ② 시장별 · 채널별</p>
+    <h2 class="rv d1">시장은 모두 같은 방향, 채널은 다르다</h2>
     <div class="two rv d2">
-      <table id="tbl-market"><thead><tr><th>오른다고 한 뒤 20일</th><th class="r">표본</th><th class="r">평균</th><th class="r">상승</th><th class="r">시장 대비</th><th class="r">거래량</th></tr></thead><tbody></tbody></table>
+      <table id="tbl-market"><thead><tr><th>20거래일 뒤</th><th class="r">표본</th><th class="r">평균</th><th class="r">상승</th><th class="r">시장 대비</th><th class="r">거래량</th></tr></thead><tbody></tbody></table>
       <div>
-        <h3 class="sub">낙관 언급 기준 채널 TOP 3 · BOTTOM 3 (시장 대비, 20일 · 30건·10종목 이상)</h3>
+        <h3 class="sub">시장 대비 TOP 3 · BOTTOM 3 (낙관 30건 · 10종목 이상)</h3>
         <div id="rank-top" class="ranks"></div>
         <div id="rank-bottom" class="ranks"></div>
       </div>
@@ -224,116 +248,84 @@
   </div>
 </section>
 
-<!-- 12 발견 -->
+<!-- 14 발견 -->
 <section class="slide alt" id="s-findings">
   <div class="in">
-    <p class="kicker rv">데이터 분석 결과 ③</p>
-    <h2 class="rv d1">숫자가 말해 준 것</h2>
-    <div class="findings rv d2">
-      <div class="card"><span class="n">1</span><p data-finding="1">—</p></div>
-      <div class="card"><span class="n">2</span><p data-finding="2">—</p></div>
-      <div class="card"><span class="n">3</span><p data-finding="3">—</p></div>
-      <div class="card"><span class="n">4</span><p data-finding="4">—</p></div>
-      <div class="card wide"><span class="n">5</span><p data-finding="5">—</p></div>
+    <p class="kicker rv">분석 결과 ③ 발견</p>
+    <h2 class="rv d1">숫자가 말해 준 다섯 가지</h2>
+    <div class="findings2 rv d2">
+      <div class="card"><b class="n" data-fnum="1">—</b><div><p data-finding="1">—</p><small data-fsub="1"></small></div></div>
+      <div class="card"><b class="n" data-fnum="2">—</b><div><p data-finding="2">—</p><small data-fsub="2"></small></div></div>
+      <div class="card"><b class="n" data-fnum="3">—</b><div><p data-finding="3">—</p><small data-fsub="3"></small></div></div>
+      <div class="card"><b class="n" data-fnum="4">—</b><div><p data-finding="4">—</p><small data-fsub="4"></small></div></div>
+      <div class="card"><b class="n" data-fnum="5">—</b><div><p data-finding="5">—</p><small data-fsub="5"></small></div></div>
     </div>
-    <p class="note rv d3">학습용 통계 · 투자 권유 아님 · 제목만 보고 언급을 셌다 · 1년 · 채널 51개라는 범위 안의 결과</p>
+    <p class="note rv d3">학습용 통계 · 투자 권유 아님 · 1년 · 채널 51개 · 제목만 본 범위 안의 결과</p>
   </div>
 </section>
 
-<!-- 13 한계 -->
+<!-- 15 한계 -->
 <section class="slide" id="s-limits">
   <div class="in">
-    <p class="kicker rv">알고 있는 한계 · 숫자를 읽을 때 같이 봐야 할 것</p>
+    <p class="kicker rv">분석 결과 ④ 한계</p>
     <h2 class="rv d1">이 숫자가 말하지 않는 것</h2>
-    <div class="fails limits rv d2">
-      <div class="card"><b>제목만 본다</b><p>자막·설명·댓글은 수집하지 않았다. 제목에 종목이 없거나("이 종목 지금 사야 합니다") 맥락으로만 낙관인 영상은 놓친다. 반대로 반어·질문형 제목("삼성전자 지금 사도 될까?")은 낙관으로 잡힐 수 있다</p></div>
-      <div class="card"><b>단어 사전 분류</b><p>낙관·비관은 단어 목록으로 가른다. 모델이 아니다. 사후 해설 규칙을 넣었지만 오분류는 남아 있다 → 화면에 근거 단어를 그대로 보여 주고, 100건 무작위 검수를 진행 중</p></div>
-      <div class="card"><b>1년 · 채널 51개</b><p>2025.10~2026.10 한 해의 시장 국면 안의 결과다. 다른 해, 다른 채널 묶음이면 숫자는 달라질 수 있다. 채널 선정 규칙은 공개했고 바꿔 돌릴 수 있다</p></div>
-      <div class="card"><b>사건이 겹친다</b><p>같은 날 여러 채널이 같은 종목을 말하면 사건 n 은 늘지만 독립 표본은 아니다. 평균·승률은 그대로 쓰되 유의성은 보수적으로 읽어야 한다</p></div>
-      <div class="card"><b>종가 기준 · 비용 없음</b><p>사건일 종가에 사서 N거래일 뒤 종가에 판 것으로 계산한다. 슬리피지·수수료·세금은 없다. 실제 수익률은 이보다 낮다</p></div>
-      <div class="card"><b>인과가 아니다</b><p>"언급 뒤에 내렸다"는 상관이다. 유튜브가 내리게 한 것도, 유튜버가 틀린 것도 아닐 수 있다. 이미 오른 뒤에 언급이 몰리는 구조가 가장 그럴듯한 설명이다</p></div>
+    <div class="limits2 rv d2">
+      <div class="card"><b>제목만 본다</b><p>자막 · 설명은 안 봤다</p></div>
+      <div class="card"><b>단어 사전으로 가른다</b><p>모델이 아니다 · 근거 단어를 화면에 그대로</p></div>
+      <div class="card"><b>1년 · 채널 51개</b><p>다른 해, 다른 채널이면 숫자는 달라진다</p></div>
+      <div class="card"><b>사건이 겹친다</b><p>같은 날 같은 종목 → 독립 표본이 아니다</p></div>
+      <div class="card"><b>종가 기준 · 비용 없음</b><p>실제 수익률은 이보다 낮다</p></div>
+      <div class="card"><b>상관이지 인과가 아니다</b><p>이미 오른 뒤에 언급이 몰린다</p></div>
     </div>
   </div>
 </section>
 
-<!-- 14 한 문장 -->
+<!-- 16 한 문장 -->
 <section class="slide kick" id="s-kick">
   <div class="in">
     <p class="kicker rv" style="color:#9db4ff">데이터가 말하는 한 문장</p>
     <h2 class="display rv d1" style="color:#fff">유튜브가 "오른다"고 할 때는<br>이미 늦었다</h2>
     <div class="kick-nums rv d2">
-      <div><b data-bind="summary.bull:overall:20.win_rate" data-fmt="pct0">43%</b><span>낙관 언급 뒤 20일 상승 확률</span></div>
+      <div><b data-bind="summary.bull:overall:20.win_rate" data-fmt="pct0">42%</b><span>낙관 언급 뒤 20일 상승 확률</span></div>
       <div><b data-bind="summary.bull:overall:20.excess_mean" data-fmt="pct1">−2.8%</b><span>시장 대비</span></div>
       <div><b data-bind="summary.bull:overall:20.vol_ratio_median" data-fmt="x">0.92배</b><span>언급 뒤 ÷ 앞 거래량</span></div>
     </div>
-    <p class="lead rv d3" style="color:rgba(255,255,255,.8)">영상이 말한 종목을 사기 전에, 그 종목이 전에 떴을 때 어땠는지 먼저 본다 — 그게 이 서비스가 하는 일</p>
+    <p class="lead rv d3" style="color:rgba(255,255,255,.8)">그래서 — 영상이 말한 종목을 사기 전에, 그 종목이 전에 떴을 때 어땠는지 먼저 본다</p>
   </div>
 </section>
 
-<!-- 15 BM -->
-<section class="slide" id="s-bm">
+<!-- 17 활용 · BM -->
+<section class="slide alt" id="s-bm">
   <div class="in">
-    <p class="kicker rv">데이터 활용 기획 시나리오 · 비즈니스 모델</p>
-    <h2 class="rv d1">누구에게, 무엇을, 어떻게 지속하나</h2>
+    <p class="kicker rv">활용 · 비즈니스 모델</p>
+    <h2 class="rv d1">누가, 어떻게, 무엇으로 지속하나</h2>
     <div class="three rv d2">
-      <div class="card"><h3>시나리오</h3><p class="note"><b>개인투자자</b>가 영상을 보고 종목을 사기 전 두 번 클릭 — 종목 페이지에서 "전에 떴을 때 어땠나", 채널 페이지에서 "이 채널 말은 맞았나"를 본다. <b>리서치·콘텐츠팀</b>은 채널별 적중 기록으로 출연자·인용 채널을 고른다.</p></div>
-      <div class="card"><h3>대상 고객 · 제공 가치</h3><p class="note">유튜브로 정보를 얻는 개인투자자 · 증권사 리서치·콘텐츠팀 · 금융 미디어. 영상의 분위기 대신 <b>과거 기록</b>. 숫자는 매일 갱신되고 근거(제목·단어·사건일)가 함께 보인다.</p></div>
-      <div class="card"><h3>수익 · 운영</h3><p class="note">관심 종목 언급 급증 알림 구독 · 채널 적중 기록 리포트 · 언급량 데이터 API. 운영비는 무료 티어 + 하루 1회 배치(YouTube 쿼터 하루 300유닛). 광고·추천 없이도 유지되는 구조.</p></div>
-    </div>
-  </div>
-</section>
-
-<!-- 16 실패 · 개선 -->
-<section class="slide alt" id="s-fail">
-  <div class="in">
-    <p class="kicker rv">실패한 실험과 개선 · 평가 기준 "원인과 개선 과정"</p>
-    <h2 class="rv d1">막혔던 것 여섯 가지</h2>
-    <div class="fails rv d2">
-      <div class="card"><b>매칭 26%</b><p>못 잡은 제목 1,304건을 읽음 → 종목이 아니라 업종 이야기 → 테마 사전 20개(대표 ETF) → <span data-bind="mentions.match_rate" data-fmt="pct0">65%</span></p></div>
-      <div class="card"><b>낙관 오탐</b><p>"삼성전자 급등했던 이유" 같은 사후 해설이 낙관으로 잡힘 → 과거 단서만 있고 전망 단어가 없으면 중립 → 낙관 19,925 → 18,641 (10/8 당시, 1,284건 제외)</p></div>
-      <div class="card"><b>Render 512MB OOM</b><p>서비스 4개 = 프로세스 5개가 메모리 초과 → 한 프로세스에 마운트, DART 3,998건 스트리밍 파싱, 사전 갱신은 주 1회 → 95MB</p></div>
-      <div class="card"><b>Supabase 연결 15개 한도</b><p>재배포마다 "max clients reached" → 엔진당 풀 1(+2), 유휴 연결 정리, 15분 넘는 배치는 백그라운드 + 상태 폴링</p></div>
-      <div class="card"><b>공공데이터포털 "미등록 키"</b><p>키 문제가 아니라 옛 V1 주소를 부르고 있었다 → V2 엔드포인트로 수정, 실패 시 Yahoo 국내 심볼로 자동 대체</p></div>
-      <div class="card"><b>크롤링을 넣었다 뺐다</b><p>네이버 증권 뉴스 기사 수(비공식 엔드포인트) — 소급 불가·약관·설명 부담 → 10/14 제외. 같은 질문("외부 사건을 따라가나")은 DART 공시로 답한다</p></div>
-    </div>
-  </div>
-</section>
-
-<!-- 17 우리만의 것 -->
-<section class="slide" id="s-unique">
-  <div class="in">
-    <p class="kicker rv">우리만의 것</p>
-    <h2 class="rv d1">수업 요구사항 위에 더한 여섯 가지</h2>
-    <div class="uniq rv d2">
-      <div class="card"><span class="n">1</span><div><b>모션그래픽 쇼릴</b><p>서비스를 1분 30초로 설명하는 웹 애니메이션. 숫자는 스냅샷 데이터를 읽어 매번 실제 값</p></div></div>
-      <div class="card"><span class="n">2</span><div><b>스스로 도는 파이프라인</b><p>GitHub Actions 가 매일 07:10 수집→매칭→계산을 순서대로 호출. 데이터 확정일(10/17) 게이트 포함</p></div></div>
-      <div class="card"><span class="n">3</span><div><b>명세 먼저, CI 가 지킨다</b><p>OpenAPI 계약 4개 → Spectral 린트 · oasdiff 호환성 검사 · 구현-명세 드리프트 테스트</p></div></div>
-      <div class="card"><span class="n">4</span><div><b>MSA 를 한 프로세스에</b><p>서비스 4개가 각자 스키마·명세를 갖되 무료 티어에선 한 프로세스. 분리 배포로 되돌릴 수 있다</p></div></div>
-      <div class="card"><span class="n">5</span><div><b>금융 데이터의 디테일</b><p>사건일 규칙(장 마감 시각) · 벤치마크 대비 초과수익 · 거래량 비율 · 공시 동반 · 제목 논조 분류</p></div></div>
-      <div class="card"><span class="n">6</span><div><b>채널도 데이터로 골랐다</b><p>후보 547개를 API 로 측정해 임계값 2단 규칙으로 51개. 사람의 취향이 들어갈 자리를 없앴다</p></div></div>
+      <div class="card"><h3>누가</h3><ul class="plain big"><li><b>개인투자자</b> — 유튜브로 정보를 얻는 사람</li><li><b>리서치 · 콘텐츠팀</b> — 출연자 · 인용 채널 고를 때</li></ul></div>
+      <div class="card"><h3>어떻게 · 사기 전 두 번 클릭</h3><ul class="plain big"><li><b>종목</b> — 전에 떴을 때 어땠나</li><li><b>채널</b> — 이 채널 말은 맞았나</li></ul></div>
+      <div class="card"><h3>수익 · 운영</h3><ul class="plain big"><li>언급 급증 알림 구독 · 채널 적중 리포트 · 데이터 API</li><li>운영비 ≈ 0 — 무료 티어 + 하루 1회 배치 (YouTube 쿼터 300유닛)</li></ul></div>
     </div>
   </div>
 </section>
 
 <!-- 18 마무리 -->
-<section class="slide alt cover" id="s-end">
-  <div class="in">
-    <div class="team-badge rv"><span class="num5">5</span><span>조</span></div>
-    <h2 class="display rv d1">공개 API 6개 →<br>하루 한 번 가공 →<br>한 질문에 답하는 숫자</h2>
-    <ul class="members big rv d2"><li>김지환</li><li>오선호</li><li>조인성</li><li>채재희</li><li>김현준</li></ul>
-    <div class="links rv d3">
-      <a class="btn primary" id="btn-web2" href="#" target="_blank" rel="noreferrer">서비스 <span class="u" data-url="web"></span></a>
-      <a class="btn" id="btn-docs2" href="#" target="_blank" rel="noreferrer">Swagger <span class="u" data-url="docs"></span></a>
-      <a class="btn" href="https://github.com/insung1939/hindsight" target="_blank" rel="noreferrer">GitHub <span class="u">insung1939/hindsight</span></a>
+<section class="slide kick end" id="s-end">
+  <div class="in endgrid">
+    <div>
+      <p class="kicker rv" style="color:#9db4ff">마무리</p>
+      <h2 class="display rv d1" style="color:#fff">감사합니다</h2>
+      <p class="lead rv d2" style="color:rgba(255,255,255,.8)">공개 API 6개 → 하루 한 번 가공 → 한 질문에 답하는 숫자</p>
+      <div class="urls rv d3">
+        <a id="btn-web2" href="#" target="_blank" rel="noreferrer"><span>서비스</span><b data-url="web"></b></a>
+        <a id="btn-docs2" href="#" target="_blank" rel="noreferrer"><span>Swagger</span><b data-url="docs"></b></a>
+        <a href="https://github.com/insung1939/hindsight" target="_blank" rel="noreferrer"><span>GitHub</span><b>github.com/insung1939/hindsight</b></a>
+      </div>
+      <div class="doclinks rv d4">
+        <a href="#s-db">부록 · DB 테이블 문서</a>
+        <a href="#s-api">부록 · API 설명 문서</a>
+      </div>
+      <p class="members-line rv d4">5조 · 김지환 · 김현준 · 오선호 · 조인성 · 채재희</p>
     </div>
-    <div class="doclinks rv d4">
-      <a href="#s-api">API 설명 문서 → 20장</a>
-      <a href="#s-db">DB 테이블 문서 → 19장</a>
-      <a href="https://github.com/insung1939/hindsight/blob/main/docs/api.md" target="_blank" rel="noreferrer">docs/api.md</a>
-      <a href="https://github.com/insung1939/hindsight/blob/main/docs/db.md" target="_blank" rel="noreferrer">docs/db.md</a>
-      <a href="https://github.com/insung1939/hindsight/blob/main/docs/data-sources.md" target="_blank" rel="noreferrer">데이터 출처</a>
-      <a href="https://github.com/insung1939/hindsight/blob/main/docs/channel-selection.md" target="_blank" rel="noreferrer">채널 선정 근거</a>
-    </div>
+    <figure class="qr rv d2"><img src="img/qr-web.svg" alt="서비스 QR" width="186" height="186"><figcaption>hindsight-web.vercel.app</figcaption></figure>
   </div>
 </section>
 
