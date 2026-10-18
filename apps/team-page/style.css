@@ -312,3 +312,10 @@ html.deck-mode .slide.active { transform: none; }
 .limits3 .card b { display: block; font-size: clamp(20px, 2vw, 28px); color: var(--navy); letter-spacing: -.02em; line-height: 1.2; margin-bottom: 10px; }
 .limits3 .card p { margin: 0; font-size: clamp(15px, 1.4vw, 18px); color: var(--muted); line-height: 1.5; }
 @media (max-width: 900px) { .limits3 { grid-template-columns: 1fr; } }
+
+/* 4장 — 리포트는 있다 · 유튜브는 없다 */
+.vs { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 18px 0 20px; }
+.vs .card.acc { background: var(--navy); border-color: var(--navy); color: #fff; } .vs .card.acc h3 { color: rgba(255,255,255,.7); } .vs .card.acc .big small { color: rgba(255,255,255,.75); }
+.vs .card.acc .big { color: #9db4ff; }
+#s-problem .lead { max-width: none; margin: 0; }
+@media (max-width: 760px) { .vs { grid-template-columns: 1fr; } }
