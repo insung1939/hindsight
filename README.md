@@ -1,6 +1,6 @@
 # HINDSIGHT — 유튜버가 오른다고 한 종목, 정말 올랐을까?
 
-**배포 주소 (2026-10-07)** · 서비스 https://hindsight-web.vercel.app · Swagger https://hindsight-api-edab.onrender.com/docs · 발표 페이지 https://hindsight-gold.vercel.app · 저장소 https://github.com/insung1939/hindsight
+**배포 주소** · 서비스 https://hindsight-web.vercel.app · Swagger https://hindsight-api-edab.onrender.com/docs · 발표 페이지 https://hindsight-gold.vercel.app · 저장소 https://github.com/insung1939/hindsight
 
 KAIST 디지털금융MBA 〈클라우드컴퓨팅실습〉 팀 프로젝트. 주식·코인 유튜브 채널이 영상 제목에서 언급한 종목을 모아, **언급 뒤 5·20·60 거래일 동안 주가가 실제로 어떻게 움직였는지** 통계로 보여준다. 채널 실명과 채널별 성적(상·하위)을 보여주되 학습용 통계임을 고지하고, 종목 추천 문구는 없다.
 
