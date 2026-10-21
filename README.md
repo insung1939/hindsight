@@ -6,6 +6,15 @@ KAIST 디지털금융MBA 〈클라우드컴퓨팅실습〉 팀 프로젝트. 주
 
 **처음 보면 [docs/overview.md](docs/overview.md)(검토 가이드) 부터.** 교수님 요구사항·중간 피드백·디자인 원칙은 [docs/requirements.md](docs/requirements.md), 현재 상태와 10/21 까지의 할 일은 [docs/checklist.md](docs/checklist.md). 기획·역할은 [PLAN.md](PLAN.md), API 설명은 [docs/api.md](docs/api.md), 테이블은 [docs/db.md](docs/db.md), 데이터 출처는 [docs/data-sources.md](docs/data-sources.md), 배포는 [docs/deploy.md](docs/deploy.md).
 
+## 영상으로 보기
+
+- **데이터 흐름 모션그래픽** (1분 58초, 팀원 제작) — 유튜브 제목이 수익률 통계가 되기까지의 흐름. https://hindsight-gold.vercel.app/dataflow.html
+
+https://github.com/insung1939/hindsight/raw/main/apps/team-page/dataflow.mp4
+
+- **서비스 쇼릴** (1분 40초, 숫자는 실제 데이터) — https://hindsight-gold.vercel.app/showreel.html
+- **발표 페이지** (20장, ← → 로 넘김) — https://hindsight-gold.vercel.app
+
 > 평가 포인트(교수 피드백): **어떤 소스에서 데이터를 가져와 어떻게 가공해 무슨 가치를 주는가.** UI 가 아니라 데이터와 API 호출이 중심. 발표의 절반은 파이프라인(소스 → 수집 → 매칭 → 계산 → 결과)에 실제 건수를 붙여 설명한다.
 
 ## 구조 — 서비스 4개 (데이터 소유권 기준)
