@@ -291,24 +291,6 @@ transition: zoom
 </v-clicks>
 
 ---
-layout: center
-class: text-center
-transition: zoom
----
-
-# 감사합니다
-
-공개 API 6개 → 하루 한 번 가공 → 한 질문에 답하는 숫자
-
-| 서비스 | Swagger | GitHub |
-|---|---|---|
-| https://hindsight-web.vercel.app | https://hindsight-api-edab.onrender.com/docs | https://github.com/insung1939/hindsight |
-
-부록 · DB 테이블 문서 → `docs/db.md` · API 설명 문서 → `docs/api.md`
-
-5조 · 김지환 · 김현준 · 오선호 · 조인성 · 채재희
-
----
 
 # 부록 · DB 테이블 문서 — 스키마 4개 · 테이블 9개 · 영상 1 → 언급 n → 수익률 1
 
@@ -342,3 +324,21 @@ transition: zoom
 | 수집 실행(배치 전용) | `POST /{service}/internal/sync` | X-Internal-Token · days · background | { added, updated, skipped[] } |
 
 JSON · ISO 날짜 · 수익률은 소수(0.024 = 2.4%) · 오류는 RFC 9457 problem+json · X-Request-ID · GET 은 Cache-Control 10분 · 명세 `contracts/*.yaml`(Spectral · oasdiff CI) · 전체 `docs/api.md`
+
+---
+layout: center
+class: text-center
+transition: zoom
+---
+
+# 감사합니다
+
+공개 API 6개 → 하루 한 번 가공 → 한 질문에 답하는 숫자
+
+| 서비스 | Swagger | GitHub |
+|---|---|---|
+| https://hindsight-web.vercel.app | https://hindsight-api-edab.onrender.com/docs | https://github.com/insung1939/hindsight |
+
+부록 ① DB 테이블 문서 → `docs/db.md` · 부록 ② API 설명 문서 → `docs/api.md` · 데이터 흐름 영상 → README
+
+5조 · 김지환 · 김현준 · 오선호 · 조인성 · 채재희

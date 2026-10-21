@@ -60,7 +60,7 @@
       <li><b>아키텍처</b><span>구조 · 요청 한 번의 흐름 · 막혔던 것과 고친 것</span></li>
       <li><b>분석 결과</b><span>정말 올랐을까 · 발견 · 한계</span></li>
       <li><b>활용</b><span>한 문장 · 누가 어떻게 쓰나</span></li>
-      <li><b>마무리</b><span>주소 3개 · 부록(DB · API 문서)</span></li>
+      <li><b>마무리</b><span>부록(DB · API 문서) · 주소 3개</span></li>
     </ol>
   </div>
 </section>
@@ -317,33 +317,10 @@
   </div>
 </section>
 
-<!-- 18 마무리 -->
-<section class="slide kick end" id="s-end" data-transition="zoom">
-  <div class="in endgrid">
-    <div>
-      <p class="kicker rv" style="color:#9db4ff">마무리</p>
-      <h2 class="display rv d1" style="color:#fff">감사합니다</h2>
-      <p class="lead rv d2" style="color:rgba(255,255,255,.8)">공개 API 6개 → 하루 한 번 가공 → 한 질문에 답하는 숫자</p>
-      <div class="urls rv d3">
-        <a id="btn-web2" href="#" target="_blank" rel="noreferrer"><span>서비스</span><b data-url="web"></b></a>
-        <a id="btn-docs2" href="#" target="_blank" rel="noreferrer"><span>Swagger</span><b data-url="docs"></b></a>
-        <a href="https://github.com/insung1939/hindsight" target="_blank" rel="noreferrer"><span>GitHub</span><b>github.com/insung1939/hindsight</b></a>
-      </div>
-      <div class="doclinks rv d4">
-        <a href="#s-db">부록 · DB 테이블 문서</a>
-        <a href="#s-api">부록 · API 설명 문서</a>
-        <a href="dataflow.html" target="_blank" rel="noreferrer">데이터 흐름 영상 2분</a>
-      </div>
-      <p class="members-line rv d4">5조 · 김지환 · 김현준 · 오선호 · 조인성 · 채재희</p>
-    </div>
-    <figure class="qr rv d2"><img src="img/qr-web.svg" alt="서비스 QR" width="186" height="186"><figcaption>hindsight-web.vercel.app</figcaption></figure>
-  </div>
-</section>
-
-<!-- 19 부록 DB -->
+<!-- 18 부록 DB -->
 <section class="slide" id="s-db">
   <div class="in">
-    <p class="kicker rv">부록 · DB 테이블 문서 · 전체 <code>docs/db.md</code></p>
+    <p class="kicker rv">부록 ① DB 테이블 문서 · 전체 <code>docs/db.md</code></p>
     <h2 class="rv d1">스키마 4개 · 테이블 9개 · 영상 1 → 언급 n → 수익률 1</h2>
     <div class="dbgrid rv d2">
       <table class="compact db">
@@ -382,10 +359,10 @@
   </div>
 </section>
 
-<!-- 20 부록 API -->
+<!-- 19 부록 API -->
 <section class="slide alt" id="s-api">
   <div class="in">
-    <p class="kicker rv">부록 · API 설명 문서 · 전체 <code>docs/api.md</code> · 실행 <span data-url="docs"></span></p>
+    <p class="kicker rv">부록 ② API 설명 문서 · 전체 <code>docs/api.md</code> · 실행 <span data-url="docs"></span></p>
     <h2 class="rv d1">GET 으로 읽고, 쓰기는 배치만 · 엔드포인트 36개(읽기 24 · 내부·상태 12) 중 주요 8개</h2>
     <table class="compact api rv d2">
       <thead><tr><th>기능</th><th>요청</th><th>입력값</th><th>응답(JSON)</th></tr></thead>
@@ -401,6 +378,29 @@
       </tbody>
     </table>
     <p class="note rv d3">공통: JSON · ISO 날짜 · 수익률은 소수(0.024 = 2.4%) · 오류는 RFC 9457 problem+json · 응답마다 X-Request-ID · GET 은 Cache-Control 10분 · 명세 <code>contracts/*.yaml</code>(Spectral · oasdiff CI)</p>
+  </div>
+</section>
+
+<!-- 20 마무리 -->
+<section class="slide kick end" id="s-end" data-transition="zoom">
+  <div class="in endgrid">
+    <div>
+      <p class="kicker rv" style="color:#9db4ff">마무리</p>
+      <h2 class="display rv d1" style="color:#fff">감사합니다</h2>
+      <p class="lead rv d2" style="color:rgba(255,255,255,.8)">공개 API 6개 → 하루 한 번 가공 → 한 질문에 답하는 숫자</p>
+      <div class="urls rv d3">
+        <a id="btn-web2" href="#" target="_blank" rel="noreferrer"><span>서비스</span><b data-url="web"></b></a>
+        <a id="btn-docs2" href="#" target="_blank" rel="noreferrer"><span>Swagger</span><b data-url="docs"></b></a>
+        <a href="https://github.com/insung1939/hindsight" target="_blank" rel="noreferrer"><span>GitHub</span><b>github.com/insung1939/hindsight</b></a>
+      </div>
+      <div class="doclinks rv d4">
+        <a href="#s-db">부록 ① DB 테이블 문서</a>
+        <a href="#s-api">부록 ② API 설명 문서</a>
+        <a href="dataflow.html" target="_blank" rel="noreferrer">▶ 데이터 흐름 영상 2분 (README)</a>
+      </div>
+      <p class="members-line rv d4">5조 · 김지환 · 김현준 · 오선호 · 조인성 · 채재희</p>
+    </div>
+    <figure class="qr rv d2"><img src="img/qr-web.svg" alt="서비스 QR" width="186" height="186"><figcaption>hindsight-web.vercel.app</figcaption></figure>
   </div>
 </section>
 
