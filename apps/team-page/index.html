@@ -155,7 +155,7 @@
       <div class="st"><div class="k">④ 시세 · 공시</div><div class="v num" data-bind="market.prices" data-fmt="n">—</div><div class="d">시세 행 · 공시 <span data-bind="market.disclosures" data-fmt="n"></span></div></div>
       <div class="st acc"><div class="k">⑤ 수익률</div><div class="v num" data-bind="stats.events" data-fmt="n">—</div><div class="d">언급마다 5 · 20 · 60일 · 전 논조</div></div>
     </div>
-    <div class="pillrow big fg"><span>매칭 26% → 65% · 업종 테마 사전</span><span>사건일 = 영상 뒤 처음 거래할 수 있는 날</span><span>오탐은 규칙 + 테스트 18개</span></div>
+    <div class="pillrow big rv d3"><span>매칭 26% → 65% · 업종 테마 사전</span><span>사건일 = 영상 뒤 처음 거래할 수 있는 날</span><span>오탐은 규칙 + 테스트 18개</span></div>
   </div>
 </section>
 
@@ -223,8 +223,10 @@
   <div class="in">
     <p class="kicker rv">아키텍처 ③ 막혔던 것과 고친 것 · 실패한 실험의 원인과 개선 과정</p>
     <h2 class="rv d1">세 번 막혔고, 세 번 고쳤다</h2>
-    <div class="fixes3 rv d2 fglist">
+    <div class="fixes3 rv d2">
       <div class="fx"><span class="n">1</span><b>제목에서 종목을 26%밖에 못 찾았다</b><i>→</i><span>못 잡은 제목 1,304건을 직접 읽음 → 종목이 아니라 "반도체 급등" 같은 업종 얘기 → 업종 테마 사전 20개 추가 → <strong data-bind="mentions.match_rate" data-fmt="pct0">65%</strong></span></div>
+    </div>
+    <div class="fixes3 fglist" style="margin-top:14px">
       <div class="fx"><span class="n">2</span><b>"급등했던 이유"가 낙관으로 잡혔다</b><i>→</i><span>지난 일을 설명하는 제목은 전망이 아니다 → 과거 단서만 있고 앞날 단어가 없으면 중립 → <strong>1,284건</strong> 제외</span></div>
       <div class="fx"><span class="n">3</span><b>무료 서버 512MB 가 터졌다</b><i>→</i><span>서비스 4개 + 게이트웨이 = 프로세스 5개가 기본 350MB → 한 프로세스에 마운트 · DART 3,998건 스트리밍 파싱 → <strong>95MB</strong></span></div>
     </div>
@@ -279,7 +281,7 @@
   <div class="in">
     <p class="kicker rv">분석 결과 ④ 한계</p>
     <h2 class="rv d1">이 숫자가 말하지 않는 것, 두 가지</h2>
-    <div class="limits2x rv d2 fglist">
+    <div class="limits2x rv d2">
       <div class="card"><span class="n">1</span><b>제목만 봤다</b><p>자막·설명은 안 봤고, 낙관·비관은 모델이 아니라 단어 사전으로 가른다. 그래서 낙관 언급을 완벽하게 가려내지는 못한다 — 근거 단어를 화면에 그대로 보여 준다</p></div>
       <div class="card"><span class="n">2</span><b>최근 1년 · 채널 51개의 표본이다</b><p>다른 해, 다른 채널이면 숫자는 달라질 수 있다. 더 많은 채널, 더 긴 기간으로 넓힐 필요가 있다</p></div>
     </div>
@@ -292,12 +294,12 @@
   <div class="in">
     <p class="kicker rv" style="color:#9db4ff">데이터가 말하는 한 문장</p>
     <h2 class="display rv d1" style="color:#fff">유튜브가 "오른다"고 할 때는<br>이미 늦었다</h2>
-    <div class="kick-nums fg">
+    <div class="kick-nums rv d2">
       <div><b data-bind="summary.bull:overall:20.win_rate" data-fmt="pct0">42%</b><span>낙관 언급 뒤 20일 상승 확률</span></div>
       <div><b data-bind="summary.bull:overall:20.excess_mean" data-fmt="pct1">−2.9%</b><span>시장 대비</span></div>
       <div><b data-bind="summary.bull:overall:20.vol_ratio_median" data-fmt="x">0.92배</b><span>언급 뒤 ÷ 앞 거래량</span></div>
     </div>
-    <p class="lead fg" style="color:rgba(255,255,255,.8)">그래서 — 영상이 말한 종목을 사기 전에, 그 종목이 전에 떴을 때 어땠는지 먼저 본다</p>
+    <p class="lead rv d3" style="color:rgba(255,255,255,.8)">그래서 — 영상이 말한 종목을 사기 전에, 그 종목이 전에 떴을 때 어땠는지 먼저 본다</p>
   </div>
 </section>
 
