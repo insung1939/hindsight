@@ -8,10 +8,7 @@ KAIST 디지털금융MBA 〈클라우드컴퓨팅실습〉 팀 프로젝트. 주
 
 ## 영상으로 보기
 
-- **데이터 흐름 모션그래픽** (1분 58초, 팀원 제작) — 유튜브 제목이 수익률 통계가 되기까지의 흐름. https://hindsight-gold.vercel.app/dataflow.html
-
-https://github.com/insung1939/hindsight/raw/main/apps/team-page/dataflow.mp4
-
+- **데이터 흐름 모션그래픽** (1분 58초, 팀원 제작) — 매일 07:10 배치가 공개 API 6개를 읽어 DB 를 채우는 흐름과, 브라우저 → Render(API) → Supabase(DB) 로 이어지는 다섯 탭의 요청 흐름. **▶ https://hindsight-gold.vercel.app/dataflow.html** (원본 `apps/team-page/dataflow.mp4`)
 - **서비스 쇼릴** (1분 40초, 숫자는 실제 데이터) — https://hindsight-gold.vercel.app/showreel.html
 - **발표 페이지** (20장, ← → 로 넘김) — https://hindsight-gold.vercel.app
 
