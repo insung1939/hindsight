@@ -333,3 +333,11 @@ html.deck-mode .slide.active { transform: none; }
 .define p { margin: 16px 0 0; font-size: clamp(14px, 1.4vw, 18px); line-height: 1.5; color: rgba(255,255,255,.78); }
 .define::before { content: ""; position: absolute; inset: 0; border-radius: 22px; background: linear-gradient(135deg, rgba(20,33,61,.55), rgba(20,33,61,.15)); z-index: -1; }
 @media (prefers-reduced-motion: reduce) { .hero-art img, .define { transition: none; } }
+
+/* 막혔던 것 — 셋만, 크게 */
+.fixes3 { display: grid; gap: 14px; }
+.fixes3 .fx { grid-template-columns: 44px minmax(260px, .9fr) 32px 1.6fr; padding: 20px 24px; }
+.fixes3 .n { width: 36px; height: 36px; border-radius: 10px; background: var(--navy); color: #fff; display: grid; place-items: center; font-weight: 800; }
+.fixes3 .fx b { font-size: clamp(18px, 1.9vw, 26px); }
+.fixes3 .fx span:last-child { font-size: clamp(15px, 1.45vw, 18.5px); }
+@media (max-width: 900px) { .fixes3 .fx { grid-template-columns: 1fr; } .fixes3 .fx i { display: none; } }

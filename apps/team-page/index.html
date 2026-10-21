@@ -222,15 +222,13 @@
 <section class="slide" id="s-fail">
   <div class="in">
     <p class="kicker rv">아키텍처 ③ 막혔던 것과 고친 것 · 실패한 실험의 원인과 개선 과정</p>
-    <h2 class="rv d1">여섯 번 막혔고, 여섯 번 고쳤다</h2>
-    <div class="fixes rv d2 fglist">
-      <div class="fx"><b>매칭 성공률 26%</b><i>→</i><span>못 잡은 제목 1,304건을 읽음 → 업종 테마 사전 → <strong data-bind="mentions.match_rate" data-fmt="pct0">65%</strong></span></div>
-      <div class="fx"><b>낙관 오탐</b><i>→</i><span>"급등했던 이유" 같은 사후 해설 → 중립으로 → <strong>1,284건</strong> 제외</span></div>
-      <div class="fx"><b>Render 512MB OOM</b><i>→</i><span>프로세스 5개 → 1개 · DART 스트리밍 파싱 → <strong>95MB</strong></span></div>
-      <div class="fx"><b>Supabase 연결 15개 한도</b><i>→</i><span>엔진당 풀 1개 · 긴 배치는 백그라운드 + 상태 폴링</span></div>
-      <div class="fx"><b>공공데이터포털 "미등록 키"</b><i>→</i><span>키가 아니라 옛 V1 주소 → V2 · 실패 시 Yahoo 대체</span></div>
-      <div class="fx"><b>뉴스 크롤링</b><i>→</i><span>넣었다 뺐다 — 소급 불가 · 비공식 → 같은 질문은 <strong>DART 공시</strong>로</span></div>
+    <h2 class="rv d1">세 번 막혔고, 세 번 고쳤다</h2>
+    <div class="fixes3 rv d2 fglist">
+      <div class="fx"><span class="n">1</span><b>제목에서 종목을 26%밖에 못 찾았다</b><i>→</i><span>못 잡은 제목 1,304건을 직접 읽음 → 종목이 아니라 "반도체 급등" 같은 업종 얘기 → 업종 테마 사전 20개 추가 → <strong data-bind="mentions.match_rate" data-fmt="pct0">65%</strong></span></div>
+      <div class="fx"><span class="n">2</span><b>"급등했던 이유"가 낙관으로 잡혔다</b><i>→</i><span>지난 일을 설명하는 제목은 전망이 아니다 → 과거 단서만 있고 앞날 단어가 없으면 중립 → <strong>1,284건</strong> 제외</span></div>
+      <div class="fx"><span class="n">3</span><b>무료 서버 512MB 가 터졌다</b><i>→</i><span>서비스 4개 + 게이트웨이 = 프로세스 5개가 기본 350MB → 한 프로세스에 마운트 · DART 3,998건 스트리밍 파싱 → <strong>95MB</strong></span></div>
     </div>
+    <p class="note rv d3">그 밖에 Supabase 연결 15개 한도 · 공공데이터포털 "미등록 키"(옛 V1 주소) · 뉴스 크롤링을 넣었다 뺀 것 — 질문 주시면 설명</p>
   </div>
 </section>
 
