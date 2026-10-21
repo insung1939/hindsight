@@ -319,3 +319,17 @@ html.deck-mode .slide.active { transform: none; }
 .vs .card.acc .big { color: #9db4ff; }
 #s-problem .lead { max-width: none; margin: 0; }
 @media (max-width: 760px) { .vs { grid-template-columns: 1fr; } }
+
+/* 표지 — → 를 누르면 유튜브 그림이 흐려지고 이름의 뜻이 떠오른다 */
+.hero-art { position: relative; overflow: hidden; border-radius: 22px; }
+.hero-art img { transition: filter .9s ease, transform .9s cubic-bezier(.22,1,.36,1), opacity .9s ease; }
+.hero-art:has(.define.on) img { filter: blur(10px) saturate(.6) brightness(.45); transform: scale(1.04); }
+.define { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; padding: clamp(20px, 4vw, 48px); color: #fff; border-radius: 22px;
+  opacity: 0; transform: translateY(18px); transition: opacity .7s ease .25s, transform .7s cubic-bezier(.22,1,.36,1) .25s; pointer-events: none; }
+.define.on { opacity: 1; transform: none; }
+.define .pos { font-family: var(--mono); font-size: clamp(12px, 1.1vw, 14px); color: #9db4ff; letter-spacing: .04em; }
+.define b { font-size: clamp(44px, 5.2vw, 84px); font-weight: 900; letter-spacing: -.04em; line-height: 1; margin: 8px 0 14px; }
+.define em { font-style: normal; font-size: clamp(18px, 1.9vw, 26px); font-weight: 750; color: #fff; letter-spacing: -.01em; }
+.define p { margin: 16px 0 0; font-size: clamp(14px, 1.4vw, 18px); line-height: 1.5; color: rgba(255,255,255,.78); }
+.define::before { content: ""; position: absolute; inset: 0; border-radius: 22px; background: linear-gradient(135deg, rgba(20,33,61,.55), rgba(20,33,61,.15)); z-index: -1; }
+@media (prefers-reduced-motion: reduce) { .hero-art img, .define { transition: none; } }

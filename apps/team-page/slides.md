@@ -21,6 +21,12 @@ layout: cover
 
 <!-- transition: zoom · 오른쪽에 img/story-1.webp -->
 
+<v-click>
+
+**hindsight** /ˈhaɪnd.saɪt/ — 뒤늦은 깨달음, 지나고 나서야 보이는 것
+
+</v-click>
+
 ---
 layout: default
 ---

@@ -164,7 +164,8 @@ if (!SCROLL) {
   const fgpos = document.createElement("div"); fgpos.id = "fgpos"; fgpos.className = "fgpos"; document.body.appendChild(fgpos);
   const fromHash = parseInt((location.hash || "#1").slice(1), 10);
   const byId = location.hash && location.hash.length > 3 ? slides.findIndex((s) => "#" + s.id === location.hash) : -1;
-  show(byId >= 0 ? byId : (isNaN(fromHash) ? 0 : fromHash - 1), false);
+  const first = byId >= 0 ? byId : (isNaN(fromHash) ? 0 : fromHash - 1);
+  show(first, false, first === 0 ? 1 : 0);  // 표지에서 시작하면 단계(이름의 뜻)는 숨긴 채 — 다른 장으로 바로 열면 전부 보인 상태
   if (STATIC) $$(".rv").forEach((x) => x.classList.add("on"));
   // 쇼릴 장에서는 Space = 멈춤/재생, R = 처음부터. iframe 에 메시지로 전달한다(키 입력은 부모 문서가 받으므로)
   const reelFrame = () => slides[cur].classList.contains("reel") ? slides[cur].querySelector("iframe") : null;
