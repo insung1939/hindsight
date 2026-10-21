@@ -341,3 +341,11 @@ html.deck-mode .slide.active { transform: none; }
 .fixes3 .fx b { font-size: clamp(18px, 1.9vw, 26px); }
 .fixes3 .fx span:last-child { font-size: clamp(15px, 1.45vw, 18.5px); }
 @media (max-width: 900px) { .fixes3 .fx { grid-template-columns: 1fr; } .fixes3 .fx i { display: none; } }
+
+/* 한계 — 둘만, 크게 */
+.limits2x { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.limits2x .card { padding: 26px 28px; }
+.limits2x .n { display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; background: var(--navy); color: #fff; font-weight: 800; margin-bottom: 12px; }
+.limits2x .card b { display: block; font-size: clamp(22px, 2.3vw, 32px); color: var(--navy); letter-spacing: -.02em; line-height: 1.2; margin-bottom: 12px; }
+.limits2x .card p { margin: 0; font-size: clamp(15px, 1.5vw, 19px); color: var(--muted); line-height: 1.55; }
+@media (max-width: 760px) { .limits2x { grid-template-columns: 1fr; } }
