@@ -1,6 +1,6 @@
 # 수집 스케줄 — 매일 순서대로: market-data(사전·시세·거래량) → youtube(새 영상) → mentions(매칭) → market-data(새로 tracked 된 종목 시세)
 #               → market-data(공시) → stats(수익률·거래량 비율·요약)
-# 데이터 확정: FREEZE_DATE(KST) 다음날부터 스케줄 실행은 건너뛴다 (발표 숫자를 고정). 수동 실행(workflow_dispatch)은 언제나 가능.
+# 발표용 데이터 확정(FREEZE_DATE=2026-10-17)은 발표가 끝나 10/28 에 풀었다. 수집이 며칠 끊기면 수동 실행에 날짜 수를 넉넉히 넣어 메운다.
 # Secrets: API_URL (합본 API, 예 https://hindsight-api-edab.onrender.com), INTERNAL_TOKEN
 #          분리 배포라면 API_URL 대신 MARKET_DATA_URL · YOUTUBE_URL · MENTIONS_URL · STATS_URL 을 넣는다.
 name: sync
@@ -16,27 +16,12 @@ on:
       price_days:
         description: "시세를 며칠 거슬러 받을지 (최초 420)"
         default: "30"
-
-env:
-  FREEZE_DATE: "2026-10-17"   # 이 날(KST 07:10 실행)까지 수집 → 10/16(금) 종가까지 반영. 발표 10/21.
+      attention_days:
+        description: "DART 공시를 며칠 거슬러 받을지"
+        default: "7"
 
 jobs:
-  gate:
-    runs-on: ubuntu-latest
-    outputs:
-      run: ${{ steps.chk.outputs.run }}
-    steps:
-      - id: chk
-        run: |
-          TODAY=$(TZ=Asia/Seoul date +%F)
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "$TODAY" \< "$FREEZE_DATE" ] || [ "$TODAY" = "$FREEZE_DATE" ]; then
-            echo "run=true" >> $GITHUB_OUTPUT; echo "실행 ($TODAY ≤ $FREEZE_DATE 또는 수동)"
-          else
-            echo "run=false" >> $GITHUB_OUTPUT; echo "데이터 확정일($FREEZE_DATE) 지남 — 건너뜀. 다시 돌리려면 FREEZE_DATE 를 바꾸거나 수동 실행"
-          fi
   sync:
-    needs: gate
-    if: needs.gate.outputs.run == 'true'
     runs-on: ubuntu-latest
     env:
       API_URL: ${{ secrets.API_URL }}
@@ -47,6 +32,7 @@ jobs:
       INTERNAL_TOKEN: ${{ secrets.INTERNAL_TOKEN }}
       YT_DAYS: ${{ github.event.inputs.youtube_days || '3' }}
       PRICE_DAYS: ${{ github.event.inputs.price_days || '30' }}
+      ATTENTION_DAYS: ${{ github.event.inputs.attention_days || '7' }}
     steps:
       - name: 주소 정하기 (합본이면 API_URL/<service>)
         run: |
@@ -80,7 +66,7 @@ jobs:
       - name: market-data (DART 공시 — 백그라운드 후 폴링)
         if: env.MARKET_DATA_URL != ''
         run: |
-          curl -sS --fail --max-time 120 --retry 3 --retry-delay 30 -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "$MARKET_DATA_URL/internal/sync-attention?background=true"
+          curl -sS --fail --max-time 120 --retry 3 --retry-delay 30 -X POST -H "X-Internal-Token: $INTERNAL_TOKEN" "$MARKET_DATA_URL/internal/sync-attention?background=true&days=$ATTENTION_DAYS"
           for i in $(seq 1 80); do
             sleep 30
             S=$(curl -sS --max-time 60 -H "X-Internal-Token: $INTERNAL_TOKEN" "$MARKET_DATA_URL/internal/sync-attention-status" || echo '{"state":"unknown"}')
