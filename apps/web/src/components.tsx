@@ -1,10 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type DependencyList, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { onProgress } from "./api";
+import { onProgress, type ApiError } from "./api";
+import type { HistBucket } from "./types";
 
 // ── 데이터 훅: 로딩 중에도 이전 데이터를 유지해 화면이 뚝 끊기지 않게 ──
-export function useLoad(fn, deps) {
-  const [state, set] = useState({ data: null, loading: true, error: null });
+export interface Loaded<T> { data: T | null; loading: boolean; error: ApiError | null }
+export function useLoad<T>(fn: () => Promise<T>, deps: DependencyList): Loaded<T> {
+  const [state, set] = useState<Loaded<T>>({ data: null, loading: true, error: null });
   useEffect(() => {
     let alive = true;
     set((s) => ({ ...s, loading: true, error: null }));
@@ -17,7 +19,7 @@ export function useLoad(fn, deps) {
 }
 
 // ── 용어 설명: 점선 밑줄 + 떠오르는 설명 ──
-export const GLOSSARY = {
+export const GLOSSARY: Record<string, [string, string]> = {
   mention: ["언급", "영상 제목에 종목 이름·별칭(삼전, 하닉, 엔비디아)이 나온 것."],
   stance: ["낙관 언급", "제목에 오른다·급등·매수·기회·목표가 같은 말이 있는 언급. 하락·폭락·매도·조심 같은 말이 더 많으면 제외. 이 서비스는 낙관 언급만 센다: 유튜브가 좋다고 한 종목이 실제로 올랐나."],
   t0: ["사건일(T0)", "영상을 보고 처음 거래할 수 있는 날. 국내 15:30 전 게시면 그날, 뒤면 다음 거래일. 미국 동부 16:00, 코인은 업비트 09:00 캔들."],
@@ -37,10 +39,10 @@ export const GLOSSARY = {
   theme: ["업종·테마", "'반도체 급등'처럼 종목 없이 업종만 말한 제목. 대표 ETF 수익률로 재고 종목과 섞지 않는다."],
   match: ["매칭 성공률", "제목에서 종목이나 테마를 하나라도 찾은 비율. 못 찾은 제목도 남겨 둔다."],
 };
-export function Term({ k, children }) {
+export function Term({ k, children }: { k: string; children?: ReactNode }) {
   const [label, text] = GLOSSARY[k] || [k, ""];
-  const ref = useRef(null);
-  const [pos, setPos] = useState(null);
+  const ref = useRef<HTMLSpanElement>(null);
+  const [pos, setPos] = useState<{ left: number; top: number; w: number; above: number | null } | null>(null);
   const show = () => {
     const r = ref.current?.getBoundingClientRect(); if (!r) return;
     const w = Math.min(320, window.innerWidth - 24);
@@ -64,7 +66,8 @@ export function LoadingBar() {
   return <div className={"loadbar " + (n > 0 ? "on" : "")} aria-hidden />;
 }
 
-export function Stat({ k, label, value, sub, cls, loading }) {
+interface StatProps { k?: string; label: ReactNode; value: ReactNode; sub?: ReactNode; cls?: string; loading?: boolean }
+export function Stat({ k, label, value, sub, cls, loading }: StatProps) {
   return (
     <div className="card stat">
       <span className="label">{k ? <Term k={k}>{label}</Term> : label}</span>
@@ -74,24 +77,25 @@ export function Stat({ k, label, value, sub, cls, loading }) {
   );
 }
 
-export function Seg({ value, onChange, options }) {
+// options: [값, 라벨] 목록
+export function Seg<V extends string | number>({ value, onChange, options }: { value: V; onChange: (v: V) => void; options: readonly (readonly [V, string])[] }) {
   return <div className="seg">{options.map(([v, l]) => <button key={v} className={v === value ? "on" : ""} onClick={() => onChange(v)}>{l}</button>)}</div>;
 }
 
-export function SkeletonRows({ n = 6 }) {
+export function SkeletonRows({ n = 6 }: { n?: number }) {
   return <div>{Array.from({ length: n }).map((_, i) => <div key={i} className="sk sk-row" />)}</div>;
 }
 
-export function ErrorBox({ error }) {
+export function ErrorBox({ error }: { error: ApiError | Error | null }) {
   if (!error) return null;
-  return <div className="banner err">⚠ {error.message}{error.status ? <span className="muted"> (HTTP {error.status})</span> : null}</div>;
+  return <div className="banner err">⚠ {error.message}{"status" in error && error.status ? <span className="muted"> (HTTP {error.status})</span> : null}</div>;
 }
 
-export function Histogram({ hist, loading }) {
+export function Histogram({ hist, loading }: { hist?: HistBucket[]; loading?: boolean }) {
   if (loading && !hist) return <div className="sk" style={{ height: 170 }} />;
   if (!hist) return null;
   const max = Math.max(1, ...hist.map((b) => b.n));
-  const label = (b) => (b.from <= -1 ? "< −20%" : b.to >= 9 ? "> +20%" : `${Math.round(b.from * 100)}~${Math.round(b.to * 100)}%`);
+  const label = (b: HistBucket) => (b.from <= -1 ? "< −20%" : b.to >= 9 ? "> +20%" : `${Math.round(b.from * 100)}~${Math.round(b.to * 100)}%`);
   return (
     <div className="hist">
       {hist.map((b, i) => (

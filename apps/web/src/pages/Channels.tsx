@@ -1,32 +1,34 @@
 import { useMemo, useState } from "react";
 import { api, channelMap, compact, num, pct, pct0, sign, HORIZON_LABEL } from "../api";
 import { Disclaimer, ErrorBox, Seg, SkeletonRows, Term, useLoad } from "../components";
+import type { ChannelOut, ChannelRank, ChannelRanking, Go, Horizon, RankMetric } from "../types";
 
-const METRICS = [["excess_mean", "시장 대비"], ["mean", "평균 수익률"], ["win_rate", "상승 확률"], ["asset_win_rate", "종목 승률"]];
-const fmt = (m, v) => (m === "win_rate" || m === "asset_win_rate" ? pct0(v) : pct(v));
+const METRICS: [RankMetric, string][] = [["excess_mean", "시장 대비"], ["mean", "평균 수익률"], ["win_rate", "상승 확률"], ["asset_win_rate", "종목 승률"]];
+const fmt = (m: RankMetric, v: number | null | undefined) => (m === "win_rate" || m === "asset_win_rate" ? pct0(v) : pct(v));
 
-function RankCard({ r, ch, i, kind, metric, go }) {
+interface RankCardProps { r: ChannelRank; ch?: ChannelOut; i: number; kind: "top" | "bottom"; metric: RankMetric; go: Go }
+function RankCard({ r, ch, i, kind, metric, go }: RankCardProps) {
   return (
     <div className={"rank clickable " + kind} onClick={() => go("channel", r.channel_id)} title="채널 상세">
       <div className="pos-n">{i + 1}</div>
       <div className="who"><b>{ch?.title || r.channel_id}</b><small>{ch?.handle} · {ch?.category === "crypto" ? "코인" : "주식"} · 구독자 {compact(ch?.subscriber_count)} · 언급 {num(r.n)}건{ch?.handle && <> · <a href={`https://www.youtube.com/${ch.handle}`} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} style={{ color: "var(--accent)" }}>YouTube ↗</a></>}</small></div>
-      <div className="val"><b className={metric === "asset_win_rate" ? (r[metric] >= 0.5 ? "pos" : "neg") : sign(r[metric])}>{fmt(metric, r[metric])}</b><small>{metric === "asset_win_rate" ? `종목 ${r.assets_n}개 중 ${r.assets_up}개 상승` : `평균 ${pct(r.mean)} · 상승 ${pct0(r.win_rate)}`}</small></div>
+      <div className="val"><b className={metric === "asset_win_rate" ? ((r[metric] ?? 0) >= 0.5 ? "pos" : "neg") : sign(r[metric])}>{fmt(metric, r[metric])}</b><small>{metric === "asset_win_rate" ? `종목 ${r.assets_n}개 중 ${r.assets_up}개 상승` : `평균 ${pct(r.mean)} · 상승 ${pct0(r.win_rate)}`}</small></div>
     </div>
   );
 }
 
-function BarChart({ rows, metric, chs }) {
+function BarChart({ rows, metric, chs }: { rows: ChannelRank[]; metric: RankMetric; chs: Record<string, ChannelOut> }) {
   if (!rows.length) return null;
   // 왼쪽 고정 폭에 채널명, 가운데 0(또는 50%) 축, 값 라벨은 항상 행 오른쪽 끝 — 음수 막대와 채널명이 겹치지 않는다
   const base = metric === "asset_win_rate" || metric === "win_rate" ? 0.5 : 0;
-  const vals = rows.map((r) => r[metric] - base);
+  const vals = rows.map((r) => (r[metric] ?? 0) - base);
   const max = Math.max(...vals.map(Math.abs), 0.01);
   const W = 760, rowH = 22, H = rows.length * rowH + 10, NAME = 180, VAL = 64, mid = NAME + (W - NAME - VAL) / 2, half = (W - NAME - VAL) / 2 - 6;
   return (
     <svg className="chart" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="채널별 수익률 막대 차트">
       <line x1={mid} x2={mid} y1={0} y2={H} stroke="var(--border)" />
       {rows.map((r, i) => {
-        const v = r[metric] - base; const w = (Math.abs(v) / max) * half; const y = i * rowH + 5;
+        const v = (r[metric] ?? 0) - base; const w = (Math.abs(v) / max) * half; const y = i * rowH + 5;
         return (
           <g key={r.channel_id}>
             <text x={NAME - 10} y={y + 13} textAnchor="end" fontSize="11" fill="var(--muted)" fontFamily="inherit">{(chs[r.channel_id]?.title || r.channel_id).slice(0, 14)}</text>
@@ -40,11 +42,11 @@ function BarChart({ rows, metric, chs }) {
 }
 
 // 채널 — 언급 뒤 성적이 좋았던 채널과 나빴던 채널
-export default function Channels({ go }) {
-  const [horizon, setHorizon] = useState(20);
-  const [metric, setMetric] = useState("excess_mean");
-  const data = useLoad(() => Promise.all([api("stats", "/v1/channels/ranking", { params: { horizon, metric, stance: "bull", min_n: 30, min_assets: 10, limit: 3 }, ttl: 5 * 60e3 }), channelMap()]), [horizon, metric]);
-  const [rank, chs] = data.data || [null, {}];
+export default function Channels({ go }: { go: Go }) {
+  const [horizon, setHorizon] = useState<Horizon>(20);
+  const [metric, setMetric] = useState<RankMetric>("excess_mean");
+  const data = useLoad(() => Promise.all([api<ChannelRanking>("stats", "/v1/channels/ranking", { params: { horizon, metric, stance: "bull", min_n: 30, min_assets: 10, limit: 3 }, ttl: 5 * 60e3 }), channelMap()]), [horizon, metric]);
+  const [rank, chs] = data.data || [null, {} as Record<string, ChannelOut>];
   const all = rank?.all || [];
   const [q, setQ] = useState("");
   // 채널 검색 — 51개 전부에서 이름·핸들로 찾는다(순위에 없는 채널도 상세로 간다)
@@ -84,7 +86,7 @@ export default function Channels({ go }) {
           {data.loading && !rank ? <SkeletonRows n={3} /> : <div className="rank-list">{(rank?.bottom || []).map((r, i) => <RankCard key={r.channel_id} r={r} ch={chs[r.channel_id]} i={i} kind="bottom" metric={metric} go={go} />)}</div>}
         </div>
         <div className="card col-12">
-          <div className="card-head"><div><h3>채널 {all.length}개 · {METRICS.find((m) => m[0] === metric)[1]}</h3><p>{metric === "asset_win_rate" ? "50% 기준 오른쪽이 좋음" : "빨강 좋음 · 파랑 나쁨"}</p></div></div>
+          <div className="card-head"><div><h3>채널 {all.length}개 · {METRICS.find((m) => m[0] === metric)?.[1]}</h3><p>{metric === "asset_win_rate" ? "50% 기준 오른쪽이 좋음" : "빨강 좋음 · 파랑 나쁨"}</p></div></div>
           {data.loading && !rank ? <div className="sk" style={{ height: 300 }} /> : <BarChart rows={all} metric={metric} chs={chs} />}
         </div>
         <div className="card col-12">

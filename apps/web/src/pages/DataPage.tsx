@@ -1,5 +1,7 @@
 import { api, channelMap, compact, dateOnly, num, pct0, API_BASE } from "../api";
+import type { ReactNode } from "react";
 import { Disclaimer, ErrorBox, SkeletonRows, Term, useLoad } from "../components";
+import type { MarketCoverage, MentionsCoverage, Paged, StatsCoverage, UnmatchedOut, YoutubeCoverage } from "../types";
 
 // 데이터 — 어떤 소스에서, 어떻게 가공해, 얼마나 쌓였나 (수업 필수 페이지)
 const SOURCES = [
@@ -11,19 +13,19 @@ const SOURCES = [
   { k: "disclosures", name: "DART 공시검색", org: "금융감독원", url: "https://opendart.fss.or.kr/guide/detail.do?apiGrpCd=DS001&apiId=2019001", what: "접수일·공시명 → 실적·계약·자금조달·주요사항·지분·기타", how: "언급된 국내 종목의 1년치. 언급 전후 ±3일 주요 공시 유무를 판정." },
 ];
 
-function Step({ n, title, big, unit, sub, loading }) {
+function Step({ n, big, unit, sub, loading }: { n: string; big: ReactNode; unit: string; sub: ReactNode; loading: boolean }) {
   return <div className="st"><div className="k">{n}</div>{loading ? <div className="sk sk-big" /> : <div className="v">{big ?? "—"}<span className="muted" style={{ fontSize: 13, fontWeight: 600 }}> {unit}</span></div>}<div className="d">{sub}</div></div>;
 }
 
 export default function DataPage() {
   const d = useLoad(() => Promise.all([
-    api("youtube", "/v1/coverage"), api("mentions", "/v1/coverage"), api("marketData", "/v1/coverage"), api("stats", "/v1/coverage"),
-    channelMap(), api("mentions", "/v1/unmatched", { params: { limit: 20 } }),
+    api<YoutubeCoverage>("youtube", "/v1/coverage"), api<MentionsCoverage>("mentions", "/v1/coverage"), api<MarketCoverage>("marketData", "/v1/coverage"), api<StatsCoverage>("stats", "/v1/coverage"),
+    channelMap(), api<Paged<UnmatchedOut>>("mentions", "/v1/unmatched", { params: { limit: 20 } }),
   ]), []);
   const [yt, cov, mk, st, chs, un] = d.data || [];
   const chList = Object.values(chs || {}).sort((a, b) => (b.subscriber_count || 0) - (a.subscriber_count || 0));
   const loading = d.loading && !d.data;
-  const status = (k) => {
+  const status = (k: string) => {
     if (!mk) return "";
     if (k === "youtube" && yt) return `채널 ${yt.channels} · 영상 ${num(yt.videos)} · ~${dateOnly(yt.last_published)}`;
     if (k === "dart") return `국내 종목 ${num((mk.assets_by_market?.KRX?.total || 0) - (mk.assets_by_market?.KRX?.theme || 0))}개 · 테마 ${mk.assets_by_market?.KRX?.theme ?? 0}`;

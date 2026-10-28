@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { api, assetNames, assetSummaries, compact, dateOnly, num, pct, pct0, sign, MARKET_LABEL } from "../api";
 import { Disclaimer, ErrorBox, Seg, SkeletonRows, Term, useLoad } from "../components";
+import type { Go, MentionsCoverage, Paged, StatsCoverage, TrendingItem, YoutubeCoverage } from "../types";
 
-export default function Home({ go }) {
+export default function Home({ go }: { go: Go }) {
   const [days, setDays] = useState(7);
   const [market, setMarket] = useState("ALL");
-  const head = useLoad(() => Promise.all([api("youtube", "/v1/coverage", { ttl: 60e3 }), api("mentions", "/v1/coverage", { ttl: 60e3 }), api("stats", "/v1/coverage", { ttl: 60e3 })]), []);
+  const head = useLoad(() => Promise.all([api<YoutubeCoverage>("youtube", "/v1/coverage", { ttl: 60e3 }), api<MentionsCoverage>("mentions", "/v1/coverage", { ttl: 60e3 }), api<StatsCoverage>("stats", "/v1/coverage", { ttl: 60e3 })]), []);
   const trend = useLoad(async () => {
-    const [t, names, sum] = await Promise.all([api("mentions", "/v1/mentions/trending", { params: { days, limit: 60, stance: "bull" }, ttl: 60e3 }), assetNames(), assetSummaries(20, "bull")]);
+    const [t, names, sum] = await Promise.all([api<Paged<TrendingItem>>("mentions", "/v1/mentions/trending", { params: { days, limit: 60, stance: "bull" }, ttl: 60e3 }), assetNames(), assetSummaries(20, "bull")]);
     return t.items.map((r) => ({ ...r, asset: names[r.asset_id], summary: sum[r.asset_id] }));
   }, [days]);
   const [yt, me, st] = head.data || [];

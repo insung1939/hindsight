@@ -1,22 +1,23 @@
 import { api, assetNames, channelMap, compact, dateOnly, num, pct, pct0, sign, MARKET_LABEL } from "../api";
 import { useState } from "react";
 import { Disclaimer, ErrorBox, Seg, SkeletonRows, Stat, Term, useLoad } from "../components";
+import type { EventOut, Go, Horizon, Paged, SummaryOut } from "../types";
 
-const HORIZONS = [[5, "5거래일 · 1주"], [20, "20거래일 · 1개월"], [60, "60거래일 · 3개월"]];
+const HORIZONS: [Horizon, string][] = [[5, "5거래일 · 1주"], [20, "20거래일 · 1개월"], [60, "60거래일 · 3개월"]];
 
 // 채널 하나 — 오른다고 한 언급과 그 뒤 성적
-export default function Channel({ channelId, go }) {
-  const [horizon, setHorizon] = useState(20);
-  const rk = `r${horizon}`;
+export default function Channel({ channelId, go }: { channelId: string; go: Go }) {
+  const [horizon, setHorizon] = useState<Horizon>(20);
+  const rk = `r${horizon}` as const;
   const data = useLoad(async () => {
-    const [chs, names, ev] = await Promise.all([channelMap(), assetNames(), api("stats", `/v1/channels/${channelId}/events`)]);
+    const [chs, names, ev] = await Promise.all([channelMap(), assetNames(), api<Paged<EventOut>>("stats", `/v1/channels/${channelId}/events`)]);
     return { ch: chs[channelId], names, events: ev.items.filter((e) => e.stance === "bull"), all: ev.items.length };
   }, [channelId]);
   // 기간을 바꾸면 요약만 다시 받는다 (사건 목록은 r5·r20·r60 을 다 들고 있다)
-  const sumData = useLoad(() => api("stats", "/v1/summary", { params: { scope: `channel:${channelId}`, horizon, stance: "bull" }, ttl: 5 * 60e3 }).then((r) => r.value).catch(() => null), [channelId, horizon]);
+  const sumData = useLoad(() => api<SummaryOut>("stats", "/v1/summary", { params: { scope: `channel:${channelId}`, horizon, stance: "bull" }, ttl: 5 * 60e3 }).then((r) => r.value).catch(() => null), [channelId, horizon]);
   const d = data.data; const ch = d?.ch; const sum = sumData.data;
-  const byAsset = {};
-  (d?.events || []).forEach((e) => { const a = byAsset[e.asset_id] || (byAsset[e.asset_id] = { id: e.asset_id, n: 0, r: [] }); a.n++; if (e[rk] != null) a.r.push(e[rk]); });
+  const byAsset: Record<string, { id: string; n: number; r: number[] }> = {};
+  (d?.events || []).forEach((e) => { const a = byAsset[e.asset_id] || (byAsset[e.asset_id] = { id: e.asset_id, n: 0, r: [] }); a.n++; const v = e[rk]; if (v != null) a.r.push(v); });
   const assets = Object.values(byAsset).map((a) => ({ ...a, mean: a.r.length ? a.r.reduce((x, y) => x + y, 0) / a.r.length : null, up: a.r.filter((x) => x > 0).length })).sort((a, b) => b.n - a.n).slice(0, 30);
   const yt = ch?.handle ? `https://www.youtube.com/${ch.handle}` : null;
 
@@ -39,7 +40,7 @@ export default function Channel({ channelId, go }) {
           {data.loading && !d ? <SkeletonRows n={8} /> : (
             <div className="table-wrap" style={{ maxHeight: 480, overflowY: "auto" }}><table>
               <thead><tr><th>종목</th><th className="num">언급</th><th className="num"><Term k="horizon">{horizon}일 평균</Term></th><th className="num">오른 건 / 계산된 건</th><th>마지막 언급</th></tr></thead>
-              <tbody>{assets.map((a) => { const nm = d.names[a.id]; const last = d.events.filter((e) => e.asset_id === a.id).map((e) => e.published_at).sort().pop(); return (
+              <tbody>{assets.map((a) => { const nm = d!.names[a.id]; const last = d!.events.filter((e) => e.asset_id === a.id).map((e) => e.published_at).sort().pop(); return (
                 <tr key={a.id} className="clickable" onClick={() => go("ticker", a.id)}>
                   <td className="name"><b>{nm?.name || a.id}</b><small>{nm?.asset_type === "theme" ? "업종·테마" : MARKET_LABEL[nm?.market] || ""} · {a.id.split(":")[1]}</small></td>
                   <td className="num">{a.n}</td><td className={"num " + sign(a.mean)}>{pct(a.mean)}</td><td className="num">{a.r.length ? `${a.up}/${a.r.length}` : "—"}</td><td className="muted">{dateOnly(last)}</td>

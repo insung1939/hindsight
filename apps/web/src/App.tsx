@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { onWaking } from "./api";
+import { onWaking, type WakingState } from "./api";
 import { LoadingBar } from "./components";
 import Home from "./pages/Home";
 import Analysis from "./pages/Analysis";
@@ -7,9 +7,10 @@ import Channels from "./pages/Channels";
 import Ticker from "./pages/Ticker";
 import DataPage from "./pages/DataPage";
 import Channel from "./pages/Channel";
+import type { Go } from "./types";
 import "./styles.css";
 
-const TABS = [["home", "홈"], ["analysis", "언급 뒤에"], ["channels", "채널"], ["ticker", "종목"], ["data", "데이터"], ["channel", null]];
+const TABS: [string, string | null][] = [["home", "홈"], ["analysis", "언급 뒤에"], ["channels", "채널"], ["ticker", "종목"], ["data", "데이터"], ["channel", null]];
 
 // 해시 라우팅: #analysis, #ticker/KRX:005930 — 주소를 공유할 수 있고 새로고침해도 같은 화면
 function parseHash() {
@@ -20,10 +21,10 @@ function parseHash() {
 
 export default function App() {
   const [route, setRoute] = useState(parseHash);
-  const [waking, setWaking] = useState(null);
+  const [waking, setWaking] = useState<WakingState | null>(null);
   useEffect(() => { const f = () => { setRoute(parseHash()); window.scrollTo({ top: 0 }); }; window.addEventListener("hashchange", f); return () => window.removeEventListener("hashchange", f); }, []);
   useEffect(() => onWaking(setWaking), []);
-  const go = (tab, arg) => { location.hash = arg ? `${tab}/${encodeURIComponent(arg)}` : tab; };
+  const go: Go = (tab, arg) => { location.hash = arg ? `${tab}/${encodeURIComponent(arg)}` : tab; };
 
   return (
     <>
@@ -42,7 +43,7 @@ export default function App() {
         {route.tab === "channels" && <Channels go={go} />}
         {route.tab === "ticker" && <Ticker assetId={route.arg} go={go} />}
         {route.tab === "data" && <DataPage />}
-        {route.tab === "channel" && <Channel channelId={route.arg} go={go} />}
+        {route.tab === "channel" && route.arg && <Channel channelId={route.arg} go={go} />}
       </main>
       <footer>
         <div className="container">

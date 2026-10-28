@@ -1,16 +1,17 @@
 import { useState } from "react";
 import { api, assetNames, assetSummaries, num, pct, pct0, sign, HORIZON_LABEL } from "../api";
 import { Disclaimer, ErrorBox, GLOSSARY, Histogram, Seg, SkeletonRows, Stat, Term, useLoad } from "../components";
+import type { Go, Horizon, Summary, SummaryOut } from "../types";
 
-const SCOPES = [["overall", "종목·코인 전체"], ["market:KRX", "국내"], ["market:US", "미국"], ["market:CRYPTO", "코인"], ["kind:theme", "업종·테마"]];
-const H = (h) => HORIZON_LABEL[h].split(" ")[0];
+const SCOPES: [string, string][] = [["overall", "종목·코인 전체"], ["market:KRX", "국내"], ["market:US", "미국"], ["market:CRYPTO", "코인"], ["kind:theme", "업종·테마"]];
+const H = (h: number) => HORIZON_LABEL[h].split(" ")[0];
 
-export default function Analysis({ go }) {
-  const [horizon, setHorizon] = useState(20);
+export default function Analysis({ go }: { go: Go }) {
+  const [horizon, setHorizon] = useState<Horizon>(20);
   const [scope, setScope] = useState("overall");
   const stance = "bull";  // 서비스는 "오른다"고 한 언급만 센다
-  const sum = useLoad(() => api("stats", "/v1/summary", { params: { scope, horizon, stance }, ttl: 5 * 60e3 }).then((r) => r.value), [scope, horizon, stance]);
-  const markets = useLoad(() => Promise.all(SCOPES.map(([k]) => api("stats", "/v1/summary", { params: { scope: k, horizon, stance }, ttl: 5 * 60e3 }).then((r) => [k, r.value]).catch(() => [k, null]))), [horizon, stance]);
+  const sum = useLoad(() => api<SummaryOut>("stats", "/v1/summary", { params: { scope, horizon, stance }, ttl: 5 * 60e3 }).then((r) => r.value), [scope, horizon, stance]);
+  const markets = useLoad(() => Promise.all(SCOPES.map(([k]) => api<SummaryOut>("stats", "/v1/summary", { params: { scope: k, horizon, stance }, ttl: 5 * 60e3 }).then((r): [string, Summary | null] => [k, r.value]).catch((): [string, Summary | null] => [k, null]))), [horizon, stance]);
   const assets = useLoad(async () => {
     const [s, names] = await Promise.all([assetSummaries(horizon, stance), assetNames()]);
     return Object.entries(s).map(([id, v]) => ({ id, asset: names[id], ...v })).filter((a) => a.n > 0);
@@ -40,9 +41,9 @@ export default function Analysis({ go }) {
         <div className="col-3"><Stat k="horizon" label="평균 수익률" loading={sum.loading && !v} value={pct(v?.mean)} cls={sign(v?.mean)} sub={v ? `중앙값 ${pct(v.median)} · 하위 10% ${pct(v.p10)} · 상위 10% ${pct(v.p90)}` : ""} /></div>
         <div className="col-3"><Stat k="excess" label="시장 대비" loading={sum.loading && !v} value={pct(v?.excess_mean)} cls={sign(v?.excess_mean)} sub={v ? `시장 이김 ${pct0(v.excess_win_rate)}` : ""} /></div>
         <div className="col-3"><Stat k="win" label="상승 확률" loading={sum.loading && !v} value={pct0(v?.win_rate)} sub="수익률 > 0" /></div>
-        <div className="col-3"><Stat k="vol" label="거래량 비율" loading={sum.loading && !v} value={v?.vol_ratio_median ? `${v.vol_ratio_median}배` : "—"} cls={v?.vol_ratio_median > 1 ? "warn" : ""} sub={v?.vol_n ? `늘어난 언급 ${pct0(v.vol_up_rate)} · n=${num(v.vol_n)}` : ""} /></div>
-        {v?.disclosure_n > 0 && <div className="col-3"><Stat k="disc" label="공시 동반" loading={false} value={pct0(v.disclosure_rate)} sub={`국내 n=${num(v.disclosure_n)}`} /></div>}
-        <div className={v?.disclosure_n > 0 ? "card col-6" : "card col-9"}>
+        <div className="col-3"><Stat k="vol" label="거래량 비율" loading={sum.loading && !v} value={v?.vol_ratio_median ? `${v.vol_ratio_median}배` : "—"} cls={(v?.vol_ratio_median ?? 0) > 1 ? "warn" : ""} sub={v?.vol_n ? `늘어난 언급 ${pct0(v.vol_up_rate)} · n=${num(v.vol_n)}` : ""} /></div>
+        {v && (v.disclosure_n ?? 0) > 0 && <div className="col-3"><Stat k="disc" label="공시 동반" loading={false} value={pct0(v.disclosure_rate)} sub={`국내 n=${num(v.disclosure_n)}`} /></div>}
+        <div className={(v?.disclosure_n ?? 0) > 0 ? "card col-6" : "card col-9"}>
           <div className="card-head"><div><h3>{H(horizon)} 수익률 분포</h3><p>파랑 내림 · 빨강 오름 · 막대 위는 건수</p></div></div>
           <Histogram hist={v?.histogram} loading={sum.loading} />
         </div>
@@ -55,7 +56,7 @@ export default function Analysis({ go }) {
               <thead><tr><th>범위</th><th className="num"><Term k="n">표본</Term></th><th className="num">평균</th><th className="num"><Term k="win">상승</Term></th><th className="num"><Term k="excess">시장 대비</Term></th><th className="num"><Term k="vol">거래량</Term></th></tr></thead>
               <tbody>{(markets.data || []).map(([k, m]) => (
                 <tr key={k} className={"clickable " + (k === scope ? "hl" : "")} onClick={() => setScope(k)}>
-                  <td><b>{SCOPES.find((s) => s[0] === k)[1]}</b></td><td className="num">{m?.n ? num(m.n) : "—"}</td>
+                  <td><b>{SCOPES.find((s) => s[0] === k)?.[1]}</b></td><td className="num">{m?.n ? num(m.n) : "—"}</td>
                   <td className={"num " + sign(m?.mean)}>{pct(m?.mean)}</td><td className="num">{pct0(m?.win_rate)}</td>
                   <td className={"num " + sign(m?.excess_mean)}>{pct(m?.excess_mean)}</td><td className="num">{m?.vol_ratio_median ? m.vol_ratio_median + "배" : "—"}</td>
                 </tr>
